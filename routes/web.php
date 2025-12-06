@@ -4,35 +4,32 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect('/login');
 });
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    if (in_array($user->user_type, ['admin', 'general_service'])) {
-        return redirect('/admin'); 
+    $redirects = [
+        'admin' => '/admin',
+        'general_service' => '/maintenance',
+        //'nurse' => route('nurse.station'),
+        //'physician' => route('doctor.rounds'),
+    ];
+
+    if (isset($redirects[$user->user_type])) {
+        return redirect($redirects[$user->user_type]);
     }
 
-    if ($user->user_type === 'nurse') {
-        return redirect()->route('nurse.station');
-    }
-
-    if ($user->user_type === 'physician') {
-        return redirect()->route('doctor.rounds');
-    }
-
+    abort(403, 'Unauthorized user type.');
+        
 })->middleware(['auth'])->name('dashboard');
+
 
 Route::middleware(['auth'])->group(function () {
     
-    Route::get('/nurse/station', function() {
-        return "<h1>Nurse Station - Built with DaisyUI</h1>"; 
-    })->name('nurse.station');
-
-    Route::get('/doctor/rounds', function() {
-        return "<h1>Doctor Rounds - Built with DaisyUI</h1>";
-    })->name('doctor.rounds');
+    //Route::get('/nurse/station', [NurseController::class, 'station'])->name('nurse.station');
+    //Route::get('/doctor/rounds', [DoctorController::class, 'rounds'])->name('doctor.rounds');
 
 });
 

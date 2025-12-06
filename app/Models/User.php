@@ -14,10 +14,10 @@ class User extends Authenticatable implements FilamentUser
 
     protected $fillable = [
         'name',
-        'badge_id',    
-        'email',      
+        'badge_id',
+        'email',
         'password',
-        'user_type',  
+        'user_type',
     ];
 
     protected $hidden = [
@@ -56,6 +56,14 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array($this->user_type, ['admin', 'general_service']);
+        if ($panel->getId() === 'admin') {
+            return $this->user_type === 'admin';
+        }
+
+        if ($panel->getId() === 'maintenance') {
+            return in_array($this->user_type, ['general_service', 'admin']);
+        }
+
+        return false;
     }
 }

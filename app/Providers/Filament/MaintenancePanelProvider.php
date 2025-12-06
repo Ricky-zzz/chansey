@@ -19,27 +19,25 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+class MaintenancePanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-             ->colors([
-            'primary' => Color::Purple, 
-        ])
-        ->brandLogo(fn () => view('filament.brand')) 
-        ->viteTheme('resources/css/filament/admin/theme.css')
-        ->sidebarFullyCollapsibleOnDesktop()
-            
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->id('maintenance')
+            ->path('maintenance')
+            ->colors([
+                'primary' => Color::Amber,
+            ])
+            ->brandLogo(fn () => view('filament.brand')) 
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->discoverResources(in: app_path('Filament/Maintenance/Resources'), for: 'App\Filament\Maintenance\Resources')
+            ->discoverPages(in: app_path('Filament/Maintenance/Pages'), for: 'App\Filament\Maintenance\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->sidebarFullyCollapsibleOnDesktop()
+            ->discoverWidgets(in: app_path('Filament/Maintenance/Widgets'), for: 'App\Filament\Maintenance\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,

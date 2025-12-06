@@ -12,15 +12,23 @@ class EditPhysician extends EditRecord
 {
     protected static string $resource = PhysicianResource::class;
 
-        protected function handleRecordUpdate(Model $record, array $data): Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $userUpdates = [];
+
         if (! empty($data['password'])) {
-            $record->user->update([
-                'password' => Hash::make($data['password']),
-            ]);
+            $userUpdates['password'] = Hash::make($data['password']);
         }
 
-        unset($data['password']);
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $userUpdates['name'] = $data['first_name'] . ' ' . $data['last_name'];
+        }
+
+        if (! empty($userUpdates)) {
+            $record->user->update($userUpdates);
+        }
+
+        unset($data['password']); 
 
         $record->update($data);
 

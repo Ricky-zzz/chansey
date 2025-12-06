@@ -15,16 +15,22 @@ class EditGeneralService extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // 1. Handle Password Update
+        $userUpdates = [];
+
         if (! empty($data['password'])) {
-            $record->user->update([
-                'password' => Hash::make($data['password']),
-            ]);
+            $userUpdates['password'] = Hash::make($data['password']);
         }
 
-        unset($data['password']);
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $userUpdates['name'] = $data['first_name'] . ' ' . $data['last_name'];
+        }
 
-        // 2. Update Profile
+        if (! empty($userUpdates)) {
+            $record->user->update($userUpdates);
+        }
+
+        unset($data['password']); 
+
         $record->update($data);
 
         return $record;
