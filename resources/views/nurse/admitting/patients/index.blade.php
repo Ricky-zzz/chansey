@@ -1,0 +1,97 @@
+@extends('layouts.layout')
+
+@section('content')
+<div class="max-w-7xl mx-auto">
+
+    <!-- OUTER CONTAINER WITH BORDER + WHITE BG -->
+    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+
+        <!-- HEADER & SEARCH -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h2 class="text-3xl font-bold text-slate-700">Patient Master List</h2>
+            
+            <div class="flex gap-2 w-full md:w-auto">
+                <!-- SEARCH FORM -->
+                <form action="{{ route('nurse.admitting.patients.index') }}" method="GET" class="join w-full md:w-96">
+                    <input type="text" name="search" class="input input-bordered join-item w-full" 
+                           placeholder="Search PID or Name..." 
+                           value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary join-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- ADD BUTTON -->
+                <a href="{{ route('nurse.admitting.patients.create') }}" class="btn btn-accent text-white">
+                    + New Patient
+                </a>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card bg-base-100 shadow-xl border border-base-200">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <!-- Head -->
+                    <thead class="bg-base-300 font-bold text-slate-950">
+                        <tr>
+                            <th>PID</th>
+                            <th>Patient Name</th>
+                            <th>Age / Sex</th>
+                            <th>Contact</th>
+                            <th>Date Registered</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <!-- Body -->
+                    <tbody>
+                        @forelse($patients as $patient)
+                        <tr class="hover">
+                            <td class="font-mono font-bold text-primary">{{ $patient->patient_unique_id }}</td>
+
+                            <td>
+                                <div class="font-bold">{{ $patient->last_name }}, {{ $patient->first_name }}</div>
+                                <div class="text-xs text-gray-500">{{ $patient->middle_name }}</div>
+                            </td>
+
+                            <td>
+                                {{ $patient->age }} yo / {{ $patient->sex }}
+                                <br>
+                                <span class="text-xs text-gray-400">{{ $patient->date_of_birth->format('M d, Y') }}</span>
+                            </td>
+
+                            <td>{{ $patient->contact_number }}</td>
+                            <td>{{ $patient->created_at->format('M d, Y') }}</td>
+
+                            <td>
+                                <a href="{{ route('nurse.admitting.patients.show', $patient->id) }}" 
+                                   class="btn btn-sm btn-ghost border-gray-300">
+                                    View Profile
+                                </a>
+                            </td>
+                        </tr>
+
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">
+                                No patients found matching your search.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="p-4">
+                {{ $patients->links() }}
+            </div>
+        </div>
+
+    </div> <!-- END OUTER CONTAINER -->
+
+</div>
+@endsection

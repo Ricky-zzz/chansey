@@ -1,5 +1,5 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light, dark, cupcake, emerald;
+  themes: light, dark, emerald, winter;
 }
 

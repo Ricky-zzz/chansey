@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -31,6 +32,19 @@ class User extends Authenticatable implements FilamentUser
             // 'email_verified_at' => 'datetime', 
             'password' => 'hashed',
         ];
+    }
+    protected function initials(): Attribute
+    {
+        return Attribute::get(function ($value, $attributes) {
+            $nameParts = explode(' ', $attributes['name']);
+            $initials = '';
+
+            foreach ($nameParts as $part) {
+                $initials .= strtoupper(substr($part, 0, 1));
+            }
+
+            return $initials;
+        });
     }
 
 

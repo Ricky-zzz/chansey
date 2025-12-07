@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -10,27 +11,75 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    $redirects = [
-        'admin' => '/admin',
-        'general_service' => '/maintenance',
-        //'nurse' => route('nurse.station'),
-        //'physician' => route('doctor.rounds'),
-    ];
+    if ($user->user_type === 'admin') {
+        return redirect('/admin');
+    }
 
-    if (isset($redirects[$user->user_type])) {
-        return redirect($redirects[$user->user_type]);
+    if ($user->user_type === 'general_service') {
+        return redirect('/maintenance');
+    }
+ 
+    if ($user->user_type === 'nurse') {
+        if (! $user->nurse) {
+            abort(403, 'Nurse profile not found.');
+        }
+
+        if ($user->nurse->designation === 'Admitting') {
+            return redirect()->route('nurse.admitting.dashboard');
+        }
+
+        return redirect()->route('nurse.clinical.dashboard');
+    }
+
+    if ($user->user_type === 'physician') {
+        return "Doctor Dashboard Coming Soon";
     }
 
     abort(403, 'Unauthorized user type.');
-        
 })->middleware(['auth'])->name('dashboard');
 
 
-Route::middleware(['auth'])->group(function () {
-    
-    //Route::get('/nurse/station', [NurseController::class, 'station'])->name('nurse.station');
-    //Route::get('/doctor/rounds', [DoctorController::class, 'rounds'])->name('doctor.rounds');
+//  ADMITTING NURSES 
+Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')->group(function () {
 
+    // Dashboard
+    Route::get('/dashboard', function () {
+        if (Auth::user()->nurse->designation !== 'Admitting') abort(403, 'Access Restricted to Admitting Staff');
+        return view('nurse.admitting.dashboard');
+    })->name('dashboard');
+    
+    Route::get('/test-success', function () {
+        return redirect()->route('nurse.admitting.dashboard')->with('success', 'This is a test success message!');
+    });
+
+    Route::get('/test-error', function () {
+        return redirect()->route('nurse.admitting.dashboard')->with('error', 'This is a test error message!');
+    });
+
+    // Patient index (Register New Patient)
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+
+    // Patient create form
+    Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
+
+    // Patient store action
+    Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
+
+    // View Patient Profile
+    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
 });
 
-require __DIR__.'/auth.php';
+
+//  CLINICAL NURSES
+// Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->group(function () {
+// 
+//     Route::get('/dashboard', function () {
+//         if (Auth::user()->nurse->designation !== 'Clinical') abort(403, 'Access Restricted to Clinical Staff');
+// 
+//         return view('nurse.clinical.dashboard');
+//     })->name('dashboard');
+// 
+// 
+// });
+
+require __DIR__ . '/auth.php';
