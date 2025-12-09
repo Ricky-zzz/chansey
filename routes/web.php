@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -42,21 +44,13 @@ Route::get('/dashboard', function () {
 //  ADMITTING NURSES 
 Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')->group(function () {
 
-    // Dashboard
+    // Admitting Dashboard
     Route::get('/dashboard', function () {
         if (Auth::user()->nurse->designation !== 'Admitting') abort(403, 'Access Restricted to Admitting Staff');
         return view('nurse.admitting.dashboard');
     })->name('dashboard');
-    
-    Route::get('/test-success', function () {
-        return redirect()->route('nurse.admitting.dashboard')->with('success', 'This is a test success message!');
-    });
 
-    Route::get('/test-error', function () {
-        return redirect()->route('nurse.admitting.dashboard')->with('error', 'This is a test error message!');
-    });
-
-    // Patient index (Register New Patient)
+    // Patient index 
     Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
 
     // Patient create form
@@ -67,7 +61,23 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
 
     // View Patient Profile
     Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
+
+    // view patient edit form
+    Route::get('/patients/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
+    
+    // view patient update action
+    Route::put('/patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
+
+    // Admission index
+    Route::get('/admissions', [AdmissionController::class, 'index'])->name('admissions.index');
+    Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])->name('admissions.show');
 });
+
+// File viewing route (accessible to authenticated users)
+Route::middleware(['auth'])->get('/documents/{id}/view', [FileController::class, 'view'])->name('document.view');
+
+
+
 
 
 //  CLINICAL NURSES

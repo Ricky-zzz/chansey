@@ -237,4 +237,40 @@ class PatientController extends Controller
 
         return view('nurse.admitting.patients.show', compact('patient'));
     }
+
+    public function edit($id)
+    {
+        $patient = Patient::findOrFail($id);
+        return view('nurse.admitting.patients.edit', compact('patient'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $patient = Patient::findOrFail($id);
+
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name' => 'required|string|max:50',
+            'middle_name' => 'nullable|string|max:50',
+            'date_of_birth' => 'required|date',
+            'sex' => 'required|in:Male,Female',
+            'civil_status' => 'required',
+            'nationality' => 'required',
+            'religion' => 'nullable',
+            'address_permanent' => 'required',
+            'address_present' => 'nullable',
+            'contact_number' => 'required',
+            'email' => 'nullable|email',
+            'emergency_contact_name' => 'required',
+            'emergency_contact_relationship' => 'required',
+            'emergency_contact_number' => 'required',
+            'philhealth_number' => 'nullable',
+            'senior_citizen_id' => 'nullable',
+        ]);
+
+        $patient->update($validated);
+
+        return redirect()->route('nurse.admitting.patients.show', $patient->id)
+            ->with('success', 'Patient profile updated successfully.');
+    }
 }
