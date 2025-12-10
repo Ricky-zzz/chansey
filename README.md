@@ -1,52 +1,172 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Chansey - Hospital Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive **Hospital Management System** built with **Laravel 12** and **Filament** that streamlines clinical operations, patient management, and staff coordination for modern healthcare facilities.
 
-## About Laravel
+## Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Chansey is designed to centralize and automate critical hospital operations, enabling healthcare providers to deliver efficient patient care while maintaining accurate medical records and optimizing resource allocation. The system integrates patient demographics, clinical admissions, billing, staff management, inventory tracking, and infrastructure management into a unified platform.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Core Goals
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Patient-Centric Care**: Maintain complete patient profiles with clinical history and emergency contact information
+- **Clinical Operations**: Manage admissions, bed assignments, physician-patient relationships, and discharge processes
+- **Staff Coordination**: Organize nurses, physicians, and support staff with scheduling and shift management
+- **Billing & Insurance**: Handle payment processing, insurance verification, and billing documentation
+- **Resource Management**: Track inventory items, hospital infrastructure (rooms, beds), and facility maintenance
+- **Data Integrity**: Ensure secure, accurate medical records and audit trails for compliance
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. **Patient Management**
+- Complete patient registration with demographic information
+- Automatic age calculation from date of birth
+- Emergency contact tracking
+- Support for multiple identification formats (PhilHealth, Senior Citizen ID)
+- Patient file and document management
+- Comprehensive address tracking (permanent and present)
 
-## Laravel Sponsors
+### 2. **Clinical Admissions**
+- Multi-type admission support (Emergency, Outpatient, Inpatient, Transfer)
+- Case type classification (New Case, Returning, Follow-up)
+- Bed assignment and management
+- Vital signs recording at admission (Temperature, Blood Pressure, Pulse Rate, Respiratory Rate, O₂ Saturation)
+- Chief complaint and initial diagnosis documentation
+- Mode of arrival tracking (Walk-in, Ambulance, Wheelchair, Stretcher)
+- Admission status tracking (Admitted, Discharged, Transferred, Died)
+- Known allergies logging in JSON format for flexibility
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. **Billing & Insurance Management**
+- Multiple payment type support (Cash, Insurance, HMO, Company)
+- Insurance provider and policy management
+- Letter of Authorization (LOA) approval code tracking
+- HMO coordination and verification
+- Admission billing information linked to clinical records
 
-### Premium Partners
+### 4. **Staff Management & Organization**
+- **Admins**: System administrators with full access
+- **Nurses**: Clinical and Admitting nurses with:
+  - License number tracking
+  - Shift scheduling (start/end times)
+  - Station assignment
+  - Designation management
+- **Physicians**: Medical staff with:
+  - Specialization tracking
+  - Employment type management
+  - Patient assignment capabilities
+- **General Services**: Support staff with:
+  - Area assignment
+  - Shift scheduling
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 5. **Hospital Infrastructure**
+- **Room Management**:
+  - Multiple room types (Private, Semi-Private, Ward, ICU, ER)
+  - Capacity management
+  - Room status tracking (Active, Maintenance, Closed)
+- **Bed Management**:
+  - Unique bed codes for easy identification
+  - Bed status tracking (Available, Occupied, Cleaning, Maintenance)
+  - Room-to-bed relationship management
 
-## Contributing
+### 6. **Inventory Management**
+- Track inventory items and supplies
+- Item quantity and status management
+- Inventory-related operational support
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 7. **User Authentication & Authorization**
+- Role-based access control (Admin, Nurse, Physician, General Services)
+- User badge ID system for identification
+- Secure password management
+- Email-based authentication
 
-## Code of Conduct
+### 8. **Admin Panel (Filament)**
+- Intuitive admin dashboard built with Filament
+- Resource management for:
+  - Nurses
+  - Physicians
+  - General Services staff
+- System maintenance tools
+- Real-time status monitoring
+
+---
+
+## Technology Stack
+
+- **Backend**: Laravel 12 with PHP 8.2+
+- **Admin Panel**: Filament 4.0
+- **Frontend**: Tailwind CSS 4, Alpine.js
+- **Build Tool**: Vite 7
+- **Database**: Relational database (PostgreSQL/MySQL)
+- **Authentication**: Laravel Authentication with Filament integration
+
+---
+
+## Installation & Setup
+
+### Prerequisites
+- PHP 8.2 or higher
+- Composer
+- Node.js & npm
+- Database (MySQL or PostgreSQL)
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd chansey
+
+# Install dependencies
+composer install
+npm install
+
+# Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# Run migrations
+php artisan migrate
+
+# Build frontend assets
+npm run build
+
+# Start development server
+npm run dev
+```
+
+---
+
+## Project Structure
+
+```
+app/
+├── Models/              # Eloquent models (Patient, User, Nurse, etc.)
+├── Http/
+│   ├── Controllers/     # Request handlers
+│   └── Requests/        # Form validation
+├── Filament/
+│   └── Resources/       # Filament admin resources
+└── Services/            # Business logic services
+
+database/
+├── migrations/          # Schema definitions
+└── seeders/             # Initial data
+
+resources/
+├── views/               # Blade templates
+├── css/                 # Tailwind styles
+└── js/                  # Frontend scripts
+
+routes/                  # API and web routes
+tests/                   # Unit and feature tests
+```
+
+---
+
+## License
+
+MIT License - Open source and free to use.
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 

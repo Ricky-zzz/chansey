@@ -196,7 +196,7 @@
                         </label>
                         <label class="floating-label w-full">
                             <span>Insurance Provider</span>
-                            <input type="text" name="neutral_insurance_provider" value="{{ old('neutral_insurance_provider', $admission->billingInfo->neutral_insurance_provider ?? '') }}" class="input input-bordered input-md w-full" placeholder="Insurance Provider" />
+                            <input type="text" name="primary_insurance_provider " value="{{ old('primary_insurance_provider ', $admission->billingInfo->primary_insurance_provider  ?? '') }}" class="input input-bordered input-md w-full" placeholder="Insurance Provider" />
                         </label>
                         <label class="floating-label w-full">
                             <span>Policy Number</span>
