@@ -6,6 +6,15 @@
     <!-- 1. BREADCRUMBS & HEADER -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
+
+            <h2 class="text-3xl font-black text-slate-800">
+                Admission Details
+                @if($admission->status === 'Admitted')
+                <span class="badge badge-success text-white align-middle ml-2">Active</span>
+                @else
+                <span class="badge badge-neutral text-white align-middle ml-2">{{ $admission->status }}</span>
+                @endif
+            </h2>
             <div class="text-xs md:text-sm lg:text-lg breadcrumbs text-slate-900 font-bold">
                 <ul>
                     <li><a href="{{ route('nurse.admitting.dashboard') }}">Dashboard</a></li>
@@ -15,19 +24,11 @@
                     <li class="font-bold text-primary">{{ $admission->admission_number }}</li>
                 </ul>
             </div>
-            <h2 class="text-3xl font-black text-slate-800">
-                Admission Details
-                @if($admission->status === 'Admitted')
-                <span class="badge badge-success text-white align-middle ml-2">Active</span>
-                @else
-                <span class="badge badge-neutral text-white align-middle ml-2">{{ $admission->status }}</span>
-                @endif
-            </h2>
         </div>
 
         <div class="join ">
             <button class="text-white btn btn-accent join-item btn-lg">Print Face Sheet</button>
-            <button class="text-white btn btn-secondary join-item btn-lg">Edit Details</button>
+            <button class="text-white btn btn-secondary join-item btn-lg"><a href="{{ route('nurse.admitting.admissions.edit',$admission) }}">Edit Details</a></button>
         </div>
     </div>
 

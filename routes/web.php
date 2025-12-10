@@ -70,7 +70,14 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
 
     // Admission index
     Route::get('/admissions', [AdmissionController::class, 'index'])->name('admissions.index');
+    
+    // View Admission Profile
     Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])->name('admissions.show');
+    
+    // admission edit form
+    Route::get('/admissions/{admission}/edit', [AdmissionController::class, 'edit'])->name('admissions.edit');
+
+    Route::get('/admissions/{admission}/update', [AdmissionController::class, 'update'])->name('admissions.update');
 });
 
 // File viewing route (accessible to authenticated users)
