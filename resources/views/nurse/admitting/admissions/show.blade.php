@@ -7,7 +7,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
 
-            <h2 class="text-3xl font-black text-slate-800">
+            <h2 class="text-2xl font-black text-slate-800">
                 Admission Details
                 @if($admission->status === 'Admitted')
                 <span class="badge badge-success text-white align-middle ml-2">Active</span>
@@ -26,8 +26,8 @@
             </div>
         </div>
 
-        <div class="join ">
-            <button class="text-white btn btn-accent join-item btn-lg">Print Face Sheet</button>
+        <div class="join">
+            <button class="text-white btn btn-accent join-item btn-lg">Transfer Patient</button>
             <button class="text-white btn btn-secondary join-item btn-lg"><a href="{{ route('nurse.admitting.admissions.edit',$admission) }}">Edit Details</a></button>
         </div>
     </div>
@@ -37,7 +37,7 @@
 
         <!-- Patient Context Card -->
         <div class="card bg-white shadow-sm border border-slate-200 lg:col-span-2">
-            <div class="card-body flex-row gap-4 lg:gap-6 items-center p-4 lg:p-6">
+            <div class="card-body flex-row gap-4 lg:gap-6 items-center p-3 lg:p-4">
                 <div class="avatar placeholder shrink-0">
                     <div class="bg-neutral text-neutral-content rounded-full w-16 h-16 lg:w-36 lg:h-36 flex items-center justify-center">
                         <span class="text-lg lg:text-5xl font-bold">{{ strtoupper(substr($admission->patient->first_name, 0, 1)) }}{{ strtoupper(substr($admission->patient->last_name, 0, 1)) }}</span>
@@ -61,18 +61,25 @@
         <!-- Location & Doctor Card -->
         <div class="card bg-primary text-primary-content shadow-sm">
             <div class="card-body p-6 text-white">
-                <h4 class="uppercase text-xs font-bold  tracking-widest">Current Location</h4>
-                <div class="text-2xl font-black">
+                @if($admission->status !== 'Admitted')
+                <h4 class="uppercase text-md  tracking-widest">Last Location</h4>
+                @else
+                <h4 class="uppercase text-md  tracking-widest">Current Location</h4
+                @endif
+                
+                <h4 class="uppercase text-xs  font-black  tracking-widest">Station: {{ $admission->bed->room->station->station_name}}</h4>
+                <h4 class="uppercase text-xs  font-black  tracking-widest">Room:</h4>
+                <div class="text-xl font-black mb-3 mx-3">
                     @if($admission->bed)
                     {{ $admission->bed->bed_code }}
                     @else
                     No Bed Assigned
                     @endif
                 </div>
-                <div class="divider my-2 opacity-20"></div>
-                <h4 class="uppercase text-xs font-bold  tracking-widest">Attending Physician</h4>
-                <div class="font-bold">Dr. {{ $admission->attendingPhysician->last_name ?? 'None' }}</div>
-                <div class="text-sm ">{{ $admission->attendingPhysician->specialization ?? '' }}</div>
+                
+                <h4 class="uppercase text-md tracking-widest">Attending Physician</h4>
+                <div class="font-bold text-xl mx-3">Dr. {{ $admission->attendingPhysician->last_name ?? 'None' }}, {{ $admission->attendingPhysician->first_name ?? 'None' }}</div>
+                <div class="text-md mx-3">{{ $admission->attendingPhysician->specialization ?? '' }}</div>
             </div>
         </div>
     </div>
@@ -249,10 +256,16 @@
             </div>
 
             <!-- Audit Info (Bottom Right) -->
-            <div class="text-xs text-slate-500 px-2">
-                <div>Admitted By: <span class="font-medium text-slate-600">{{ $admission->admittingClerk->name ?? 'Unknown' }}</span></div>
-                <div>Date: {{ $admission->created_at->format('M d, Y h:i A') }}</div>
+            <div class="text-xs text-slate-500 px-3 py-2 bg-white rounded border border-slate-200 font-mono">
+                <div>Admitted By: <span class="font-medium text-rose-600">{{ $admission->admittingClerk->name ?? 'Unknown' }}</span></div>
+                <div>Date: <span class="font-medium text-rose-600"> {{ $admission->created_at->format('M d, Y h:i A') }}</span></div>
             </div>
+            
+            @if($admission->status !== 'Admitted')
+            <div class="text-xs text-slate-500 px-3 py-2 bg-white rounded border border-slate-200 font-mono">
+                <div>Discharged Date: <span class="font-medium text-rose-600"> {{ $admission->discharge_date?->format('M d, Y h:i A') ?? 'N/A' }}</span></div>
+            </div>
+            @endif
 
         </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Station;
 use App\Models\Patient;
 use App\Models\Physician;
 use App\Models\Bed;
@@ -13,6 +14,7 @@ use App\Models\PatientFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\StoreAdmissionRequest;
 
 class PatientController extends Controller
 {
@@ -39,73 +41,27 @@ class PatientController extends Controller
     public function create()
     {
         $physicians = Physician::select('id', 'first_name', 'last_name', 'specialization')->get();
+        $stations = Station::select('id', 'station_name')->get();
 
-        $beds = Bed::where('status', 'Available')->get();
+        $rawBeds = Bed::with('room.station')
+            ->where('status', 'Available')
+            ->get()
+            ->map(function ($bed) {
+                return [
+                    'id' => $bed->id,
+                    'bed_code' => $bed->bed_code,
+                    'station_id' => $bed->room->station_id, 
+                    'room_number' => $bed->room->room_number
+                ];
+            });
 
-        return view('nurse.admitting.patients.create', compact('physicians', 'beds'))->with('success', "YAHALOOOOOOOOOOO");
+        return view('nurse.admitting.patients.create', compact('physicians', 'stations', 'rawBeds'));
     }
 
-    public function store(Request $request)
+    public function store(StoreAdmissionRequest $request)
     {
-        // We validate everything at once to prevent partial saves
-        $validated = $request->validate([
-            // A. Patient Demographics
-            'first_name' => 'required|string|max:50',
-            'last_name' => 'required|string|max:50',
-            'middle_name' => 'nullable|string|max:50',
-            'date_of_birth' => 'required|date',
-            'sex' => 'required|in:Male,Female',
-            'civil_status' => 'required',
-            'nationality' => 'required|string',
-            'religion' => 'nullable|string',
-            'address_permanent' => 'required|string',
-            'address_present' => 'nullable|string',
-            'contact_number' => 'required|string',
-            'email' => 'nullable|email',
 
-            // B. Emergency Contact
-            'emergency_contact_name' => 'required|string',
-            'emergency_contact_relationship' => 'required|string',
-            'emergency_contact_number' => 'required|string',
-
-            // C. IDs
-            'philhealth_number' => 'nullable|string',
-            'senior_citizen_id' => 'nullable|string',
-
-            // D. Admission Details
-            'admission_type' => 'required',
-            'bed_id' => 'exists:beds,id,status,Available',
-            'attending_physician_id' => 'required|exists:physicians,id',
-            'case_type' => 'required',
-            'mode_of_arrival' => 'required',
-            'chief_complaint' => 'required|string',
-            'initial_diagnosis' => 'nullable|string',
-
-            // E. Vitals 
-            'temp' => 'nullable|numeric',
-            'bp_systolic' => 'nullable|integer',
-            'bp_diastolic' => 'nullable|integer',
-            'pulse_rate' => 'nullable|integer',
-            'respiratory_rate' => 'nullable|integer',
-            'o2_sat' => 'nullable|integer',
-            'known_allergies' => 'nullable|array',
-
-            // G. Financials
-            'payment_type' => 'required',
-            'primary_insurance_provider' => 'nullable|string',
-            'policy_number' => 'nullable|string',
-            'approval_code' => 'nullable|string',
-            'guarantor_name' => 'nullable|string',
-            'guarantor_relationship' => 'nullable|string',
-            'guarantor_contact' => 'nullable|string',
-
-            // H. Files (Validate format/size)
-            'doc_valid_id' => 'nullable|file|mimes:jpg,png,pdf|max:5120',
-            'doc_loa' => 'nullable|file|mimes:jpg,png,pdf|max:5120',
-            'doc_consent' => 'nullable|file|mimes:jpg,png,pdf|max:5120',
-            'doc_privacy' => 'nullable|file|mimes:jpg,png,pdf|max:5120',
-            'doc_mdr' => 'nullable|file|mimes:jpg,png,pdf|max:5120',
-        ]);
+        $data = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -120,23 +76,23 @@ class PatientController extends Controller
             $patient = Patient::create([
                 'patient_unique_id' => $pid,
                 'created_by_user_id' => Auth::id(),
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'middle_name' => $request->middle_name,
-                'date_of_birth' => $request->date_of_birth,
-                'sex' => $request->sex,
-                'civil_status' => $request->civil_status,
-                'nationality' => $request->nationality,
-                'religion' => $request->religion,
-                'address_permanent' => $request->address_permanent,
-                'address_present' => $request->address_present,
-                'contact_number' => $request->contact_number,
-                'email' => $request->email,
-                'emergency_contact_name' => $request->emergency_contact_name,
-                'emergency_contact_relationship' => $request->emergency_contact_relationship,
-                'emergency_contact_number' => $request->emergency_contact_number,
-                'philhealth_number' => $request->philhealth_number,
-                'senior_citizen_id' => $request->senior_citizen_id,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'middle_name' => $data['middle_name'],
+                'date_of_birth' => $data['date_of_birth'],
+                'sex' => $data['sex'],
+                'civil_status' => $data['civil_status'],
+                'nationality' => $data['nationality'],
+                'religion' => $data['religion'],
+                'address_permanent' => $data['address_permanent'],
+                'address_present' => $data['address_present'],
+                'contact_number' => $data['contact_number'],
+                'email' => $data['email'],
+                'emergency_contact_name' => $data['emergency_contact_name'],
+                'emergency_contact_relationship' => $data['emergency_contact_relationship'],
+                'emergency_contact_number' => $data['emergency_contact_number'],
+                'philhealth_number' => $data['philhealth_number'],
+                'senior_citizen_id' => $data['senior_citizen_id'],
             ]);
 
             // --- 3. CREATE ADMISSION ---
@@ -150,42 +106,42 @@ class PatientController extends Controller
                 'admission_date' => now(),
                 'status' => 'Admitted',
                 'admitting_clerk_id' => Auth::id(),
-                'attending_physician_id' => $request->attending_physician_id,
+                'attending_physician_id' => $data['attending_physician_id'],
 
                 // Details
-                'admission_type' => $request->admission_type,
-                'bed_id' => $request->bed_id,
-                'case_type' => $request->case_type,
-                'mode_of_arrival' => $request->mode_of_arrival,
-                'chief_complaint' => $request->chief_complaint,
-                'initial_diagnosis' => $request->initial_diagnosis,
+                'admission_type' => $data['admission_type'],
+                'station_id' => $data['station_id'],
+                'bed_id' => $data['bed_id'],
+                'case_type' => $data['case_type'],
+                'mode_of_arrival' => $data['mode_of_arrival'],
+                'chief_complaint' => $data['chief_complaint'],
+                'initial_diagnosis' => $data['initial_diagnosis'],
 
                 // Vitals
-                'temp' => $request->temp,
-                'bp_systolic' => $request->bp_systolic,
-                'bp_diastolic' => $request->bp_diastolic,
-                'pulse_rate' => $request->pulse_rate,
-                'respiratory_rate' => $request->respiratory_rate,
-                'o2_sat' => $request->o2_sat,
+                'temp' => $data['temp'],
+                'bp_systolic' => $data['bp_systolic'],
+                'bp_diastolic' => $data['bp_diastolic'],
+                'pulse_rate' => $data['pulse_rate'],
+                'respiratory_rate' => $data['respiratory_rate'],
+                'o2_sat' => $data['o2_sat'],
 
-                'known_allergies' => $request->known_allergies ?? [],
+                // Arrays are handled automatically if validation passed
+                'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            $bed = Bed::findOrFail($request->bed_id);
-            $bed->update([
-                'status' => 'Occupied'
-            ]);
+            $bed = Bed::findOrFail($data['bed_id']);
+            $bed->update(['status' => 'Occupied']);
 
             // --- 4. CREATE BILLING INFO ---
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
-                'payment_type' => $request->payment_type,
-                'primary_insurance_provider' => $request->primary_insurance_provider,
-                'policy_number' => $request->policy_number,
-                'approval_code' => $request->approval_code,
-                'guarantor_name' => $request->guarantor_name,
-                'guarantor_relationship' => $request->guarantor_relationship,
-                'guarantor_contact' => $request->guarantor_contact,
+                'payment_type' => $data['payment_type'] ?? null,
+                'primary_insurance_provider' => $data['primary_insurance_provider'],
+                'policy_number' => $data['policy_number'],
+                'approval_code' => $data['approval_code'],
+                'guarantor_name' => $data['guarantor_name'],
+                'guarantor_relationship' => $data['guarantor_relationship'],
+                'guarantor_contact' => $data['guarantor_contact'],
             ]);
 
             $fileMap = [
@@ -231,11 +187,14 @@ class PatientController extends Controller
 
     public function show($id)
     {
-        $patient = Patient::with(['admissions' => function ($query) {
-            $query->latest('admission_date')->with('attendingPhysician');
-        }])->findOrFail($id);
+        $patient = Patient::findOrFail($id);
+        
+        $admissions = $patient->admissions()
+            ->latest('admission_date')
+            ->with('attendingPhysician')
+            ->paginate(5);
 
-        return view('nurse.admitting.patients.show', compact('patient'));
+        return view('nurse.admitting.patients.show', compact('patient', 'admissions'));
     }
 
     public function edit($id)

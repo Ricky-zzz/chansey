@@ -39,8 +39,6 @@ class MaintenancePanelProvider extends PanelProvider
             ->sidebarFullyCollapsibleOnDesktop()
             ->discoverWidgets(in: app_path('Filament/Maintenance/Widgets'), for: 'App\Filament\Maintenance\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

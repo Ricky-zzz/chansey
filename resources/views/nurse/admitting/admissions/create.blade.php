@@ -44,177 +44,56 @@
         this.step++;
     }
 }'">
+    <!-- DISPLAY ALL VALIDATION ERRORS -->
+    @if ($errors->any())
+    <div class="alert alert-error mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+            <h3 class="font-bold">Validation Errors:</h3>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+    @endif
+    <div class=" flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+        <div class="text-md md:text-lg lg:text-2xl breadcrumbs text-slate-900 font-bold">
+            <ul>
+                <li><a href="{{ route('nurse.admitting.dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ route('nurse.admitting.patients.index') }}">Patients</a></li>
+                <li class=" text-primary"><a href="{{ route('nurse.admitting.patients.show',$patient ) }}">{{ $patient->last_name }}, {{ $patient->first_name }}</a></li>
+                <li><a href="">New Admission</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-    <!-- HEADER & WIZARD STEPS -->
-    <div class=" mb-8">
-    <h2 class="text-3xl font-bold mb-4">New Patient Admission</h2>
+<!-- HEADER & WIZARD STEPS -->
+<div class=" mb-8">
     <ul class="steps w-full">
-        <li class="step" :class="step >= 1 ? 'step-primary' : ''">Demographics</li>
-        <li class="step" :class="step >= 2 ? 'step-primary' : ''">Clinical Admission</li>
-        <li class="step" :class="step >= 3 ? 'step-primary' : ''">Billing</li>
-        <li class="step" :class="step >= 4 ? 'step-primary' : ''">Documents</li>
-        <li class="step" :class="step >= 5 ? 'step-primary' : ''">Review & Submit</li>
+        <li class="step" :class="step >= 1 ? 'step-primary' : ''">Clinical Admission</li>
+        <li class="step" :class="step >= 2 ? 'step-primary' : ''">Billing</li>
+        <li class="step" :class="step >= 3 ? 'step-primary' : ''">Documents</li>
+        <li class="step" :class="step >= 4 ? 'step-primary' : ''">Review & Submit</li>
     </ul>
 </div>
 
 <!-- THE ONE GIANT FORM -->
-<form action="{{ route('nurse.admitting.patients.store') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('nurse.admitting.admissions.store', $patient) }}" method="POST" enctype="multipart/form-data">
     @csrf
 
-    <!-- STEP 1: PATIENT DEMOGRAPHICS -->
+    <!-- STEP 1: ADMISSION DETAILS -->
     <div x-show="step === 1" class="animate-fade-in w-full max-w-5xl mx-auto">
         <div class="card bg-base-100 shadow-xl border border-base-200">
             <div class="card-body p-8">
 
                 <!-- ERROR MESSAGE DISPLAY -->
                 <div x-show="step === 1 && errorMessage" class="alert alert-error mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span x-text="errorMessage"></span>
-                </div>
-
-                <!-- CENTERED MAIN TITLE -->
-                <h3 class="card-title text-3xl font-bold text-primary justify-center mb-8 border-b pb-4">
-                    Patient Information
-                </h3>
-
-                <!-- 1. BASIC INFORMATION -->
-                <fieldset class="mb-8">
-                    <!-- CENTERED LEGEND -->
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Basic Information
-                    </legend>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>First Name</span>
-                            <input type="text" name="first_name" data-step="1" class="input input-md w-full" placeholder="First Name" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Last Name</span>
-                            <input type="text" name="last_name" data-step="1" class="input input-md w-full" placeholder="Last Name" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Middle Name</span>
-                            <input type="text" name="middle_name" data-step="1" class="input input-md w-full" placeholder="Middle Name" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Date of Birth</span>
-                            <input type="date" name="date_of_birth" data-step="1" class="input input-md w-full" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Sex</span>
-                            <select name="sex" data-step="1" class="select select-bordered w-full" required>
-                                <option value="" disabled selected>Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Civil Status</span>
-                            <select name="civil_status" data-step="1" class="select select-bordered w-full" required>
-                                <option value="" disabled selected>Select Status</option>
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                                <option value="Widowed">Widowed</option>
-                                <option value="Separated">Separated</option>
-                            </select>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- 2. PERSONAL DETAILS -->
-                <fieldset class="mb-8">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Personal Details
-                    </legend>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>Nationality</span>
-                            <input type="text" name="nationality" data-step="1" class="input input-md w-full" placeholder="Nationality e.g. Filipino" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Religion</span>
-                            <input type="text" name="religion" data-step="1" class="input input-md w-full" placeholder="Religion e.g. catholic" required>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- 3. CONTACT INFORMATION -->
-                <fieldset class="mb-8">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Contact Information
-                    </legend>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>Permanent Address</span>
-                            <input type="text" name="address_permanent" data-step="1" class="input input-md w-full" placeholder="Permanent Address" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Present Address</span>
-                            <input type="text" name="address_present" data-step="1" class="input input-md w-full" placeholder="Present Address" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Contact Number</span>
-                            <input type="text" name="contact_number" data-step="1" class="input input-md w-full" placeholder="Contact Number" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Email Address</span>
-                            <input type="text" name="email" data-step="1" class="input input-md w-full" placeholder="email@example.com" required>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- 4. EMERGENCY CONTACT -->
-                <fieldset class="mb-8">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Emergency Contact
-                    </legend>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>Contact Name</span>
-                            <input type="text" name="emergency_contact_name" data-step="1" class="input input-md w-full" placeholder="Contact Full Name" required>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Relationship</span>
-                            <input type="text" name="emergency_contact_relationship" data-step="1" class="input input-md w-full" placeholder="Relationship e.g. Spouse, Parent" required>
-                        </label>
-                        <label class="floating-label w-full md:col-span-2">
-                            <span>Emergency Contact Number</span>
-                            <input type="text" name="emergency_contact_number" data-step="1" class="input input-md w-full" placeholder="Emergency Contact Number" required>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- 5. INSURANCE & ID -->
-                <fieldset class="mb-2">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Insurance & Identification
-                    </legend>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>PhilHealth Number</span>
-                            <input type="text" name="philhealth_number" class="input input-md w-full" placeholder="PhilHealth Number">
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Senior Citizen ID</span>
-                            <input type="text" name="senior_citizen_id" class="input input-md w-full" placeholder="Senior Citizen ID: Optional">
-                        </label>
-                    </div>
-                </fieldset>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- STEP 2: ADMISSION DETAILS -->
-    <div x-show="step === 2" class="animate-fade-in w-full max-w-5xl mx-auto" style="display: none;">
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body p-8">
-
-                <!-- ERROR MESSAGE DISPLAY -->
-                <div x-show="step === 2 && errorMessage" class="alert alert-error mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -248,7 +127,7 @@
                         <!-- 1. SELECT STATION (The Filter Trigger) -->
                         <label class="floating-label w-full">
                             <span>Nursing Station / Ward</span>
-                            <select name="station_id" data-step="2" x-model="selectedStation" class="select select-bordered w-full" required>
+                            <select name="station_id" data-step="1" x-model="selectedStation" class="select select-bordered w-full" required>
                                 <option value="" disabled selected>Select Station First</option>
                                 <template x-for="station in stations" :key="station.id">
                                     <option :value="station.id" x-text="station.station_name"></option>
@@ -259,7 +138,7 @@
                         <!-- 2. SELECT BED (Filtered Results) -->
                         <label class="floating-label w-full">
                             <span>Room and Bed Assignment</span>
-                            <select name="bed_id" data-step="2" class="select select-bordered w-full" :disabled="!selectedStation" required>
+                            <select name="bed_id" data-step="1" class="select select-bordered w-full" :disabled="!selectedStation" required>
                                 <option value="" disabled selected x-text="selectedStation ? 'Select Available Bed' : 'Please Select Station First'"></option>
 
                                 <template x-for="bed in filteredBeds" :key="bed.id">
@@ -275,7 +154,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
                             <label class="floating-label w-full">
                                 <span>Admission Type</span>
-                                <select name="admission_type" data-step="2" class="select select-bordered w-full" required>
+                                <select name="admission_type" data-step="1" class="select select-bordered w-full" required>
                                     <option value="" disabled selected>Select Admission Type</option>
                                     <option value="Emergency">Emergency</option>
                                     <option value="Outpatient">Outpatient</option>
@@ -286,7 +165,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Attending Physician</span>
-                                <select name="attending_physician_id" data-step="2" class="select select-bordered w-full" required>
+                                <select name="attending_physician_id" data-step="1" class="select select-bordered w-full" required>
                                     <option value="">Select an Attending Physician</option>
                                     @foreach($physicians as $doc)
                                     <option value="{{ $doc->id }}">Dr. {{ $doc->last_name }}, {{ $doc->first_name }} ({{ $doc->specialization }})</option>
@@ -296,7 +175,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Case Type</span>
-                                <select name="case_type" data-step="2" class="select select-bordered w-full" required>
+                                <select name="case_type" data-step="1" class="select select-bordered w-full" required>
                                     <option value="" disabled selected>Select Case Type</option>
                                     <option value="New Case">New Case</option>
                                     <option value="Returning">Returning</option>
@@ -306,7 +185,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Mode of Arrival</span>
-                                <select name="mode_of_arrival" data-step="2" class="select select-bordered w-full" required>
+                                <select name="mode_of_arrival" data-step="1" class="select select-bordered w-full" required>
                                     <option value="" disabled selected>Select Mode of Arrival</option>
                                     <option value="Walk-in">Walk-in</option>
                                     <option value="Ambulance">Ambulance</option>
@@ -326,14 +205,12 @@
                     <div class="grid grid-cols-1 gap-6">
                         <label class="floating-label w-full">
                             <span>Chief Complaint</span>
-                            <textarea name="chief_complaint" class="textarea textarea-bordered w-full"
-                                placeholder="Describe the patient's primary complaint req" required></textarea>
+                            <textarea name="chief_complaint" data-step="1" class="textarea textarea-bordered w-full" placeholder="Describe the patient's primary complaint" required></textarea>
                         </label>
 
                         <label class="floating-label w-full">
                             <span>Initial Diagnosis</span>
-                            <textarea name="initial_diagnosis" class="textarea textarea-bordered w-full"
-                                placeholder="Initial medical impression or suspected diagnosis"></textarea>
+                            <textarea name="initial_diagnosis" class="textarea textarea-bordered w-full" placeholder="Initial medical impression or suspected diagnosis"></textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -450,8 +327,8 @@
     </div>
 
 
-    <!-- STEP 3: BILLING -->
-    <div x-show="step === 3" class="animate-fade-in w-full max-w-5xl mx-auto" style="display: none;">
+    <!-- STEP 2: BILLING -->
+    <div x-show="step === 2" class="animate-fade-in w-full max-w-5xl mx-auto" style="display: none;">
         <div class="card bg-base-100 shadow-xl border border-base-200">
             <div class="card-body p-8">
 
@@ -471,7 +348,7 @@
                         <!-- Payment Type -->
                         <label class="floating-label w-full">
                             <span>Payment Type</span>
-                            <select name="payment_type" class="select select-bordered w-full" required>
+                            <select name="payment_type" data-step="2" class="select select-bordered w-full" required>
                                 <option value="" disabled selected>Select Payment Type</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Insurance">Insurance</option>
@@ -545,8 +422,8 @@
         </div>
     </div>
 
-    <!-- STEP 4: DOCUMENTS -->
-    <div x-show="step === 4" style="display: none;">
+    <!-- STEP 3: DOCUMENTS -->
+    <div x-show="step === 3" style="display: none;">
         <div class="card bg-base-100 shadow border">
             <div class="card-body">
                 <h3 class="card-title text-primary">Required Documents</h3>
@@ -591,8 +468,8 @@
     </div>
 
 
-    <!-- STEP 5: REVIEW -->
-    <div x-show="step === 5" style="display: none;">
+    <!-- STEP 4: REVIEW -->
+    <div x-show="step === 4" style="display: none;">
         <div class="card bg-base-100 shadow border">
             <div class="card-body">
                 <div class="alert alert-warning">
@@ -616,15 +493,15 @@
         <div x-show="step === 1"></div>
 
         <!-- Next Button -->
-        <button type="button" class="btn btn-primary"
-            x-show="step < 5"
+        <button type="button" class="btn btn-primary text-white"
+            x-show="step < 4"
             @click="validateAndNext()">
             Next Step
         </button>
 
         <!-- Final Submit Button -->
         <button type="submit" class="btn btn-error"
-            x-show="step === 5">
+            x-show="step === 4">
             Confirm & Admit Patient
         </button>
     </div>

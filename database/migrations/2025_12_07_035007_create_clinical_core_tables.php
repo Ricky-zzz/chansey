@@ -21,8 +21,11 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name')->index();
             $table->date('date_of_birth')->index();
-            $table->enum('sex', ['Male', 'Female']);
-            $table->enum('civil_status', ['Single', 'Married', 'Widowed', 'Separated']);
+            
+    
+            $table->string('sex');
+            $table->string('civil_status'); 
+            
             $table->string('nationality')->default('Filipino');
             $table->string('religion')->nullable(); 
             
@@ -52,10 +55,10 @@ return new class extends Migration
             $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
             
             // System Identifiers
-            $table->string('admission_number')->unique(); // Visit ID
-            // $table->string('qr_code_hash')->nullable();   // For wristband if ever needed
+            $table->string('admission_number')->unique(); 
             
             // Assignment & Classification
+            $table->foreignId('station_id')->nullable()->constrained('stations'); 
             $table->foreignId('bed_id')->nullable()->constrained('beds'); 
             $table->foreignId('attending_physician_id')->constrained('physicians');
             $table->foreignId('admitting_clerk_id')->constrained('users'); 
@@ -63,15 +66,17 @@ return new class extends Migration
             $table->dateTime('admission_date');
             $table->dateTime('discharge_date')->nullable();
             
-            // Types
-            $table->enum('admission_type', ['Emergency', 'Outpatient', 'Inpatient', 'Transfer']);
-            $table->enum('case_type', ['New Case', 'Returning', 'Follow-up']);
-            $table->enum('status', ['Admitted', 'Discharged', 'Transferred', 'Died'])->default('Admitted')->index();
+            // CHANGED: Enum -> String
+            $table->string('admission_type'); 
+            $table->string('case_type'); 
+            $table->string('status')->default('Admitted')->index(); 
             
             // Clinical Entry Snapshot
             $table->text('chief_complaint');
             $table->text('initial_diagnosis')->nullable();
-            $table->enum('mode_of_arrival', ['Walk-in', 'Ambulance', 'Wheelchair', 'Stretcher']);
+            
+            // CHANGED: Enum -> String
+            $table->string('mode_of_arrival'); 
             
             // Entry Vitals (Snapshot)
             $table->decimal('temp', 4, 1)->nullable();
@@ -91,12 +96,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('admission_id')->constrained()->cascadeOnDelete();
             
-            $table->enum('payment_type', ['Cash', 'Insurance', 'HMO', 'Company']);
+            // CHANGED: Enum -> String
+            $table->string('payment_type'); // Cash, Insurance...
             
             // Insurance / HMO Details
-            $table->string('primary_insurance_provider')->nullable(); // e.g. "Maxicare"
+            $table->string('primary_insurance_provider')->nullable(); 
             $table->string('policy_number')->nullable();
-            $table->string('approval_code')->nullable(); // LOA Code
+            $table->string('approval_code')->nullable(); 
             
             // Guarantor (Person paying if not patient)
             $table->string('guarantor_name')->nullable();
@@ -115,15 +121,8 @@ return new class extends Migration
             $table->string('file_path'); 
             $table->string('file_name');
             
-            $table->enum('document_type', [
-                'General Consent',
-                'Privacy Notice',
-                'PhilHealth MDR',
-                'Insurance LOA',
-                'Valid ID',
-                'Lab Result',
-                'Other'
-            ]);
+            // CHANGED: Enum -> String
+            $table->string('document_type'); // Consent, Lab Result...
             
             $table->foreignId('uploaded_by_id')->constrained('users');
             $table->timestamps();

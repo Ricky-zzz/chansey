@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Filament\Maintenance\Resources\Beds;
-
+use Filament\Notifications\Notification;
 use App\Filament\Maintenance\Resources\Beds\Pages\CreateBed;
 use App\Filament\Maintenance\Resources\Beds\Pages\EditBed;
 use App\Filament\Maintenance\Resources\Beds\Pages\ListBeds;
@@ -38,23 +38,22 @@ class BedResource extends Resource
             ->components([
                 Section::make('Bed Details')
                     ->schema([
-                        // 1. SELECT ROOM (The Trigger)
                         Select::make('room_id')
                             ->relationship('room', 'room_number')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->live() 
+                            ->live()
                             ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
                                 if (! $state) return;
 
-                                // Find the room
-                                $room = Room::find($state);
-                                
+
+                                $room = Room::with('station')->find($state);
+
                                 $count = $room->beds()->count();
                                 $nextLetter = chr(64 + $count + 1);
 
-                                $set('bed_code', $room->room_number . '-' . $nextLetter);
+                                $set('bed_code', "{$room->station->station_code}-{$room->room_number}-{$nextLetter}");
                             }),
 
                         TextInput::make('bed_code')
@@ -81,7 +80,7 @@ class BedResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('room.room_number') 
+                TextColumn::make('room.room_number')
                     ->label('Room')
                     ->sortable()
                     ->searchable(),
@@ -111,8 +110,20 @@ class BedResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                    DeleteAction::make(),
+                    DeleteAction::make()
+                        ->before(function ($record, DeleteAction $action) {
+                            if ($record->status === 'Occupied') {
+                                Notification::make()
+                                    ->title('Action Blocked')
+                                    ->body('This bed is currently occupied by a patient and cannot be deleted.')
+                                    ->danger()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        }),
                 ]),
+
             ]);
     }
 

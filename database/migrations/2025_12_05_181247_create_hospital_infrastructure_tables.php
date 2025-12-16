@@ -8,29 +8,45 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::create('stations', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('station_name')->unique(); 
+            
+            $table->string('station_code')->nullable()->unique(); 
+            
+            $table->string('floor_location')->nullable(); 
+
+            $table->timestamps();
+        });
+
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             
-            $table->string('room_number')->unique(); 
+            $table->foreignId('station_id')->constrained('stations')->cascadeOnDelete();
+
+            $table->string('room_number'); 
             
-            $table->enum('room_type', ['Private', 'Semi-Private', 'Ward', 'ICU', 'ER'])->index();
+            $table->string('room_type')->index(); 
             
-            $table->integer('capacity')->default(1); 
-            
-            $table->enum('status', ['Active', 'Maintenance', 'Closed'])->default('Active')->index();
-            
+            $table->integer('capacity')->default(1);
+            $table->decimal('price_per_night', 10, 2)->default(0); 
+
+            $table->string('status')->default('Active')->index(); 
             $table->timestamps();
+            
+            $table->unique('room_number');
         });
 
         Schema::create('beds', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('room_id')->constrained('rooms')->cascadeOnDelete();
-            
-            $table->string('bed_code')->unique(); 
-            
-            $table->enum('status', ['Available', 'Occupied', 'Cleaning', 'Maintenance'])->default('Available')->index();
-            
+
+            $table->string('bed_code')->unique();
+
+            $table->string('status')->default('Available')->index();
+
             $table->timestamps();
         });
     }
@@ -39,5 +55,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('beds');
         Schema::dropIfExists('rooms');
+        Schema::dropIfExists('stations'); 
     }
 };

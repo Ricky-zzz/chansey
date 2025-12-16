@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Filament\Maintenance\Resources\Rooms;
-
+use Filament\Notifications\Notification;
 use App\Filament\Maintenance\Resources\Rooms\Pages\CreateRoom;
 use App\Filament\Maintenance\Resources\Rooms\Pages\EditRoom;
 use App\Filament\Maintenance\Resources\Rooms\Pages\ListRooms;
 use App\Models\Room;
+use App\Models\Station;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -36,6 +37,12 @@ class RoomResource extends Resource
             ->components([
                 Section::make('Room Details')
                     ->schema([
+                        Select::make('station_id')
+                            ->relationship('station', 'station_name')
+                            ->label('Nurse Station / Ward')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
                         TextInput::make('room_number')
                             ->label('Room Number / Name')
                             ->required()
@@ -77,10 +84,11 @@ class RoomResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('station.station_code')->sortable()->weight('bold'),
                 TextColumn::make('room_number')->sortable()->searchable()->weight('bold'),
                 TextColumn::make('room_type')->sortable(),
                 TextColumn::make('capacity')->label('Beds'),
-                TextColumn::make('beds_count')->counts('beds')->label('Actual Beds'), // Helpful check
+                TextColumn::make('beds_count')->counts('beds')->label('Actual Beds'),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
@@ -96,8 +104,20 @@ class RoomResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                    DeleteAction::make(),
+                    DeleteAction::make()
+                        ->before(function ($record, DeleteAction $action) {
+                            if ($record->beds()->where('status', 'Occupied')->exists()) {
+                                Notification::make()
+                                    ->title('Action Blocked')
+                                    ->body('Cannot delete this room. One or more beds are currently occupied.')
+                                    ->danger()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        }),
                 ]),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

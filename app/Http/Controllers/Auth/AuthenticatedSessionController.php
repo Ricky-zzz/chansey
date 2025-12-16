@@ -28,13 +28,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $url = $request->session()->get('url.intended');
+        // Always clear intended URL to prevent cross-user redirects
+        $request->session()->forget('url.intended');
 
-        if ($request->user()->user_type === 'general_service' && $url && str_contains($url, '/admin')) {
-            $request->session()->forget('url.intended');
-        }
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->route('dashboard');
     }
 
     /**

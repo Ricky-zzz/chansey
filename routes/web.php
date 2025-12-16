@@ -10,6 +10,7 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+// AUTH
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
@@ -73,30 +74,21 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
     
     // View Admission Profile
     Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])->name('admissions.show');
+
+    Route::get('/admissions/{patient_id}/create', [AdmissionController::class, 'create'])->name('admissions.create');
+
+    Route::post('/admissions/{patient_id}/store', [AdmissionController::class, 'store'])->name('admissions.store');
     
     // admission edit form
     Route::get('/admissions/{admission}/edit', [AdmissionController::class, 'edit'])->name('admissions.edit');
 
-    Route::get('/admissions/{admission}/update', [AdmissionController::class, 'update'])->name('admissions.update');
+    Route::put('/admissions/{admission}', [AdmissionController::class, 'update'])->name('admissions.update');
 });
 
-// File viewing route (accessible to authenticated users)
+// File viewing route
 Route::middleware(['auth'])->get('/documents/{id}/view', [FileController::class, 'view'])->name('document.view');
 
 
 
-
-
-//  CLINICAL NURSES
-// Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->group(function () {
-// 
-//     Route::get('/dashboard', function () {
-//         if (Auth::user()->nurse->designation !== 'Clinical') abort(403, 'Access Restricted to Clinical Staff');
-// 
-//         return view('nurse.clinical.dashboard');
-//     })->name('dashboard');
-// 
-// 
-// });
 
 require __DIR__ . '/auth.php';

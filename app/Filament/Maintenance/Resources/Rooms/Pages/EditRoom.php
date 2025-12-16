@@ -17,14 +17,16 @@ class EditRoom extends EditRecord
     {
 
         $record->update($data);
-      
+
+        $stationCode = $record->station->station_code;
+
         $addedBeds = 0;
 
         for ($i = 1; $i <= $record->capacity; $i++) {
-            
-            $bedCode = $record->room_number . '-' . chr(64 + $i); 
+            $letter = chr(64 + $i);
 
-            // Check if this specific bed code already exists
+            $bedCode = "{$stationCode}-{$record->room_number}-{$letter}";
+
             $exists = Bed::where('room_id', $record->id)
                 ->where('bed_code', $bedCode)
                 ->exists();
@@ -45,8 +47,7 @@ class EditRoom extends EditRecord
                 ->body("Successfully added {$addedBeds} new bed(s) to match capacity.")
                 ->success()
                 ->send();
-        } 
-        elseif ($record->beds()->count() > $record->capacity) {
+        } elseif ($record->beds()->count() > $record->capacity) {
             $extra = $record->beds()->count() - $record->capacity;
             Notification::make()
                 ->title("Capacity Reduced")

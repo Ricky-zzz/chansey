@@ -33,7 +33,7 @@ return new class extends Migration
             
             $table->string('license_number');
             
-            $table->enum('designation', ['Clinical', 'Admitting'])->default('Clinical')->index(); 
+            $table->string('designation')->default('Clinical')->index(); 
             
             $table->string('station_assignment')->nullable()->index(); 
             $table->time('shift_start');

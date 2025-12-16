@@ -12,13 +12,16 @@ class CreateRoom extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $room = $this->record; 
+        $room = $this->record;
 
-        for ($i = 1; $i <= $room->capacity; $i++) {           
-            $letter = chr(64 + $i);        
+        $stationCode = $room->station->station_code;
+
+        for ($i = 1; $i <= $room->capacity; $i++) {
+            $letter = chr(64 + $i); 
+
             Bed::create([
                 'room_id' => $room->id,
-                'bed_code' => $room->room_number . '-' . $letter,
+                'bed_code' => "{$stationCode}-{$room->room_number}-{$letter}",
                 'status' => 'Available',
             ]);
         }

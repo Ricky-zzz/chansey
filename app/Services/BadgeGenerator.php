@@ -32,6 +32,6 @@ class BadgeGenerator
             $number = intval(end($parts)) + 1;
         }
 
-        return "{$prefix}-{$initials}-" . str_pad($number, 4, '0', STR_PAD_LEFT);
+        return "{$prefix}-{$initials}-" . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 }
