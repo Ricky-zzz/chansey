@@ -16,6 +16,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ActionGroup;
@@ -67,6 +68,12 @@ class RoomResource extends Resource
                             ->helperText('Beds will be auto-generated based on this number.')
                             ->required(),
 
+                        TextInput::make('price_per_night')
+                            ->numeric()
+                            ->label('Price Per Night')
+                            ->prefix('₱')
+                            ->required(),
+
                         Select::make('status')
                             ->options([
                                 'Active' => 'Active',
@@ -89,6 +96,7 @@ class RoomResource extends Resource
                 TextColumn::make('room_type')->sortable(),
                 TextColumn::make('capacity')->label('Beds'),
                 TextColumn::make('beds_count')->counts('beds')->label('Actual Beds'),
+                TextColumn::make('price_per_night')->label('Price/Night')->formatStateUsing(fn($state) => '₱' . number_format($state, 2)),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
@@ -98,7 +106,25 @@ class RoomResource extends Resource
                     }),
             ])
             ->filters([
-                //
+                SelectFilter::make('station_id')
+                    ->relationship('station', 'station_name')
+                    ->label('Station'),
+                SelectFilter::make('room_type')
+                    ->options([
+                        'Private' => 'Private Suite',
+                        'Semi-Private' => 'Semi-Private (2 Bed)',
+                        'Ward' => 'Ward (Multi-Bed)',
+                        'ICU' => 'ICU',
+                        'ER' => 'Emergency Room',
+                    ])
+                    ->label('Room Type'),
+                SelectFilter::make('status')
+                    ->options([
+                        'Active' => 'Active',
+                        'Maintenance' => 'Under Maintenance',
+                        'Closed' => 'Closed',
+                    ])
+                    ->label('Status'),
             ])
             ->recordActions([
                 ActionGroup::make([

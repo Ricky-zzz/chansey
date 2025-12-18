@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -61,17 +62,19 @@ class NurseResource extends Resource
                             ->required(),
 
                         Select::make('designation')
-                            ->label('Nurse Role')
                             ->options([
-                                'Clinical' => 'Clinical Nurse (Floor/Rounds)',
-                                'Admitting' => 'Admitting Nurse (Desk/Intake)',
+                                'Clinical' => 'Clinical Nurse',
+                                'Admitting' => 'Admitting Nurse',
                             ])
-                            ->default('Clinical')
+                            ->live() // <--- React immediately
                             ->required(),
 
-                        TextInput::make('station_assignment')
-                            ->label('Assigned Station')
-                            ->placeholder('e.g. ER, ICU, Ward 1'),
+                        Select::make('station_id')
+                            ->relationship('station', 'station_name')
+                            ->label('Station Assignment')
+                            ->nullable()
+                            ->visible(fn($get) => $get('designation') === 'Clinical')
+                            ->required(fn($get) => $get('designation') === 'Clinical'),
 
                         Grid::make(2)->schema([
                             TimePicker::make('shift_start')
@@ -117,8 +120,9 @@ class NurseResource extends Resource
                     })
                     ->sortable(),
 
-                TextColumn::make('station_assignment')
-                    ->label('Station'),
+                TextColumn::make('station_id')
+                    ->label('Station')
+                    ->formatStateUsing(fn($state, Nurse $record) => $record->station?->station_name ?? 'Admission'),
 
                 TextColumn::make('shift_start')
                     ->label('Shift')

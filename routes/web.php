@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\Admission\PatientController;
+use App\Http\Controllers\Admission\AdmissionController;
+use App\Http\Controllers\Admission\DashboardController as AdmissionDash;
+use App\Http\Controllers\Clinical\DashboardController as ClinicDash;
 use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,10 +23,10 @@ Route::get('/dashboard', function () {
     if ($user->user_type === 'general_service') {
         return redirect('/maintenance');
     }
- 
+
     if ($user->user_type === 'nurse') {
         if (! $user->nurse) {
-            abort(403, 'Nurse profile not found.');
+            return redirect('/login')->with('error', 'Nurse profile not found.');
         }
 
         if ($user->nurse->designation === 'Admitting') {
@@ -38,7 +40,7 @@ Route::get('/dashboard', function () {
         return "Doctor Dashboard Coming Soon";
     }
 
-    abort(403, 'Unauthorized user type.');
+    return redirect('/login')->with('error', 'Unauthorized user type.');
 })->middleware(['auth'])->name('dashboard');
 
 
@@ -46,10 +48,7 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')->group(function () {
 
     // Admitting Dashboard
-    Route::get('/dashboard', function () {
-        if (Auth::user()->nurse->designation !== 'Admitting') abort(403, 'Access Restricted to Admitting Staff');
-        return view('nurse.admitting.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdmissionDash::class, 'index'])->name('dashboard');
 
     // Patient index 
     Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
@@ -65,24 +64,31 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
 
     // view patient edit form
     Route::get('/patients/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
-    
+
     // view patient update action
     Route::put('/patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
 
     // Admission index
     Route::get('/admissions', [AdmissionController::class, 'index'])->name('admissions.index');
-    
+
     // View Admission Profile
     Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])->name('admissions.show');
 
     Route::get('/admissions/{patient_id}/create', [AdmissionController::class, 'create'])->name('admissions.create');
 
     Route::post('/admissions/{patient_id}/store', [AdmissionController::class, 'store'])->name('admissions.store');
-    
+
     // admission edit form
     Route::get('/admissions/{admission}/edit', [AdmissionController::class, 'edit'])->name('admissions.edit');
 
     Route::put('/admissions/{admission}', [AdmissionController::class, 'update'])->name('admissions.update');
+});
+
+//  Clinical NURSES 
+Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->group(function () {
+
+    // Clinical Dashboard
+    Route::get('/dashboard', [ClinicDash::class, 'index'])->name('dashboard');
 });
 
 // File viewing route

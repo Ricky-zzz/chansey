@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('room_type')->index(); 
             
             $table->integer('capacity')->default(1);
-            $table->decimal('price_per_night', 10, 2)->default(0); 
+            $table->decimal('price_per_night', 10, 2)->default(0.00); 
 
             $table->string('status')->default('Active')->index(); 
             $table->timestamps();

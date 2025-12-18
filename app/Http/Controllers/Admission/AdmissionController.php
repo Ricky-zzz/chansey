@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admission;
 
 use App\Http\Requests\AdmissionRequest;
 use App\Models\Admission;
@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\AdmissionBillingInfo;
+use App\Http\Controllers\Controller;
 
 
 class AdmissionController extends Controller

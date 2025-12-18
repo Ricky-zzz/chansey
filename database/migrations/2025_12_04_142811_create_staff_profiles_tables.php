@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id');
             $table->foreign('user_id', 'admins_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
-            $table->string('full_name'); 
+            $table->string('full_name');
             $table->timestamps();
         });
 
@@ -25,22 +25,23 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->index();
             $table->foreign('user_id', 'nurses_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
-            
-            $table->string('employee_id')->unique();  
-            
+
+            $table->string('employee_id')->unique();
+
             $table->string('first_name');
-            $table->string('last_name')->index(); 
-            
+            $table->string('last_name')->index();
+
             $table->string('license_number');
-            
-            $table->string('designation')->default('Clinical')->index(); 
-            
-            $table->string('station_assignment')->nullable()->index(); 
+
+            $table->string('designation')->default('Clinical')->index();
+
+            $table->foreignId('station_id')->nullable()->constrained('stations')->nullOnDelete();
+
             $table->time('shift_start');
             $table->time('shift_end');
             $table->timestamps();
 
-            $table->index(['last_name', 'first_name']); 
+            $table->index(['last_name', 'first_name']);
         });
 
         // Physicians Table
@@ -49,12 +50,12 @@ return new class extends Migration
             $table->foreignId('user_id')->index();
             $table->foreign('user_id', 'physicians_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
             $table->string('employee_id')->unique();
-            
+
             $table->string('first_name');
             $table->string('last_name')->index();
-            
-            $table->string('specialization')->index(); 
-            
+
+            $table->string('specialization')->index();
+
             $table->string('employment_type');
             $table->timestamps();
 
@@ -67,12 +68,12 @@ return new class extends Migration
             $table->foreignId('user_id')->index();
             $table->foreign('user_id', 'general_services_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
             $table->string('employee_id')->unique();
-            
+
             $table->string('first_name');
             $table->string('last_name')->index();
-            
-            $table->string('assigned_area')->index(); 
-            
+
+            $table->string('assigned_area')->index();
+
             $table->time('shift_start');
             $table->time('shift_end');
             $table->timestamps();

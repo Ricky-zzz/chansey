@@ -51,7 +51,6 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Torres',
             'license_number' => 'RN-1001',
             'designation' => 'Admitting', // 
-            'station_assignment' => 'North Wing',
             'shift_start' => '06:00:00',
             'shift_end' => '14:00:00',
         ]);

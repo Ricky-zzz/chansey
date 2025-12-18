@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admission;
 
 use App\Models\Station;
 use App\Models\Patient;
@@ -12,9 +12,10 @@ use App\Models\Admission;
 use App\Models\AdmissionBillingInfo;
 use App\Models\PatientFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreAdmissionRequest;
+use App\Http\Controllers\Controller;
+
 
 class PatientController extends Controller
 {
@@ -173,7 +174,7 @@ class PatientController extends Controller
 
             DB::commit();
 
-            return redirect()->route('nurse.admitting.patients.create')
+            return redirect()->route('nurse.admitting.patients.show', $patient->id)
                 ->with('success', "Patient Successfully Admitted! (PID: {$pid})");
         } catch (\Exception $e) {
             DB::rollback();

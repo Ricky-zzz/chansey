@@ -32,7 +32,7 @@ class CreateNurse extends CreateRecord
             'last_name' => $data['last_name'],
             'license_number' => $data['license_number'],
             'designation' => $data['designation'],
-            'station_assignment' => $data['station_assignment'],
+            'station_id' => $data['station_id'] ?? null,
             'shift_start' => $data['shift_start'],
             'shift_end' => $data['shift_end'],
         ]);

@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('item_name')->index(); 
             $table->string('category')->index();   
+            $table->decimal('price', 10, 2)->default(0.00);
             $table->integer('quantity')->default(0); 
             $table->integer('critical_level')->default(10); 
             $table->timestamps();
