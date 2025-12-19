@@ -17,25 +17,30 @@ class CreateNurse extends CreateRecord
     {
         $badgeId = BadgeGenerator::generate('nurse', $data['first_name'], $data['last_name']);
 
+        // Extract password before creating nurse
+        $password = $data['password'] ?? null;
+        
+        // Remove password and any user-related fields from data to avoid duplication
+        unset($data['password']);
+        unset($data['user_id']);
+
+        // Create the user first
         $user = User::create([
             'name' => $data['first_name'] . ' ' . $data['last_name'],
             'badge_id' => $badgeId,
             'email' => strtolower($badgeId) . '@chansey.local',
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($password),
             'user_type' => 'nurse',
         ]);
 
-        return static::getModel()::create([
-            'user_id' => $user->id,
-            'employee_id' => $badgeId,
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'license_number' => $data['license_number'],
-            'designation' => $data['designation'],
-            'station_id' => $data['station_id'] ?? null,
-            'shift_start' => $data['shift_start'],
-            'shift_end' => $data['shift_end'],
-        ]);
+        // Add user_id and employee_id to the cleaned data
+        $data['user_id'] = $user->id;
+        $data['employee_id'] = $badgeId;
+
+        // Create the nurse record with only the fields it needs
+        $nurse = static::getModel()::create($data);
+
+        return $nurse;
     }
 
     protected function getRedirectUrl(): string
