@@ -9,7 +9,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Admission extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'patient_id',
+        'admission_number',
+        'station_id',
+        'bed_id',
+        'attending_physician_id',
+        'admitting_clerk_id',
+        'admission_date',
+        'discharge_date',
+        'admission_type',
+        'case_type',
+        'status',
+        'chief_complaint',
+        'initial_diagnosis',
+        'mode_of_arrival',
+        'temp',
+        'bp_systolic',
+        'bp_diastolic',
+        'pulse_rate',
+        'respiratory_rate',
+        'o2_sat',
+        'known_allergies',
+    ];
 
     protected $casts = [
         'admission_date' => 'datetime',

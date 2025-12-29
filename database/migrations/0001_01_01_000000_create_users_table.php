@@ -18,7 +18,7 @@ Schema::create('users', function (Blueprint $table) {
     $table->string('email')->unique();    
     $table->timestamp('email_verified_at')->nullable();
     $table->string('password');
-    $table->enum('user_type', ['admin', 'nurse', 'physician', 'general_service'])->default('nurse');
+    $table->string('user_type')->default('nurse'); //['admin', 'nurse', 'physician', 'general_service']
     $table->rememberToken();
     $table->timestamps();
 });

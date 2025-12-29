@@ -84,6 +84,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('badge_id')) . '|' . $this->ip());
+        return Str::transliterate(Str::upper($this->string('badge_id')) . '|' . $this->ip());
     }
 }

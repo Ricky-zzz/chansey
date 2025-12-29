@@ -24,6 +24,10 @@ Route::get('/dashboard', function () {
         return redirect('/maintenance');
     }
 
+    if ($user->user_type === 'pharmacist') {
+        return redirect('/pharmacy');
+    }
+
     if ($user->user_type === 'nurse') {
         if (! $user->nurse) {
             return redirect('/login')->with('error', 'Nurse profile not found.');

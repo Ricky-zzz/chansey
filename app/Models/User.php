@@ -68,6 +68,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(GeneralService::class);
     }
 
+    public function pharmacist()
+    {
+        return $this->hasOne(Pharmacist::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
@@ -76,6 +81,10 @@ class User extends Authenticatable implements FilamentUser
 
         if ($panel->getId() === 'maintenance') {
             return in_array($this->user_type, ['general_service', 'admin']);
+        }
+
+        if ($panel->getId() === 'pharmacy') {
+            return in_array($this->user_type, ['pharmacist', 'admin']);
         }
 
         return false;

@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PatientFile extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'patient_id',
+        'admission_id',
+        'file_path',
+        'file_name',
+        'document_type',
+        'uploaded_by_id',
+    ];
 
     public function patient(): BelongsTo
     {

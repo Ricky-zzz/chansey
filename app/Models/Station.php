@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Station extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'station_name',
+        'station_code',
+        'floor_location',
+    ];
 
     public function rooms()
     {

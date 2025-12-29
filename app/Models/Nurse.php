@@ -9,8 +9,17 @@ class Nurse extends Model
 {
     use HasFactory;
 
-
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'employee_id',
+        'first_name',
+        'last_name',
+        'license_number',
+        'designation',
+        'station_id',
+        'shift_start',
+        'shift_end',
+    ];
 
     public function user()
     {

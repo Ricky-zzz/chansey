@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdmissionBillingInfo extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'admission_id',
+        'payment_type',
+        'primary_insurance_provider',
+        'policy_number',
+        'approval_code',
+        'guarantor_name',
+        'guarantor_relationship',
+        'guarantor_contact',
+    ];
 
     public function admission(): BelongsTo
     {

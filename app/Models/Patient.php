@@ -8,7 +8,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Patient extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'patient_unique_id',
+        'created_by_user_id',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'date_of_birth',
+        'sex',
+        'civil_status',
+        'nationality',
+        'religion',
+        'address_permanent',
+        'address_present',
+        'contact_number',
+        'email',
+        'emergency_contact_name',
+        'emergency_contact_relationship',
+        'emergency_contact_number',
+        'philhealth_number',
+        'senior_citizen_id',
+    ];
 
     protected $casts = [
         'date_of_birth' => 'datetime',

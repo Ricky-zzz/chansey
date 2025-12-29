@@ -13,6 +13,7 @@ class BadgeGenerator
             'nurse' => 'NUR',
             'physician' => 'DOC',
             'general_service' => 'SVC',
+            'pharmacist' => 'PHR',
             'admin' => 'ADM',
             default => 'STF',
         };

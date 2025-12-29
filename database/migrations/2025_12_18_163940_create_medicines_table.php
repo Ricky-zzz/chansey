@@ -28,7 +28,6 @@ public function up(): void
 
         $table->decimal('price', 10, 2)->default(0.00);
         
-        // Optional: Expiry is crucial for nurses to check
         $table->date('expiry_date')->nullable();
 
         $table->timestamps();
