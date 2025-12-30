@@ -21,4 +21,9 @@ class Medicine extends Model
         'expiry_date' => 'date',
         'price' => 'decimal:2',
     ];
+
+    public function medicalOrders()
+    {
+        return $this->hasMany(MedicalOrder::class);
+    }
 }

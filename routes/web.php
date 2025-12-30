@@ -4,7 +4,9 @@ use App\Http\Controllers\Admission\PatientController;
 use App\Http\Controllers\Admission\AdmissionController;
 use App\Http\Controllers\Admission\DashboardController as AdmissionDash;
 use App\Http\Controllers\Clinical\DashboardController as ClinicDash;
+use App\Http\Controllers\Physician\DashboardController as PhysicianDash;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\Physician\MyPatientController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -41,7 +43,7 @@ Route::get('/dashboard', function () {
     }
 
     if ($user->user_type === 'physician') {
-        return "Doctor Dashboard Coming Soon";
+        return redirect()->route('physician.dashboard');
     }
 
     return redirect('/login')->with('error', 'Unauthorized user type.');
@@ -94,6 +96,20 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // Clinical Dashboard
     Route::get('/dashboard', [ClinicDash::class, 'index'])->name('dashboard');
 });
+
+//  Physicians
+Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(function () {
+
+    // Physician Dashboard
+    Route::get('/dashboard', [PhysicianDash::class, 'index'])->name('dashboard');
+
+    // my patient list
+    Route::get('/mypatients', [MyPatientController::class, 'index'])->name('patients.index');
+
+    // patient chart view
+    Route::get('/mypatients/{admission}', [MyPatientController::class, 'show'])->name('patients.show');
+});
+
 
 // File viewing route
 Route::middleware(['auth'])->get('/documents/{id}/view', [FileController::class, 'view'])->name('document.view');

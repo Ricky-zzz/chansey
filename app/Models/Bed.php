@@ -16,4 +16,14 @@ class Bed extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    public function admissions()
+    {
+        return $this->hasMany(Admission::class);
+    }
+
+    public function currentAdmission()
+    {
+        return $this->hasOne(Admission::class)->where('status', 'Admitted');
+    }
 }

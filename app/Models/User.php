@@ -73,6 +73,31 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(Pharmacist::class);
     }
 
+    public function createdPatients()
+    {
+        return $this->hasMany(Patient::class, 'created_by_user_id');
+    }
+
+    public function clerkAdmissions()
+    {
+        return $this->hasMany(Admission::class, 'admitting_clerk_id');
+    }
+
+    public function uploadedFiles()
+    {
+        return $this->hasMany(PatientFile::class, 'uploaded_by_id');
+    }
+
+    public function clinicalLogs()
+    {
+        return $this->hasMany(ClinicalLog::class);
+    }
+
+    public function fulfilledOrders()
+    {
+        return $this->hasMany(MedicalOrder::class, 'fulfilled_by_user_id');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {

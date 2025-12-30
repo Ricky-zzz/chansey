@@ -22,4 +22,19 @@ class Physician extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function admissions()
+    {
+        return $this->hasMany(Admission::class, 'attending_physician_id');
+    }
+
+    public function treatmentPlans()
+    {
+        return $this->hasMany(TreatmentPlan::class);
+    }
+
+    public function medicalOrders()
+    {
+        return $this->hasMany(MedicalOrder::class);
+    }
 }

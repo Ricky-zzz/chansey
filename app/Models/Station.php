@@ -25,4 +25,9 @@ class Station extends Model
     {
         return $this->hasMany(Nurse::class);
     }
+
+    public function admissions()
+    {
+        return $this->hasMany(Admission::class);
+    }
 }

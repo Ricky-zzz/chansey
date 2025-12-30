@@ -51,6 +51,11 @@ class Admission extends Model
         return $this->belongsTo(Bed::class);
     }
 
+    public function station(): BelongsTo
+    {
+        return $this->belongsTo(Station::class);
+    }
+
     public function attendingPhysician(): BelongsTo
     {
         return $this->belongsTo(Physician::class, 'attending_physician_id');
@@ -69,5 +74,25 @@ class Admission extends Model
     public function files(): HasMany
     {
         return $this->hasMany(PatientFile::class);
+    }
+
+    public function treatmentPlan(): HasOne
+    {
+        return $this->hasOne(TreatmentPlan::class);
+    }
+
+    public function medicalOrders(): HasMany
+    {
+        return $this->hasMany(MedicalOrder::class);
+    }
+
+    public function clinicalLogs(): HasMany
+    {
+        return $this->hasMany(ClinicalLog::class);
+    }
+
+    public function billableItems(): HasMany
+    {
+        return $this->hasMany(BillableItem::class);
     }
 }

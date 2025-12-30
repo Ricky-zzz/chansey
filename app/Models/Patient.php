@@ -41,6 +41,11 @@ class Patient extends Model
         return $this->hasMany(Admission::class);
     }
 
+    public function activeAdmission()
+    {
+        return $this->hasOne(Admission::class)->where('status', 'Admitted');
+    }
+
     public function files(): HasMany
     {
         return $this->hasMany(PatientFile::class);
