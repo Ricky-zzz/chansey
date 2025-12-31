@@ -55,4 +55,18 @@ class MedicalOrder extends Model
     {
         return $this->hasOne(ClinicalLog::class)->latestOfMany();
     }
+
+    public function getIntervalInHoursAttribute()
+    {
+        return match ($this->frequency) {
+            'Every 1 Hour'  => 1,
+            'Every 2 Hours' => 2, 
+            'Every 4 Hours' => 4,
+            'Every 6 Hours' => 6,
+            'Every 8 Hours' => 8,
+            'Every 12 Hours' => 12,
+            'Daily'         => 24,
+            default         => null,
+        };
+    }
 }

@@ -41,9 +41,9 @@ return new class extends Migration
             
             // Optional Link to Pharmacy (If it is a medication order)
             $table->foreignId('medicine_id')->nullable()->constrained();
-            $table->integer('quantity')->default(1); // Add this!
+            $table->integer('quantity')->default(1); 
             
-            $table->string('frequency')->nullable(); // "Every 4 hours", "Once"
+            $table->string('frequency')->nullable(); 
             
             // Status Loop
             $table->string('status')->default('Pending')->index(); // Pending -> Done -> Cancelled

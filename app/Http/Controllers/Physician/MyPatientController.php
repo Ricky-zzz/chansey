@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Physician;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admission;
+use App\Models\Medicine;
+use App\Models\MedicalOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,23 +16,23 @@ class MyPatientController extends Controller
     {
         $physician = Auth::user()->physician;
 
-        // Base Query: "Active Admissions Assigned to Me"
+        // Base Query: 
         $query = Admission::with(['patient', 'bed.room.station'])
             ->where('admissions.status', 'Admitted')
             ->where('admissions.attending_physician_id', $physician->id);
 
-        // Search Logic (Same as AdmissionController but scoped)
+        // Search Logic 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('admission_number', 'like', "%{$search}%")
-                  ->orWhereHas('patient', function ($subQ) use ($search) {
+                    ->orWhereHas('patient', function ($subQ) use ($search) {
                         $subQ->where('last_name', 'like', "{$search}%")
-                             ->orWhere('first_name', 'like', "{$search}%");
-                  });
+                            ->orWhere('first_name', 'like', "{$search}%");
+                    });
             });
         }
 
-        // Sort by Location (Station -> Room) for logical rounds
+        // Pagination & Ordering
         $myPatients = $query
             ->join('beds', 'admissions.bed_id', '=', 'beds.id')
             ->join('rooms', 'beds.room_id', '=', 'rooms.id')
@@ -44,21 +46,29 @@ class MyPatientController extends Controller
         return view('physician.patients.index', compact('myPatients'));
     }
 
-    // THE PATIENT CHART (Read-Only Detail View)
+    // patient chart
     public function show($id)
     {
-        // Ensure the doctor is only viewing THEIR patient (Security)
+        $physician = Auth::user()->physician;
+
         $admission = Admission::with([
             'patient',
             'bed.room.station',
-            'clinicalLogs', // Need logs to see vitals history
-            'doctorOrders', // Need orders to see what's pending
-            'treatmentPlan' // The strategy
+            'treatmentPlan',
+            'medicalOrders' => function ($q) {
+                $q->latest();
+            },
+            'clinicalLogs' => function ($q) {
+                $q->latest();
+            }
         ])
-        ->where('id', $id)
-        ->where('attending_physician_id', Auth::user()->physician->id)
-        ->firstOrFail();
+            ->where('id', $id)
+            ->where('attending_physician_id', $physician->id)
+            ->firstOrFail();
 
-        return view('physician.patients.show', compact('admission'));
+        $latestLog = $admission->clinicalLogs->first();
+        $medicines = Medicine::where('stock_on_hand', '>', 0)->get();
+
+        return view('physician.patients.show', compact('admission', 'latestLog', 'medicines'));
     }
 }
