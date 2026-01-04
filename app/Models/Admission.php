@@ -95,4 +95,9 @@ class Admission extends Model
     {
         return $this->hasMany(BillableItem::class);
     }
+
+    public function nursingCarePlans(): HasOne
+    {
+        return $this->hasOne(NursingCarePlan::class);
+    }
 }

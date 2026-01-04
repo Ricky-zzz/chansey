@@ -6,6 +6,9 @@ use App\Http\Controllers\Admission\DashboardController as AdmissionDash;
 use App\Http\Controllers\Clinical\DashboardController as ClinicDash;
 use App\Http\Controllers\Physician\DashboardController as PhysicianDash;
 use App\Http\Controllers\Physician\OrderController;
+use \App\Http\Controllers\Clinical\WardController;
+use App\Http\Controllers\Clinical\CarePlanController;
+use App\Http\Controllers\Clinical\ClinicalLogController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Physician\TreatmentPlanController;
 use App\Http\Controllers\Physician\MyPatientController;
@@ -97,6 +100,20 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
 
     // Clinical Dashboard
     Route::get('/dashboard', [ClinicDash::class, 'index'])->name('dashboard');
+
+    // WARD LIST
+    Route::get('/my-ward', [WardController::class, 'index'])
+        ->name('ward.index');
+
+    // PATIENT CHART 
+    Route::get('/patient/{admission}', [WardController::class, 'show'])
+        ->name('ward.show');
+    
+    // NURSING CARE PLAN ROUTES
+    Route::get('/patient/{admission}/care-plan', [CarePlanController::class, 'edit'])->name('care-plan.edit');
+    Route::put('/patient/{admission}/care-plan', [CarePlanController::class, 'update'])->name('care-plan.update');
+
+    Route::post('/patient/{admission}/logs', [ClinicalLogController::class, 'store'])->name('logs.store');
 });
 
 //  Physicians
@@ -110,7 +127,7 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
 
     // patient chart view
     Route::get('/mypatients/{admission}', [MyPatientController::class, 'show'])->name('patients.show');
-    
+
     // patient order make
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 

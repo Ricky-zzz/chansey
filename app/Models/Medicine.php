@@ -26,4 +26,22 @@ class Medicine extends Model
     {
         return $this->hasMany(MedicalOrder::class);
     }
+
+    /**
+     * Format medicine display with generic name, brand name, and dosage form
+     */
+    public function getFormattedLabel()
+    {
+        $label = $this->generic_name;
+        
+        if ($this->brand_name) {
+            $label .= ' (' . $this->brand_name . ')';
+        }
+        
+        if ($this->dosage) {
+            $label .= ' - ' . $this->dosage;
+        }
+        
+        return $label;
+    }
 }

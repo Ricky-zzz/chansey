@@ -29,7 +29,7 @@
                         <th>Location</th> <!-- Critical for rounds -->
                         <th>Patient</th>
                         <th>Type</th>
-                        <th></th>Case Details</th>
+                        <th>Case Details</th>
                         <th>Admission Date</th>
                         <th class="text-right">Chart</th>
                     </tr>

@@ -57,18 +57,35 @@ class MyPatientController extends Controller
             'treatmentPlan',
             'medicalOrders' => function ($q) {
                 $q->latest();
-            },
-            'clinicalLogs' => function ($q) {
-                $q->latest();
             }
         ])
             ->where('id', $id)
             ->where('attending_physician_id', $physician->id)
             ->firstOrFail();
 
-        $latestLog = $admission->clinicalLogs->first();
+        $latestLog = $admission->clinicalLogs()->latest()->first();
+        
+        $clinicalLogs = $admission->clinicalLogs()
+            ->with('user')
+            ->latest()
+            ->paginate(15);
+
+        $vitals = null;
+        if ($latestLog && isset($latestLog->data['bp_systolic'])) {
+            $vitals = $latestLog->data;
+        } else {
+            $vitals = [
+                'bp_systolic' => $admission->bp_systolic,
+                'bp_diastolic' => $admission->bp_diastolic,
+                'temp' => $admission->temp,
+                'hr' => $admission->pulse_rate,
+                'o2' => $admission->o2_sat,
+                'recorded_at' => $admission->admission_date,
+            ];
+        }
+
         $medicines = Medicine::where('stock_on_hand', '>', 0)->get();
 
-        return view('physician.patients.show', compact('admission', 'latestLog', 'medicines'));
+        return view('physician.patients.show', compact('admission', 'latestLog', 'medicines', 'vitals', 'clinicalLogs'));
     }
 }

@@ -304,3 +304,64 @@ In your view, use the same modal for Vitals and Meds, but hide the "Inputs" when
     *   Creates Bill -> (`+ ₱Price`).
 
 This is the perfect, safe way to handle it.
+
+You are absolutely on the right track. You **do not** need a complex background timer or alarm system running on the server.
+
+You can handle this entirely using **"Runtime Calculation"**. This means every time the page loads, the system does a quick math problem to decide what the button looks like.
+
+Here is the logical breakdown of how you should implement this:
+
+### 1. The Core Formula
+You need to calculate the **Target Time**.
+
+> **Target Time** = **(Last Log Time OR Order Creation Time)** + **Frequency**
+
+### 2. The Logic Flow (Step-by-Step)
+
+When the Nurse opens the dashboard, the system looks at an Order (e.g., Paracetamol q4h) and runs this check:
+
+**Step A: Find the "Anchor" Time**
+*   **Has this been given before?**
+    *   **YES:** Look at the `clinical_logs` table. Grab the timestamp of the **Latest Log** for this order. (e.g., 8:00 AM).
+    *   **NO:** Look at the `medical_orders` table. Grab the **Created At** timestamp. (e.g., 8:00 AM).
+
+**Step B: Add the Frequency**
+*   Convert "Every 4 Hours" to `4`.
+*   **Math:** 8:00 AM + 4 Hours = **12:00 PM (Target Time)**.
+
+**Step C: Compare with "NOW"**
+*   Suppose "NOW" is **10:00 AM**.
+    *   *Math:* 12:00 PM - 10:00 AM = **2 Hours Left**.
+    *   *Result:* Show **"Next dose in 2 hours"**. (Button is Disabled/Green).
+*   Suppose "NOW" is **12:30 PM**.
+    *   *Math:* 12:30 is *past* 12:00.
+    *   *Result:* Show **"DUE NOW (Overdue by 30m)"**. (Button is Active/Red/Blinking).
+
+### 3. The "Traffic Light" UI Concept
+
+Instead of just "Due" or "Not Due", you can make the UI smart based on the time remaining:
+
+1.  **Safe Zone (> 1 hour left):**
+    *   **Color:** Gray or Green (Outline).
+    *   **Text:** "Done. Next due: 4:00 PM".
+    *   **Action:** Button might be disabled (to prevent double-dosing).
+
+2.  **Preparation Zone (< 30 mins left):**
+    *   **Color:** Yellow/Orange.
+    *   **Text:** "Due in 20 mins".
+    *   **Action:** Button becomes clickable (in case nurse rounds slightly early).
+
+3.  **Action Zone (Time Passed):**
+    *   **Color:** Red (Solid/Pulse).
+    *   **Text:** "DUE NOW".
+    *   **Action:** Primary Call to Action.
+
+### 4. Handling Transfers & Labs (The Exception)
+You are right, these don't need math.
+*   **Logic:** If `Frequency == 'Once'` OR `Type == 'Transfer'`, simply ignore the timer logic.
+*   **State:** It is always **"Due"** until the status is changed to "Done".
+
+### Summary of the Plan
+1.  **Don't** write a script that runs every minute to check times.
+2.  **Do** write a function in your Model (like `getNextDueAttribute`) that calculates the time *only when the nurse looks at the page*.
+3.  **Do** use the **Last Log** as your reference point. This ensures that if a nurse gives meds late (e.g., 12:30 instead of 12:00), the *next* dose shifts accordingly (4:30 instead of 4:00), which is safer for the patient.

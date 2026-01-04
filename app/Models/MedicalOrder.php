@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class MedicalOrder extends Model
 {
@@ -68,5 +69,62 @@ class MedicalOrder extends Model
             'Daily'         => 24,
             default         => null,
         };
+    }
+
+
+    public function getTimerStatusAttribute()
+    {
+        if ($this->frequency === 'PRN') {
+            return [
+                'color' => 'success', 
+                'label' => 'Available (PRN)',
+                'disabled' => false,
+                'is_due' => false
+            ];
+        }
+
+        if ($this->frequency === 'Once' || !$this->interval_in_hours) {
+            return [
+                'color' => 'primary',
+                'label' => 'Execute Order',
+                'disabled' => false,
+                'is_due' => true
+            ];
+        }
+
+        $lastAction = $this->latestLog ? $this->latestLog->created_at : $this->created_at;
+        
+        $nextDue = $lastAction->copy()->addHours($this->interval_in_hours);
+        $now = now();
+
+        
+        if ($now->greaterThanOrEqualTo($nextDue)) {
+            $overdueBy = $now->diffForHumans($nextDue, ['syntax' => Carbon::DIFF_ABSOLUTE]);
+            return [
+                'color' => 'error', 
+                'label' => "DUE NOW (Late by $overdueBy)",
+                'disabled' => false,
+                'is_due' => true,
+                'animate' => true 
+            ];
+        }
+
+        $minutesRemaining = $now->diffInMinutes($nextDue);
+
+        if ($minutesRemaining <= 30) {
+            return [
+                'color' => 'warning', 
+                'label' => "Due in {$minutesRemaining}m",
+                'disabled' => false,
+                'is_due' => true
+            ];
+        }
+
+        return [
+            'color' => 'neutral',
+            'label' => "Next: " . $nextDue->format('H:i'), 
+            'disabled' => true, 
+            'is_due' => false
+        ];
     }
 }

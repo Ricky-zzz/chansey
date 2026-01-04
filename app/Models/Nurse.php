@@ -29,4 +29,9 @@ class Nurse extends Model
     {
         return $this->belongsTo(Station::class);
     }
+
+    public function nursingCarePlans()
+    {
+        return $this->hasMany(NursingCarePlan::class);
+    }
 }

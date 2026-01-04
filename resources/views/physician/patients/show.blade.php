@@ -1,232 +1,275 @@
 @extends('layouts.physician')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
-
-    <!-- 1. PATIENT HEADER -->
-    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
-        <div>
-            <div class="text-sm breadcrumbs mb-1">
-                <ul>
-                    <li><a href="{{ route('physician.dashboard') }}">Dashboard</a></li>
-                    <li><a href="{{ route('physician.patients.index') }}">My Patients</a></li>
-                    <li class="font-bold text-primary">{{ $admission->patient->last_name }}</li>
-                </ul>
-            </div>
-            <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3">
+<div class="max-w-full mx-auto" x-data="clinicalChart()">
+        <!-- BREADCRUMB -->
+    <div class="text-sm breadcrumbs mb-3">
+        <ul>
+            <li><a href="{{ route('physician.dashboard') }}" class="link link-hover">Dashboard</a></li>
+            <li><a href="{{ route('physician.patients.index') }}" class="link link-hover">My Patients</a></li>
+            <li class="text-slate-700 font-semibold">
                 {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
-                <span class="badge badge-lg badge-neutral font-mono text-sm">
-                    {{ $admission->bed->bed_code ?? 'Waiting' }}
-                </span>
-            </h2>
-            <div class="text-sm text-gray-500 mt-1">
-                {{ $admission->patient->age }} yo / {{ $admission->patient->sex }} • Admitted: {{ $admission->admission_date->format('M d') }}
+            </li>
+        </ul>
+    </div>
+
+    <!-- 1. HEADER: PATIENT CONTEXT -->
+    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="avatar placeholder">
+                <div class="bg-neutral text-neutral-content rounded-full w-16 h-16 flex items-center justify-center">
+                    <span class="text-3xl">{{ substr($admission->patient->first_name, 0, 1) }}</span>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black text-slate-800">
+                    {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
+                </h1>
+                <div class="flex gap-2 items-center mt-1">
+                    <span class="badge badge-lg badge-primary font-mono">{{ $admission->bed->bed_code }}</span>
+                    <span class="text-sm text-gray-500">{{ $admission->patient->age }}yo / {{ $admission->patient->sex }}</span>
+                    <span class="text-sm text-gray-500">• Admitted: {{ $admission->admission_date->format('M d') }}</span>
+                </div>
+                <!-- Allergies Alert -->
+                @if(!empty($admission->known_allergies))
+                <div class="mt-2 flex gap-1 items-center">
+                    <span class="text-xs font-bold text-gray-500">Allergies:</span>
+                    @foreach($admission->known_allergies as $allergy)
+                    <span class="badge badge-error text-white badge-xs">{{ $allergy }}</span>
+                    @endforeach
+                </div>
+                @endif
             </div>
         </div>
 
         <!-- PRIMARY ACTIONS -->
-        <div class="join">
-            <!-- Order Modal Trigger -->
-            <button onclick="order_modal.showModal()" class="btn btn-primary join-item gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Write Order
-            </button>
+        <div class="flex flex-col gap-2 items-end">
+            <h2 class="text-xs font-bold text-gray-400 uppercase">Actions</h2>
+            <div class="join">
+                <!-- Order Modal Trigger -->
+                <button onclick="order_modal.showModal()" class="btn btn-primary btn-sm join-item gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Write Order
+                </button>
 
-            <!-- Treatment Plan Button -->
-            @if($admission->treatmentPlan)
-            <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="btn btn-secondary join-item">Manage Plan</a>
-            @else
-            <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="btn btn-secondary join-item">Create Plan</a>
-            @endif
+                <!-- Treatment Plan Button -->
+                @if($admission->treatmentPlan)
+                <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="btn btn-neutral btn-sm join-item text-white">Manage Plan</a>
+                @else
+                <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="btn btn-neutral btn-sm join-item text-white">Create Plan</a>
+                @endif
+            </div>
         </div>
     </div>
 
     <!-- 2. TOP GRID: LATEST STATUS & PLAN SUMMARY -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-        <!-- CARD A: LATEST CLINICAL STATUS  -->
-        <div class="card bg-base-100 shadow-xl border-l-8 border-info">
-            <div class="card-body">
-                <h3 class="card-title text-sm text-gray-800 uppercase font-bold flex justify-between">
-                    Latest Clinical Update
-                    <span class="text-info">{{ $latestLog ? $latestLog->created_at->diffForHumans() : 'No Data' }}</span>
-                </h3>
+        <!-- LEFT COLUMN: ACTIVE ORDERS (SCROLLABLE) -->
+        <div class="lg:col-span-1">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h3 class="font-bold text-slate-700 text-lg">Active Orders</h3>
+                <span class="badge badge-ghost">{{ $admission->medicalOrders->count() }}</span>
+            </div>
 
-                @if($latestLog)
-                @php $data = $latestLog->data; @endphp
-                <div class="grid grid-cols-2 gap-4 mt-2">
-                    <div>
-                        <div class="text-xs text-gray-800">Vital Signs</div>
-                        <div class="font-mono text-lg font-bold">
-                            BP: {{ $data['bp'] ?? '--' }} <br>
-                            T: {{ $data['temp'] ?? '--' }}°C
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                @forelse($admission->medicalOrders as $order)
+                <div class="card bg-base-100 shadow border border-l-4
+                    {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
+                      ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
+                    <div class="card-body p-3">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
+                            <span class="text-xs text-gray-500">{{ $order->frequency ?? 'Once' }}</span>
                         </div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-gray-800">Latest Note</div>
-                        <p class="italic text-sm text-gray-600 line-clamp-3">
-                            "{{ $data['observation'] ?? ($data['note'] ?? 'No note recorded') }}"
-                        </p>
-                    </div>
-                </div>
-                <div class="mt-4 text-xs text-right text-gray-800">
-                    Logged by: {{ $latestLog->user->name ?? 'Nurse' }}
-                </div>
-                @else
-                <div class="text-center py-4 text-gray-800">No clinical logs recorded yet.</div>
-                @endif
-            </div>
-        </div>
-
-        <!-- CARD B: TREATMENT PLAN SNAPSHOT -->
-        <div class="card bg-base-100 shadow-xl border-l-8 border-secondary">
-            <div class="card-body">
-                <h3 class="card-title text-sm text-gray-800 uppercase font-bold">Active Treatment Plan</h3>
-
-                @if($admission->treatmentPlan)
-                <div class="font-bold text-lg text-slate-800">{{ $admission->treatmentPlan->main_problem }}</div>
-
-                <div class="grid grid-cols-2 gap-4 mt-2">
-                    <div>
-                        <div class="text-xs text-gray-800 uppercase font-semibold">Goals</div>
-                        <ul class="list-disc list-inside text-sm font-medium">
-                            @foreach(array_slice($admission->treatmentPlan->goals ?? [], 0, 3) as $goal)
-                            <li>{{ $goal }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    <div>
-                        <div class="text-xs text-gray-800 uppercase font-semibold">Interventions</div>
-                        <ul class="list-disc list-inside text-sm font-medium">
-                            @foreach(array_slice($admission->treatmentPlan->interventions ?? [], 0, 3) as $intervention)
-                            <li>{{ $intervention }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-                @else
-                <div class="flex flex-col items-center justify-center py-2">
-                    <p class="text-gray-800 text-sm mb-2">No active plan established.</p>
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. DOCTOR'S ORDERS  -->
-    <div class="card bg-base-100 shadow-xl border border-base-200 mb-8">
-        <div class="card-body">
-            <h3 class="card-title text-slate-700">Active Orders</h3>
-
-            <div class="overflow-x-auto">
-                <table class="table">
-                    <thead class="text-slate-600">
-                        <tr>
-                            <th>Type</th>
-                            <th>Instruction</th>
-                            <th>Frequency</th>
-                            <th>Status</th>
-                            <th class="w-40 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($admission->medicalOrders as $order)
-                        <tr>
-                            <td>
-                                <div class="badge badge-outline">{{ $order->type }}</div>
-                            </td>
-                            <td class="font-bold text-slate-700">
-                                {{ $order->instruction }}
-                                @if($order->medicine)
-                                <span class="text-xs font-normal text-gray-500 block">
-                                    Using: {{ $order->medicine->name }} (Qty: {{ $order->quantity }})
-                                </span>
-                                @endif
-                            </td>
-                            <td>{{ $order->frequency ?? 'Once' }}</td>
-                            <td>
-                                <span class="badge {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
-                                    {{ $order->status }}
-                                </span>
-                            </td>
-
-                            <td class="text-right">
-
-                                @if($order->status === 'Pending' && $order->clinicalLogs->count() === 0)
-
-                                <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete this order?');">
+                        <div class="text-sm font-bold text-slate-800 mb-2">
+                            {{ $order->instruction }}
+                            @if($order->medicine)
+                            <span class="text-xs font-normal text-gray-500 block">
+                                {{ $order->medicine->name }} (Qty: {{ $order->quantity }})
+                            </span>
+                            @endif
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="badge badge-xs {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
+                                {{ $order->status }}
+                            </span>
+                            @if($order->status === 'Pending' && $order->clinicalLogs->count() === 0)
+                                <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-xs btn-outline text-error">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Delete
-                                    </button>
+                                    <button class="btn btn-xs btn-ghost text-error">Delete</button>
                                 </form>
-
-                                @elseif($order->status === 'Pending' || $order->status === 'Active')
-
-                                <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST">
+                            @elseif($order->status === 'Pending' || $order->status === 'Active')
+                                <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button class="btn btn-xs btn-warning text-white">Stop / Discontinue</button>
+                                    <button class="btn btn-xs btn-warning btn-outline">Stop</button>
                                 </form>
-
-                                @else
-                                <span class="text-xs text-gray-800">Locked</span>
-                                @endif
-
-                            </td>
-
-
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-gray-800 italic">No active orders.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center text-gray-400 text-sm py-8">No active orders.</div>
+                @endforelse
             </div>
         </div>
-    </div>
 
-    <!-- 4. CLINICAL LOGS HISTORY  -->
-    <div class="collapse collapse-arrow bg-base-100 border border-base-200">
-        <input type="checkbox" />
-        <div class="collapse-title text-xl font-medium text-slate-600">
-            Clinical Log History
-        </div>
-        <div class="collapse-content">
-            <div class="overflow-x-auto max-h-60">
-                <table class="table table-xs">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Type</th>
-                            <th>Data</th>
-                            <th>Nurse</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($admission->clinicalLogs as $log)
-                        <tr>
-                            <td class="font-mono">{{ $log->created_at->format('M d H:i') }}</td>
-                            <td class="font-bold">{{ $log->type }}</td>
-                            <td>
-                                <!-- Dirty quick dump of JSON data for reading -->
-                                @foreach($log->data as $key => $val)
-                                <span class="badge badge-ghost badge-xs">{{ $key }}: {{ $val }}</span>
-                                @endforeach
-                            </td>
-                            <td>{{ $log->user->name ?? 'Unknown' }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <!-- RIGHT COLUMN: CLINICAL STATUS -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- A. LATEST CLINICAL STATUS & PLAN -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- CARD A: LATEST VITALS  -->
+                <div class="card bg-base-100 shadow-xl border-l-8 border-info">
+                    <div class="card-body">
+                        <h3 class="card-title text-sm text-gray-800 uppercase font-bold flex justify-between">
+                            Current Vitals
+                            <span class="text-info">
+                                @if($latestLog && isset($latestLog->data['bp_systolic']))
+                                    {{ $latestLog->created_at->diffForHumans() }}
+                                @else
+                                    Admission ({{ $admission->admission_date->format('M d H:i') }})
+                                @endif
+                            </span>
+                        </h3>
+
+                        @if($vitals)
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <div class="text-xs text-gray-800">BP</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['bp_systolic'] ?? '--' }}/{{ $vitals['bp_diastolic'] ?? '--' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800">Temp</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['temp'] ?? '--' }}°C</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800">HR</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['hr'] ?? '--' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800">O2</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['o2'] ?? '--' }}%</div>
+                            </div>
+                        </div>
+                        @else
+                        <div class="text-center py-4 text-gray-800">No vitals recorded yet.</div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- CARD B: TREATMENT PLAN SNAPSHOT -->
+                <div class="card bg-base-100 shadow-xl border-l-8 border-secondary">
+                    <div class="card-body">
+                        <h3 class="card-title text-sm text-gray-800 uppercase font-bold">Active Treatment Plan</h3>
+
+                        @if($admission->treatmentPlan)
+                        <div class="font-bold text-lg text-slate-800">{{ $admission->treatmentPlan->main_problem }}</div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <div class="text-xs text-gray-800 uppercase font-semibold">Goals</div>
+                                <ul class="list-disc list-inside text-sm font-medium">
+                                    @foreach(array_slice($admission->treatmentPlan->goals ?? [], 0, 3) as $goal)
+                                    <li>{{ $goal }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800 uppercase font-semibold">Interventions</div>
+                                <ul class="list-disc list-inside text-sm font-medium">
+                                    @foreach(array_slice($admission->treatmentPlan->interventions ?? [], 0, 3) as $intervention)
+                                    <li>{{ $intervention }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        @else
+                        <div class="flex flex-col items-center justify-center py-2">
+                            <p class="text-gray-800 text-sm mb-2">No active plan established.</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- B. CLINICAL LOG HISTORY TABLE -->
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-slate-700 text-lg">Clinical Log History</h3>
+
+                    <div class="overflow-x-auto max-h-96">
+                        <table class="table table-sm">
+                            <thead class="text-slate-600 sticky top-0 bg-base-100">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Data</th>
+                                    <th>Nurse</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($clinicalLogs as $log)
+                                <tr>
+                                    <td class="font-mono text-xs">{{ $log->created_at->format('M d H:i') }}</td>
+                                    <td>
+                                        <div class="badge badge-sm badge-outline">{{ $log->type }}</div>
+                                    </td>
+                                    <td class="text-xs max-w-xs">
+                                        @if($log->type === 'Medication')
+                                            Given: <strong>{{ $log->data['medicine'] ?? 'Unknown' }}</strong> ({{ $log->data['dosage'] ?? '--' }})
+                                        @elseif($log->type === 'Vitals')
+                                            BP: {{ $log->data['bp_systolic'] }}/{{ $log->data['bp_diastolic'] }} | T: {{ $log->data['temp'] }}
+                                        @else
+                                            {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
+                                        @endif
+                                    </td>
+                                    <td class="text-xs text-gray-500">{{ $log->user->name ?? 'Unknown' }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-400 italic py-6">No clinical logs recorded yet.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    @if($clinicalLogs->hasPages())
+                    <div class="mt-4 pt-4 border-t border-base-200 flex justify-between items-center text-xs">
+                        <span class="text-gray-500">
+                            Showing {{ $clinicalLogs->firstItem() ?? 0 }} to {{ $clinicalLogs->lastItem() ?? 0 }} of {{ $clinicalLogs->total() }} logs
+                        </span>
+                        <div class="join">
+                            @if($clinicalLogs->onFirstPage())
+                                <button class="join-item btn btn-xs btn-disabled">Previous</button>
+                            @else
+                                <a href="{{ $clinicalLogs->previousPageUrl() }}" class="join-item btn btn-xs btn-outline">Previous</a>
+                            @endif
+
+                            @foreach($clinicalLogs->getUrlRange(1, $clinicalLogs->lastPage()) as $page => $url)
+                                @if($page == $clinicalLogs->currentPage())
+                                    <button class="join-item btn btn-xs btn-active">{{ $page }}</button>
+                                @else
+                                    <a href="{{ $url }}" class="join-item btn btn-xs btn-outline">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            @if($clinicalLogs->hasMorePages())
+                                <a href="{{ $clinicalLogs->nextPageUrl() }}" class="join-item btn btn-xs btn-outline">Next</a>
+                            @else
+                                <button class="join-item btn btn-xs btn-disabled">Next</button>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
