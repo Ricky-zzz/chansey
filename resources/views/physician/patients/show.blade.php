@@ -65,56 +65,121 @@
     </div>
 
     <!-- 2. TOP GRID: LATEST STATUS & PLAN SUMMARY -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" x-data="{ orderView: 'active' }">
 
-        <!-- LEFT COLUMN: ACTIVE ORDERS (SCROLLABLE) -->
+        <!-- LEFT COLUMN: ORDERS (ACTIVE OR HISTORY) (SCROLLABLE) -->
         <div class="lg:col-span-1">
             <div class="flex justify-between items-center mb-4 px-1">
-                <h3 class="font-bold text-slate-700 text-lg">Active Orders</h3>
-                <span class="badge badge-ghost">{{ $admission->medicalOrders->count() }}</span>
+                <h3 class="font-bold text-slate-700 text-lg" x-text="orderView === 'active' ? 'Active Orders' : 'Order History'"></h3>
+                <div class="join border border-slate-300 rounded-lg">
+                    <button @click="orderView = 'active'" :class="orderView === 'active' ? 'btn-active' : ''" class="btn btn-xs join-item">Active</button>
+                    <button @click="orderView = 'history'" :class="orderView === 'history' ? 'btn-active' : ''" class="btn btn-xs join-item">History</button>
+                </div>
+                <span class="badge badge-ghost" x-text="orderView === 'active' ? {{ $admission->medicalOrders->count() }} : {{ $orderHistory->count() }}"></span>
             </div>
 
-            <div class="space-y-3 max-h-96 overflow-y-auto">
-                @forelse($admission->medicalOrders as $order)
-                <div class="card bg-base-100 shadow border border-l-4
-                    {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
-                      ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
-                    <div class="card-body p-3">
-                        <div class="flex justify-between items-start mb-1">
-                            <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
-                            <span class="text-xs text-gray-500">{{ $order->frequency ?? 'Once' }}</span>
+            <div class="space-y-4 overflow-y-auto">
+                <!-- ACTIVE ORDERS -->
+                <template x-if="orderView === 'active'">
+                    <div>
+                        @forelse($admission->medicalOrders as $order)
+                        <div class="card mb-1.5 bg-base-100 shadow border border-l-4
+                            {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
+                              ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
+                            <div class="card-body p-3">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex gap-2 items-center">
+                                        <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
+                                        <span class="badge badge-sm {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
+                                            {{ $order->status }}
+                                        </span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">{{ $order->frequency ?? 'Once' }}</span>
+                                </div>
+                                @if($order->medicine)
+                                <div class="text-sm font-bold text-slate-800 mb-2">
+                                    {{ $order->medicine->getFormattedLabel() }}
+                                    <span class="text-xs font-normal text-gray-500 block">
+                                        Quantity: {{ $order->quantity }}
+                                    </span>
+                                </div>
+                                @endif
+                                <div class="text-xs text-gray-600 mb-2">
+                                    Instruction: {{ $order->instruction }}
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    @if($order->status === 'Pending' && $order->clinicalLogs->count() === 0)
+                                        <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="w-full">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-error btn-outline w-full">Delete</button>
+                                        </form>
+                                    @elseif($order->status === 'Pending' || $order->status === 'Active')
+                                        <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="w-full">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="btn btn-sm btn-error btn-outline w-full">Stop</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-sm font-bold text-slate-800 mb-2">
-                            {{ $order->instruction }}
-                            @if($order->medicine)
-                            <span class="text-xs font-normal text-gray-500 block">
-                                {{ $order->medicine->name }} (Qty: {{ $order->quantity }})
-                            </span>
-                            @endif
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="badge badge-xs {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
-                                {{ $order->status }}
-                            </span>
-                            @if($order->status === 'Pending' && $order->clinicalLogs->count() === 0)
-                                <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-xs btn-ghost text-error">Delete</button>
-                                </form>
-                            @elseif($order->status === 'Pending' || $order->status === 'Active')
-                                <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button class="btn btn-xs btn-warning btn-outline">Stop</button>
-                                </form>
-                            @endif
-                        </div>
+                        @empty
+                        <div class="text-center text-gray-400 text-sm py-8">No active orders.</div>
+                        @endforelse
                     </div>
-                </div>
-                @empty
-                <div class="text-center text-gray-400 text-sm py-8">No active orders.</div>
-                @endforelse
+                </template>
+
+                <!-- ORDER HISTORY -->
+                <template x-if="orderView === 'history'">
+                    <div>
+                        @forelse($orderHistory as $order)
+                        <div class="card bg-base-100 shadow border border-l-4
+                            {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
+                              ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
+                            <div class="card-body p-3">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex gap-2 items-center">
+                                        <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
+                                        <span class="badge badge-sm {{ $order->status === 'Done' ? 'badge-success' : 'badge-error' }}">
+                                            {{ $order->status }}
+                                        </span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">{{ $order->frequency ?? 'Once' }}</span>
+                                </div>
+                                @if($order->medicine)
+                                <div class="text-sm font-bold text-slate-800 mb-2">
+                                    {{ $order->medicine->getFormattedLabel() }}
+                                    <span class="text-xs font-normal text-gray-500 block">
+                                        Quantity: {{ $order->quantity }}
+                                    </span>
+                                </div>
+                                @endif
+                                <div class="text-xs text-gray-600 mb-2">
+                                    Instruction: {{ $order->instruction }}
+                                </div>
+                                @if($order->fulfilled_at)
+                                <div class="text-xs text-gray-500 mb-2">
+                                    {{ $order->status === 'Done' ? 'Completed' : 'Discontinued' }}: {{ $order->fulfilled_at->format('M d H:i') }}
+                                </div>
+                                @endif
+                                @if($order->type === 'Laboratory' && $order->labResultFile)
+                                <div class="flex gap-2">
+                                    <a href="{{ route('document.view', $order->labResultFile->id) }}" target="_blank" class="btn btn-xs btn-primary text-white flex-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        View Lab Result
+                                    </a>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center text-gray-400 text-sm py-8">No order history.</div>
+                        @endforelse
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -199,92 +264,19 @@
             </div>
 
             <!-- B. CLINICAL LOG HISTORY TABLE -->
-            <div class="card bg-base-100 shadow-xl border border-base-200">
-                <div class="card-body p-4">
-                    <h3 class="card-title text-slate-700 text-lg">Clinical Log History</h3>
-
-                    <div class="overflow-x-auto max-h-96">
-                        <table class="table table-sm">
-                            <thead class="text-slate-600 sticky top-0 bg-base-100">
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Type</th>
-                                    <th>Data</th>
-                                    <th>Nurse</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($clinicalLogs as $log)
-                                <tr>
-                                    <td class="font-mono text-xs">{{ $log->created_at->format('M d H:i') }}</td>
-                                    <td>
-                                        <div class="badge badge-sm badge-outline">{{ $log->type }}</div>
-                                    </td>
-                                    <td class="text-xs max-w-xs">
-                                        @if($log->type === 'Medication')
-                                            Given: <strong>{{ $log->data['medicine'] ?? 'Unknown' }}</strong> ({{ $log->data['dosage'] ?? '--' }})
-                                        @elseif($log->type === 'Vitals')
-                                            BP: {{ $log->data['bp_systolic'] }}/{{ $log->data['bp_diastolic'] }} | T: {{ $log->data['temp'] }}
-                                        @else
-                                            {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
-                                        @endif
-                                    </td>
-                                    <td class="text-xs text-gray-500">{{ $log->user->name ?? 'Unknown' }}</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center text-gray-400 italic py-6">No clinical logs recorded yet.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination Controls -->
-                    @if($clinicalLogs->hasPages())
-                    <div class="mt-4 pt-4 border-t border-base-200 flex justify-between items-center text-xs">
-                        <span class="text-gray-500">
-                            Showing {{ $clinicalLogs->firstItem() ?? 0 }} to {{ $clinicalLogs->lastItem() ?? 0 }} of {{ $clinicalLogs->total() }} logs
-                        </span>
-                        <div class="join">
-                            @if($clinicalLogs->onFirstPage())
-                                <button class="join-item btn btn-xs btn-disabled">Previous</button>
-                            @else
-                                <a href="{{ $clinicalLogs->previousPageUrl() }}" class="join-item btn btn-xs btn-outline">Previous</a>
-                            @endif
-
-                            @foreach($clinicalLogs->getUrlRange(1, $clinicalLogs->lastPage()) as $page => $url)
-                                @if($page == $clinicalLogs->currentPage())
-                                    <button class="join-item btn btn-xs btn-active">{{ $page }}</button>
-                                @else
-                                    <a href="{{ $url }}" class="join-item btn btn-xs btn-outline">{{ $page }}</a>
-                                @endif
-                            @endforeach
-
-                            @if($clinicalLogs->hasMorePages())
-                                <a href="{{ $clinicalLogs->nextPageUrl() }}" class="join-item btn btn-xs btn-outline">Next</a>
-                            @else
-                                <button class="join-item btn btn-xs btn-disabled">Next</button>
-                            @endif
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </div>
+            <x-clinical-history-table :clinicalLogs="$clinicalLogs" displayMode="physician" />
         </div>
     </div>
 
-</div>
+    <!-- CREATE ORDER MODAL  -->
+    <dialog id="order_modal" class="modal" x-data="{ orderType: 'Medication' }">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 class="font-bold text-xl mb-6">Create Physician Order</h3>
 
-<!-- CREATE ORDER MODAL  -->
-<dialog id="order_modal" class="modal" x-data="{ orderType: 'Medication' }">
-    <div class="modal-box w-11/12 max-w-2xl">
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-        </form>
-        <h3 class="font-bold text-xl mb-6">Create Physician Order</h3>
-
-        <form action="{{ route('physician.orders.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('physician.orders.store') }}" method="POST" class="space-y-4">
             @csrf
             <input type="hidden" name="admission_id" value="{{ $admission->id }}">
 
@@ -297,7 +289,6 @@
                     <option value="Medication">Medication</option>
                     <option value="Monitoring">Monitoring / Vitals</option>
                     <option value="Laboratory">Laboratory Request</option>
-                    <option value="Dietary">Dietary Instruction</option>
                     <option value="Utility">General/Utility</option>
                     <option value="Transfer">Transfer Patient</option>
                     <option value="Discharge">Ready for Discharge</option>
@@ -383,5 +374,23 @@
         <button>close</button>
     </form>
 </dialog>
+
+    <!-- VIEW LOG DETAILS MODAL -->
+    <x-clinical-log-modal />
+
+</div>
+
+<script>
+    function clinicalChart() {
+        return {
+            viewLogData: {},
+
+            viewLog(logObject) {
+                this.viewLogData = logObject;
+                document.getElementById('view_log_modal').showModal();
+            },
+        }
+    }
+</script>
 
 @endsection

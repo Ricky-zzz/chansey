@@ -35,4 +35,16 @@ class ClinicalLog extends Model
     {
         return $this->belongsTo(MedicalOrder::class);
     }
+
+    /**
+     * Get the lab result file uploaded for this lab order log.
+     * Only applies when this log is type 'Laboratory'.
+     * Uses the medical_order_id to find the associated PatientFile.
+     */
+    public function labResultFile()
+    {
+        return $this->hasOne(PatientFile::class, 'medical_order_id', 'medical_order_id')
+                    ->where('document_type', 'Lab Result')
+                    ->ofMany('id', 'max');
+    }
 }

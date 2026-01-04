@@ -65,9 +65,8 @@ class WardController extends Controller
 
         $latestLog = $admission->clinicalLogs()->latest()->first();
 
-        // Paginate clinical logs (15 per page, latest first)
         $clinicalLogs = $admission->clinicalLogs()
-            ->with('user')
+            ->with('user', 'labResultFile')
             ->latest()
             ->paginate(15);
 

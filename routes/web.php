@@ -10,6 +10,7 @@ use \App\Http\Controllers\Clinical\WardController;
 use App\Http\Controllers\Clinical\CarePlanController;
 use App\Http\Controllers\Clinical\ClinicalLogController;
 use App\Http\Controllers\FileController;
+use \App\Http\Controllers\Clinical\OrderExecutionController;
 use App\Http\Controllers\Physician\TreatmentPlanController;
 use App\Http\Controllers\Physician\MyPatientController;
 use Illuminate\Support\Facades\Auth;
@@ -108,12 +109,17 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // PATIENT CHART 
     Route::get('/patient/{admission}', [WardController::class, 'show'])
         ->name('ward.show');
-    
+
     // NURSING CARE PLAN ROUTES
     Route::get('/patient/{admission}/care-plan', [CarePlanController::class, 'edit'])->name('care-plan.edit');
     Route::put('/patient/{admission}/care-plan', [CarePlanController::class, 'update'])->name('care-plan.update');
 
+    // CLINICAL LOG add
     Route::post('/patient/{admission}/logs', [ClinicalLogController::class, 'store'])->name('logs.store');
+
+    // Upload Lab Result
+    Route::post('/orders/upload-result', [OrderExecutionController::class, 'uploadLabResult'])
+        ->name('orders.upload_result');
 });
 
 //  Physicians
@@ -151,7 +157,8 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
 
 
 // File viewing route
-Route::middleware(['auth'])->get('/documents/{id}/view', [FileController::class, 'view'])->name('document.view');
+Route::middleware(['auth'])->get('/document/view/{id}', [FileController::class, 'view'])->name('document.view');
+Route::middleware(['auth'])->get('/documents/{id}/view', [FileController::class, 'view']);
 
 
 

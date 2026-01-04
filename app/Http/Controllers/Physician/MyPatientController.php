@@ -56,36 +56,53 @@ class MyPatientController extends Controller
             'bed.room.station',
             'treatmentPlan',
             'medicalOrders' => function ($q) {
-                $q->latest();
+                $q->whereIn('status', ['Active', 'Pending'])
+                    ->with('medicine') 
+                    ->latest();
             }
         ])
             ->where('id', $id)
             ->where('attending_physician_id', $physician->id)
             ->firstOrFail();
 
-        $latestLog = $admission->clinicalLogs()->latest()->first();
-        
         $clinicalLogs = $admission->clinicalLogs()
-            ->with('user')
+            ->with(['user', 'labResultFile']) 
             ->latest()
             ->paginate(15);
 
+        $latestLog = $admission->clinicalLogs()->latest()->first();
+
         $vitals = null;
+
         if ($latestLog && isset($latestLog->data['bp_systolic'])) {
             $vitals = $latestLog->data;
         } else {
             $vitals = [
-                'bp_systolic' => $admission->bp_systolic,
+                'bp_systolic'  => $admission->bp_systolic,
                 'bp_diastolic' => $admission->bp_diastolic,
-                'temp' => $admission->temp,
-                'hr' => $admission->pulse_rate,
-                'o2' => $admission->o2_sat,
-                'recorded_at' => $admission->admission_date,
+                'temp'         => $admission->temp,
+                'hr'           => $admission->pulse_rate,      
+                'rr'           => $admission->respiratory_rate, 
+                'o2_sat'       => $admission->o2_sat,          
+                'recorded_at'  => $admission->admission_date,
             ];
         }
 
+        $orderHistory = $admission->medicalOrders()
+            ->whereIn('status', ['Done', 'Discontinued'])
+            ->with('labResultFile')
+            ->latest()
+            ->get();
+
         $medicines = Medicine::where('stock_on_hand', '>', 0)->get();
 
-        return view('physician.patients.show', compact('admission', 'latestLog', 'medicines', 'vitals', 'clinicalLogs'));
+        return view('physician.patients.show', compact(
+            'admission',
+            'latestLog',
+            'clinicalLogs',
+            'medicines',
+            'vitals',
+            'orderHistory' 
+        ));
     }
 }

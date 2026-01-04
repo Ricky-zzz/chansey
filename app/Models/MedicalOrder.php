@@ -57,6 +57,22 @@ class MedicalOrder extends Model
         return $this->hasOne(ClinicalLog::class)->latestOfMany();
     }
 
+    public function result()
+    {
+        return $this->hasOne(PatientFile::class, 'medical_order_id');
+    }
+
+    /**
+     * Get the lab result file uploaded for this order.
+     * Only applies when this order is type 'Laboratory'.
+     */
+    public function labResultFile()
+    {
+        return $this->hasOne(PatientFile::class, 'medical_order_id')
+                    ->where('document_type', 'Lab Result')
+                    ->ofMany('id', 'max');
+    }
+
     public function getIntervalInHoursAttribute()
     {
         return match ($this->frequency) {

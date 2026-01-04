@@ -112,15 +112,14 @@
                     <!-- ACTIONS -->
                     <div class="card-actions justify-end mt-2">
 
-                        @php 
-                            // Get the calculated status from the Model
-                            $status = $order->timer_status; 
+                        @php
+                        $status = $order->timer_status;
                         @endphp
 
                         <!-- 1. MONITORING: Log Values -->
                         @if($order->type === 'Monitoring')
-                        <button 
-                            @click="openLogModal({{ $order->id }}, 'Vitals')" 
+                        <button
+                            @click="openLogModal({{ $order->id }}, 'Vitals')"
                             class="btn btn-sm btn-{{ $status['color'] }} text-white w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
                             {{ $status['disabled'] ? 'disabled' : '' }}>
                             {{ $status['label'] }}
@@ -128,8 +127,8 @@
 
                         <!-- 2. MEDICATION: Administer -->
                         @elseif($order->type === 'Medication')
-                        <button 
-                            @click="openLogModal({{ $order->id }}, 'Medication', '{{ $order->medicine->brand_name ?? $order->medicine->generic_name ?? '' }}', '{{ $order->quantity ?? 1 }}')" 
+                        <button
+                            @click="openLogModal({{ $order->id }}, 'Medication', '{{ $order->medicine->brand_name ?? $order->medicine->generic_name ?? '' }}', '{{ $order->quantity ?? 1 }}')"
                             class="btn btn-sm btn-{{ $status['color'] }} text-white w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
                             {{ $status['disabled'] ? 'disabled' : '' }}>
                             {{ $status['label'] }}
@@ -138,17 +137,21 @@
                         <!-- 3. UTILITY: Execute Directly -->
                         @elseif($order->type === 'Utility')
                         @if($order->status !== 'Done')
-                            <form action="{{ route('nurse.clinical.logs.store', $admission->id) }}" method="POST" class="w-full">
-                                @csrf
-                                <input type="hidden" name="medical_order_id" value="{{ $order->id }}">
-                                <input type="hidden" name="type" value="Utility">
-                                <button type="submit" class="btn btn-sm btn-primary w-full">Execute Now</button>
-                            </form>
+                        <form action="{{ route('nurse.clinical.logs.store', $admission->id) }}" method="POST" class="w-full">
+                            @csrf
+                            <input type="hidden" name="medical_order_id" value="{{ $order->id }}">
+                            <input type="hidden" name="type" value="Utility">
+                            <button type="submit" class="btn btn-sm btn-primary w-full">Execute Now</button>
+                        </form>
                         @else
-                            <button class="btn btn-sm btn-disabled w-full">Completed</button>
+                        <button class="btn btn-sm btn-disabled w-full">Completed</button>
                         @endif
 
-                        <!-- 4. OTHER (Lab/Transfer) - Future Scope -->
+                        @elseif($order->type === 'Laboratory')
+                        <button @click="openLabModal({{ $order->id }}, '{{ $order->instruction }}')"
+                            class="btn btn-sm bg-emerald-500 text-white w-full">
+                            Upload Result
+                        </button>
                         @else
                         <button class="btn btn-sm btn-neutral w-full" disabled>Info Only</button>
                         @endif
@@ -182,9 +185,9 @@
                         </div>
                         <div class="text-[10px] text-gray-400 mt-2 text-right">
                             @if($latestLog && isset($latestLog->data['bp_systolic']))
-                                {{ $latestLog->created_at->diffForHumans() }}
+                            {{ $latestLog->created_at->diffForHumans() }}
                             @else
-                                Admission Vitals ({{ $admission->admission_date->format('M d H:i') }})
+                            Admission Vitals ({{ $admission->admission_date->format('M d H:i') }})
                             @endif
                         </div>
                         @else
@@ -212,210 +215,150 @@
             </div>
 
             <!-- B. CLINICAL LOG HISTORY -->
-            <div class="card bg-white shadow-sm border border-slate-200 h-[500px] flex flex-col">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-700">Clinical History</h3>
-                </div>
-
-                <div class="overflow-y-auto flex-1 p-0">
-                    <table class="table table-pin-rows">
-                        <thead class="bg-slate-50 text-xs">
-                            <tr>
-                                <th>Time</th>
-                                <th>Category</th>
-                                <th>Details</th>
-                                <th>Nurse</th>
-                                <th>View</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($clinicalLogs as $log)
-                            <tr class="hover:bg-slate-50 cursor-pointer" @click="viewLog({{ json_encode($log) }})">
-                                <td class="font-mono text-xs whitespace-nowrap">{{ $log->created_at->format('M d H:i') }}</td>
-
-                                <td>
-                                    <div class="badge badge-sm font-bold 
-                                        {{ $log->type === 'Medication' ? 'badge-success text-white' : 
-                                          ($log->type === 'Vitals' ? 'badge-info text-white' : 'badge-ghost') }}">
-                                        {{ $log->type }}
-                                    </div>
-                                </td>
-
-                                <td class="text-sm max-w-xs">
-                                    @if($log->type === 'Medication')
-                                    Given: <strong>{{ $log->data['medicine'] ?? 'Unknown' }}({{ $log->data['dosage'] ?? 'Unknown' }})</strong>
-                                    @elseif($log->type === 'Vitals')
-                                    BP: {{ $log->data['bp_systolic'] }}/{{ $log->data['bp_diastolic'] }} | T: {{ $log->data['temp'] }}
-                                    @else
-                                    {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
-                                    @endif
-                                </td>
-
-                                <td class="text-xs text-gray-500">{{ $log->user->name ?? 'Unknown' }}</td>
-                                <td class="text-center"><button type="button" @click.stop="viewLog({{ json_encode($log) }})" class="btn btn-xs btn-ghost">View</button></td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-gray-400 py-8">No clinical logs recorded yet.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination Controls -->
-                @if($clinicalLogs->hasPages())
-                <div class="p-4 border-t border-slate-100 bg-slate-50">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-gray-500">
-                            Showing {{ $clinicalLogs->firstItem() ?? 0 }} to {{ $clinicalLogs->lastItem() ?? 0 }} of {{ $clinicalLogs->total() }} logs
-                        </span>
-                        <div class="join">
-                            @if($clinicalLogs->onFirstPage())
-                                <button class="join-item btn btn-xs btn-disabled">Previous</button>
-                            @else
-                                <a href="{{ $clinicalLogs->previousPageUrl() }}" class="join-item btn btn-xs btn-outline">Previous</a>
-                            @endif
-
-                            @foreach($clinicalLogs->getUrlRange(1, $clinicalLogs->lastPage()) as $page => $url)
-                                @if($page == $clinicalLogs->currentPage())
-                                    <button class="join-item btn btn-xs btn-active">{{ $page }}</button>
-                                @else
-                                    <a href="{{ $url }}" class="join-item btn btn-xs btn-outline">{{ $page }}</a>
-                                @endif
-                            @endforeach
-
-                            @if($clinicalLogs->hasMorePages())
-                                <a href="{{ $clinicalLogs->nextPageUrl() }}" class="join-item btn btn-xs btn-outline">Next</a>
-                            @else
-                                <button class="join-item btn btn-xs btn-disabled">Next</button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @endif
-            </div>
+            <x-clinical-history-table :clinicalLogs="$clinicalLogs" displayMode="nurse" />
 
         </div>
     </div>
 
-    <!-- ======================= -->
-    <!-- UNIFIED LOG MODAL       -->
-    <!-- ======================= -->
+    <!-- LOG MODAL -->
     <dialog id="log_modal" class="modal">
         <div class="modal-box w-11/12 max-w-2xl">
             <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
                 <span x-text="logType === 'Medication' ? ' Give Medication' : (orderId ? ' Clinical Note / Monitoring' : ' Spontaneous Clinical Log')"></span>
             </h3>
 
-        <form action="{{ route('nurse.clinical.logs.store', $admission->id) }}" method="POST">
-            @csrf
-            <input type="hidden" name="medical_order_id" :value="orderId">
-            <input type="hidden" name="type" :value="logType">
+            <form action="{{ route('nurse.clinical.logs.store', $admission->id) }}" method="POST">
+                @csrf
+                <input type="hidden" name="medical_order_id" :value="orderId">
+                <input type="hidden" name="type" :value="logType">
 
-            <!-- MEDICATION ALERT (Only if Meds and medName is set) -->
-            <template x-if="logType === 'Medication' && medName !== ''">
-                <div class="alert alert-warning mb-6 text-sm shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <!-- MEDICATION ALERT (Only if Meds and medName is set) -->
+                <template x-if="logType === 'Medication' && medName !== ''">
+                    <div class="alert alert-warning mb-6 text-sm shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <strong>Confirm Action:</strong> Giving <strong x-text="medName"></strong> (Qty: <strong x-text="medQty"></strong>).
+                            <br><span class="text-xs">This will deduct inventory and charge the patient.</span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- VITALS INPUTS (Required if Type=Vitals, Optional if Type=Medication) -->
+                <div x-show="logType === 'Vitals' || logType === 'Medication'" class="bg-base-200 p-4 rounded-lg mb-4">
+                    <div class="label font-bold text-xs uppercase text-slate-500 mb-2">
+                        Vital Signs <span x-show="logType === 'Medication'">(Optional)</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="form-control">
+                            <label class="label text-xs">BP Systolic</label>
+                            <input type="number" name="bp_systolic" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
+                            <label class="label text-xs">BP Diastolic</label>
+                            <input type="number" name="bp_diastolic" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
+                            <label class="label text-xs">Temp (°C)</label>
+                            <input type="number" step="0.1" name="temp" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
+                            <label class="label text-xs">Heart Rate</label>
+                            <input type="number" name="heart_rate" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
+                            <label class="label text-xs">Resp Rate</label>
+                            <input type="number" name="respiratory_rate" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
+                            <label class="label text-xs">O2 Sat (%)</label>
+                            <input type="number" name="o2_sat" class="input input-sm input-bordered">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTES / REMARKS (Always Visible) -->
+                <div class="form-control">
+                    <label class="label font-bold text-xs uppercase text-slate-500">
+                        <span x-text="logType === 'Medication' ? 'Remarks / Patient Reaction' : 'Observation / Note'"></span>
+                    </label>
+                    <textarea name="observation" class="textarea textarea-bordered w-full h-24" placeholder="Enter details..."></textarea>
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" class="btn" onclick="log_modal.close()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" x-text="logType === 'Medication' ? 'Confirm & Charge' : 'Save Log'">Save Log</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- LAB UPLOAD MODAL -->
+    <dialog id="lab_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <h3 class="font-bold text-lg mb-2 flex items-center gap-2 ">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
+                </svg>
+                Upload Lab Result
+            </h3>
+            <p class="text-xs text-gray-500 mb-4">Complete the lab order by uploading findings and supporting documents</p>
+
+            <form action="{{ route('nurse.clinical.orders.upload_result') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="medical_order_id" x-model="labOrderId">
+
+                <!-- Order Context Alert -->
+                <div class="alert alert-info text-xs mb-6 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div>
-                        <strong>Confirm Action:</strong> Giving <strong x-text="medName"></strong> (Qty: <strong x-text="medQty"></strong>).
-                        <br><span class="text-xs">This will deduct inventory and charge the patient.</span>
+                        <strong>Order:</strong> <span x-text="labInstruction" class="font-mono"></span>
                     </div>
                 </div>
-            </template>
 
-            <!-- VITALS INPUTS (Required if Type=Vitals, Optional if Type=Medication) -->
-            <div x-show="logType === 'Vitals' || logType === 'Medication'" class="bg-base-200 p-4 rounded-lg mb-4">
-                <div class="label font-bold text-xs uppercase text-slate-500 mb-2">
-                    Vital Signs <span x-show="logType === 'Medication'">(Optional)</span>
+                <!-- 1. The Finding -->
+                <div class="form-control mb-5">
+                    <label class="label font-bold text-xs uppercase text-slate-500 mb-1">
+                        <span>Result / Finding</span>
+                        <span class="text-error">*</span>
+                    </label>
+                    <textarea name="findings" class="textarea textarea-bordered h-24" placeholder="e.g. Normal, Fracture detected, High WBC count, Elevated cholesterol..." required></textarea>
+                    <label class="label text-xs text-gray-400">
+                        <span>Describe the lab findings clearly</span>
+                    </label>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="form-control">
-                        <label class="label text-xs">BP Systolic</label>
-                        <input type="number" name="bp_systolic" class="input input-sm input-bordered">
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-xs">BP Diastolic</label>
-                        <input type="number" name="bp_diastolic" class="input input-sm input-bordered">
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-xs">Temp (°C)</label>
-                        <input type="number" step="0.1" name="temp" class="input input-sm input-bordered">
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-xs">Heart Rate</label>
-                        <input type="number" name="heart_rate" class="input input-sm input-bordered">
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-xs">Resp Rate</label>
-                        <input type="number" name="respiratory_rate" class="input input-sm input-bordered">
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-xs">O2 Sat (%)</label>
-                        <input type="number" name="o2_sat" class="input input-sm input-bordered">
-                    </div>
+
+                <!-- 2. The File Upload -->
+                <div class="form-control mb-6">
+                    <label class="label font-bold text-xs uppercase text-slate-500 mb-1">
+                        <span>Scan / PDF / Image</span>
+                        <span class="text-error">*</span>
+                    </label>
+                    <input type="file" name="result_file" class="file-input file-input-bordered w-full" accept=".pdf,.jpg,.png,.jpeg" required />
+                    <label class="label text-xs text-gray-400">
+                        <span>Supported: PDF, JPG, PNG (Max 5MB)</span>
+                    </label>
                 </div>
-            </div>
 
-            <!-- NOTES / REMARKS (Always Visible) -->
-            <div class="form-control">
-                <label class="label font-bold text-xs uppercase text-slate-500">
-                    <span x-text="logType === 'Medication' ? 'Remarks / Patient Reaction' : 'Observation / Note'"></span>
-                </label>
-                <textarea name="observation" class="textarea textarea-bordered w-full h-24" placeholder="Enter details..."></textarea>
-            </div>
-
-            <div class="modal-action">
-                <button type="button" class="btn" onclick="log_modal.close()">Cancel</button>
-                <button type="submit" class="btn btn-primary" x-text="logType === 'Medication' ? 'Confirm & Charge' : 'Save Log'">Save Log</button>
-            </div>
-        </form>
-    </div>
-</dialog>
-
-<!-- ======================= -->
-<!-- VIEW LOG DETAILS MODAL  -->
-<!-- ======================= -->
-<dialog id="view_log_modal" class="modal">
-    <div class="modal-box w-11/12 max-w-2xl">
-        <h3 class="font-bold text-lg mb-4">Log Details</h3>
-        
-        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-            <div>
-                <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Type</span>
-                <div class="badge badge-lg font-bold" x-text="viewLogData.type"></div>
-            </div>
-            <div>
-                <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Recorded By</span>
-                <div class="font-semibold" x-text="viewLogData.user?.name ?? 'Unknown'"></div>
-            </div>
-            <div class="col-span-2">
-                <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Date & Time</span>
-                <div class="font-mono" x-text="new Date(viewLogData.created_at).toLocaleString()"></div>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <h4 class="text-xs text-gray-400 uppercase font-bold mb-3">Recorded Data</h4>
-        <div class="bg-base-200 p-4 rounded-lg space-y-2">
-            <template x-for="(value, key) in viewLogData.data" :key="key">
-                <div class="flex justify-between text-sm border-b border-base-300 pb-2 last:border-0">
-                    <span class="font-semibold text-slate-600" x-text="key.replace(/_/g, ' ').toUpperCase()"></span>
-                    <span class="font-mono text-slate-800" x-text="value || '—'"></span>
+                <!-- Form Actions -->
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="lab_modal.close()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8m0 8l-6-4m6 4l6-4" />
+                        </svg>
+                        Upload & Complete
+                    </button>
                 </div>
-            </template>
-        </div>
-
-        <div class="modal-action mt-6">
-            <form method="dialog">
-                <button type="submit" class="btn">Close</button>
             </form>
         </div>
-    </div>
-</dialog>
+    </dialog>
+
+    <!-- VIEW LOG DETAILS MODAL  -->
+    <x-clinical-log-modal />
 
 </div>
 
@@ -427,11 +370,13 @@
             medName: '',
             medQty: 0,
             viewLogData: {},
+            labOrderId: null,
+            labInstruction: '',
 
             openLogModal(id, type, medName = '', medQty = 0) {
                 this.medName = '';
                 this.medQty = 0;
-                
+
                 this.orderId = id;
                 this.logType = type || 'Notes';
 
@@ -446,6 +391,11 @@
             viewLog(logObject) {
                 this.viewLogData = logObject;
                 document.getElementById('view_log_modal').showModal();
+            },
+            openLabModal(id, instruction) {
+                this.labOrderId = id;
+                this.labInstruction = instruction;
+                document.getElementById('lab_modal').showModal();
             },
         }
     }
