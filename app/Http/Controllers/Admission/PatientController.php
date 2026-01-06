@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreAdmissionRequest;
 use App\Http\Controllers\Controller;
+use App\Services\AdmissionNumberGenerator;
+use App\Services\PatientFileService;
+use App\Services\PatientMovementService;
 
 
 class PatientController extends Controller
@@ -97,9 +100,8 @@ class PatientController extends Controller
             ]);
 
             // --- 3. CREATE ADMISSION ---
-            $dateStr = date('Ymd');
-            $admCount = Admission::whereDate('created_at', today())->count() + 1;
-            $admNumber = "ADM-{$dateStr}-" . str_pad($admCount, 3, '0', STR_PAD_LEFT);
+            $admissionNumberGenerator = app(AdmissionNumberGenerator::class);
+            $admNumber = $admissionNumberGenerator->generate();
 
             $admission = Admission::create([
                 'patient_id' => $patient->id,
@@ -133,6 +135,11 @@ class PatientController extends Controller
             $bed = Bed::findOrFail($data['bed_id']);
             $bed->update(['status' => 'Occupied']);
 
+            // Create initial patient movement using the service
+            $bed->load('room');
+            $movementService = app(PatientMovementService::class);
+            $movementService->createInitialMovement($admission, $bed);
+
             // --- 4. CREATE BILLING INFO ---
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
@@ -145,32 +152,9 @@ class PatientController extends Controller
                 'guarantor_contact' => $data['guarantor_contact'],
             ]);
 
-            $fileMap = [
-                'doc_valid_id' => 'Valid ID',
-                'doc_loa' => 'Insurance LOA',
-                'doc_consent' => 'General Consent',
-                'doc_privacy' => 'Privacy Notice',
-                'doc_mdr' => 'PhilHealth MDR',
-            ];
-
-            foreach ($fileMap as $inputName => $docType) {
-                if ($request->hasFile($inputName)) {
-                    $file = $request->file($inputName);
-                    $path = $file->storeAs(
-                        "patient_records/{$patient->id}/{$admission->id}",
-                        $file->getClientOriginalName()
-                    );
-
-                    PatientFile::create([
-                        'patient_id' => $patient->id,
-                        'admission_id' => $admission->id,
-                        'uploaded_by_id' => Auth::id(),
-                        'document_type' => $docType,
-                        'file_name' => $file->getClientOriginalName(),
-                        'file_path' => $path,
-                    ]);
-                }
-            }
+            // Handle file uploads using the service
+            $patientFileService = app(PatientFileService::class);
+            $patientFileService->uploadFromRequest($request, $patient->id, $admission->id);
 
             DB::commit();
 

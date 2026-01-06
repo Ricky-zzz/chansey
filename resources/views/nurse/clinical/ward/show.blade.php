@@ -1,7 +1,7 @@
 @extends('layouts.clinic')
 
 @section('content')
-<div class="max-w-full mx-auto" x-data="clinicalChart()">
+<div class="max-w-full mx-auto" x-data="clinicalChart()" data-stations='@json($stations)' data-beds='@json($transferBeds)'>
 
     <!-- BREADCRUMB -->
     <div class="text-sm breadcrumbs mb-3">
@@ -60,7 +60,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- LEFT COLUMN: DOCTOR'S ORDERS (WORKLIST) -->
+        <!-- LEFT COLUMN: DOCTOR'S ORDERS  -->
         <div class="lg:col-span-1 space-y-4">
             <div class="flex justify-between items-center px-1">
                 <h3 class="font-bold text-slate-700 text-lg">Active Orders</h3>
@@ -70,9 +70,8 @@
             <!-- Loop Orders -->
             @forelse($activeOrders as $order)
             <div class="card bg-white border border-l-4 shadow-sm hover:shadow-md transition-shadow
-                            {{-- Dynamic Border Color based on Type --}}
                             {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
-                              ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
+                              ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-rose-500') }}">
                 <div class="card-body p-4">
 
                     <!-- Top Row: Type & Freq -->
@@ -128,7 +127,7 @@
                         <!-- 2. MEDICATION: Administer -->
                         @elseif($order->type === 'Medication')
                         <button
-                            @click="openLogModal({{ $order->id }}, 'Medication', '{{ $order->medicine->brand_name ?? $order->medicine->generic_name ?? '' }}', '{{ $order->quantity ?? 1 }}')"
+                            @click="openLogModal(@js($order->id), 'Medication', @js($order->medicine->brand_name ?? $order->medicine->generic_name ?? ''), @js($order->quantity ?? 1))"
                             class="btn btn-sm btn-{{ $status['color'] }} text-white w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
                             {{ $status['disabled'] ? 'disabled' : '' }}>
                             {{ $status['label'] }}
@@ -148,9 +147,14 @@
                         @endif
 
                         @elseif($order->type === 'Laboratory')
-                        <button @click="openLabModal({{ $order->id }}, '{{ $order->instruction }}')"
+                        <button @click="openLabModal(@js($order->id), @js($order->instruction))"
                             class="btn btn-sm bg-emerald-500 text-white w-full">
                             Upload Result
+                        </button>
+                        @elseif($order->type === 'Transfer')
+                        <button @click="openTransferModal(@js($order->id), @js($order->instruction))"
+                            class="btn btn-sm btn-warning text-white w-full">
+                            Request Transfer
                         </button>
                         @else
                         <button class="btn btn-sm btn-neutral w-full" disabled>Info Only</button>
@@ -360,6 +364,58 @@
     <!-- VIEW LOG DETAILS MODAL  -->
     <x-clinical-log-modal />
 
+    <!-- TRANSFER REQUEST MODAL -->
+    <dialog id="transfer_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 text-warning">Request Patient Transfer</h3>
+
+            <form action="{{ route('nurse.orders.transfer') }}" method="POST">
+                @csrf
+                <input type="hidden" name="admission_id" value="{{ $admission->id }}">
+                <input type="hidden" name="medical_order_id" x-model="transferOrderId">
+
+                <div class="alert alert-info text-xs mb-4">
+                    <span class="font-bold">Doctor's Order:</span> <span x-text="transferInstruction"></span>
+                </div>
+
+                <!-- 1. SELECT TARGET STATION -->
+                <div class="form-control mb-4">
+                    <label class="label font-bold text-xs">Target Station / Ward</label>
+                    <select name="target_station_id" x-model="selectedTargetStation" class="select select-bordered w-full" required>
+                        <option value="" disabled selected>Select Destination Station</option>
+                        <template x-for="station in transferStations" :key="station.id">
+                            <option :value="station.id" x-text="station.station_name"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- 2. SELECT TARGET BED -->
+                <div class="form-control mb-4">
+                    <label class="label font-bold text-xs">Specific Bed</label>
+                    <select name="target_bed_id" class="select select-bordered w-full" :disabled="!selectedTargetStation" required>
+                        <option value="" disabled selected x-text="selectedTargetStation ? 'Select Available Bed' : 'Select Station First'"></option>
+                        <template x-for="bed in filteredTransferBeds()" :key="bed.id">
+                            <option :value="bed.id" x-text="bed.bed_code + ' (Room ' + bed.room_number + ')'"></option>
+                        </template>
+                        <option disabled x-show="selectedTargetStation && filteredTransferBeds().length === 0">
+                            No available beds in this station.
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label font-bold text-xs">Reason / Remarks</label>
+                    <textarea name="remarks" class="textarea textarea-bordered h-20" placeholder="e.g. Needs isolation, Upgrading to Private..."></textarea>
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" class="btn" onclick="transfer_modal.close()">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
 </div>
 
 <script>
@@ -369,35 +425,51 @@
             orderId: null,
             medName: '',
             medQty: 0,
-            viewLogData: {},
-            labOrderId: null,
-            labInstruction: '',
+
+            transferOrderId: null,
+            transferInstruction: '',
+            transferStations: [],
+            transferRawBeds: [],
+            selectedTargetStation: '',
+
+            init() {
+                this.transferStations = JSON.parse(
+                    this.$el.dataset.stations
+                );
+                this.transferRawBeds = JSON.parse(
+                    this.$el.dataset.beds
+                );
+            },
+
+            filteredTransferBeds() {
+                if (!this.selectedTargetStation) return [];
+                return this.transferRawBeds.filter(
+                    bed => bed.station_id == this.selectedTargetStation
+                );
+            },
 
             openLogModal(id, type, medName = '', medQty = 0) {
-                this.medName = '';
-                this.medQty = 0;
-
                 this.orderId = id;
                 this.logType = type || 'Notes';
-
-                if (type === 'Medication') {
-                    this.medName = medName || '';
-                    this.medQty = parseInt(medQty) || 0;
-                }
-
+                this.medName = medName;
+                this.medQty = parseInt(medQty) || 0;
                 document.getElementById('log_modal').showModal();
             },
 
-            viewLog(logObject) {
-                this.viewLogData = logObject;
-                document.getElementById('view_log_modal').showModal();
-            },
             openLabModal(id, instruction) {
                 this.labOrderId = id;
                 this.labInstruction = instruction;
                 document.getElementById('lab_modal').showModal();
             },
+
+            openTransferModal(id, instruction) {
+                this.transferOrderId = id;
+                this.transferInstruction = instruction;
+                this.selectedTargetStation = '';
+                document.getElementById('transfer_modal').showModal();
+            },
         }
     }
 </script>
+
 @endsection

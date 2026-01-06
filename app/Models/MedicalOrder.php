@@ -48,6 +48,11 @@ class MedicalOrder extends Model
         return $this->belongsTo(User::class, 'fulfilled_by_user_id');
     }
 
+    public function transferRequests(): HasMany
+    {
+        return $this->hasMany(TransferRequest::class);
+    }
+
     public function clinicalLogs(): HasMany
     {
         return $this->hasMany(ClinicalLog::class);

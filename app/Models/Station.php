@@ -30,4 +30,9 @@ class Station extends Model
     {
         return $this->hasMany(Admission::class);
     }
+
+    public function transferRequests()
+    {
+        return $this->hasMany(TransferRequest::class, 'target_station_id');
+    }
 }

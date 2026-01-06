@@ -26,4 +26,14 @@ class Bed extends Model
     {
         return $this->hasOne(Admission::class)->where('status', 'Admitted');
     }
+
+    public function transferRequests()
+    {
+        return $this->hasMany(TransferRequest::class, 'target_bed_id');
+    }
+
+    public function patientMovements()
+    {
+        return $this->hasMany(PatientMovement::class);
+    }
 }

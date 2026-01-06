@@ -100,4 +100,14 @@ class Admission extends Model
     {
         return $this->hasOne(NursingCarePlan::class);
     }
+
+    public function transferRequests(): HasMany
+    {
+        return $this->hasMany(TransferRequest::class);
+    }
+
+    public function patientMovements(): HasMany
+    {
+        return $this->hasMany(PatientMovement::class);
+    }
 }

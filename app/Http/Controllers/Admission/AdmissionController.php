@@ -9,12 +9,17 @@ use App\Models\Physician;
 use App\Models\Bed;
 use App\Models\Patient;
 use App\Models\Station;
+use App\Models\PatientMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Models\AdmissionBillingInfo;
 use App\Http\Controllers\Controller;
+use App\Services\AdmissionNumberGenerator;
+use App\Services\PatientFileService;
+use App\Services\PatientMovementService;
 
 
 class AdmissionController extends Controller
@@ -90,9 +95,9 @@ class AdmissionController extends Controller
         try {
             DB::beginTransaction();
 
-            $dateStr = date('Ymd');
-            $admCount = Admission::whereDate('created_at', today())->count() + 1;
-            $admNumber = "ADM-{$dateStr}-" . str_pad($admCount, 3, '0', STR_PAD_LEFT);
+            // Generate unique admission number using the service
+            $admissionNumberGenerator = app(AdmissionNumberGenerator::class);
+            $admNumber = $admissionNumberGenerator->generate();
 
             $admission = Admission::create([
                 'patient_id' => $patient_id,
@@ -122,10 +127,13 @@ class AdmissionController extends Controller
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            $bed = Bed::findOrFail($data['bed_id']);
+            $bed = Bed::with('room')->findOrFail($data['bed_id']);
             $bed->update(['status' => 'Occupied']);
 
-            
+
+            $movementService = app(PatientMovementService::class);
+            $movementService->createInitialMovement($admission, $bed);
+
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
                 'payment_type' => $data['payment_type'] ?? null,
@@ -137,39 +145,18 @@ class AdmissionController extends Controller
                 'guarantor_contact' => $data['guarantor_contact'] ?? null,
             ]);
 
-            $fileMap = [
-                'doc_valid_id' => 'Valid ID',
-                'doc_loa' => 'Insurance LOA',
-                'doc_consent' => 'General Consent',
-                'doc_privacy' => 'Privacy Notice',
-                'doc_mdr' => 'PhilHealth MDR',
-            ];
-
-            foreach ($fileMap as $inputName => $docType) {
-                if ($request->hasFile($inputName)) {
-                    $file = $request->file($inputName);
-                    $path = $file->storeAs(
-                        "patient_records/{$patient_id}/{$admission->id}",
-                        $file->getClientOriginalName()
-                    );
-
-                    PatientFile::create([
-                        'patient_id' => $patient_id,
-                        'admission_id' => $admission->id,
-                        'uploaded_by_id' => Auth::id(),
-                        'document_type' => $docType,
-                        'file_name' => $file->getClientOriginalName(),
-                        'file_path' => $path,
-                    ]);
-                }
-            }
-
             DB::commit();
+
+            // Handle file uploads after transaction commits using the service
+            $patientFileService = app(PatientFileService::class);
+            $patientFileService->uploadFromRequest($request, $patient_id, $admission->id);
+
             return redirect()->route('nurse.admitting.admissions.show', $admission->id)
                 ->with('success', 'Admission created successfully!');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->withErrors(['error' => 'Error creating admission: ' . $e->getMessage()]);
+            Log::error('Admission Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error creating admission: ' . $e->getMessage());
         }
     }
 
@@ -225,47 +212,9 @@ class AdmissionController extends Controller
                 ]);
             }
 
-            $fileMap = [
-                'doc_valid_id' => 'Valid ID',
-                'doc_loa' => 'Insurance LOA',
-                'doc_consent' => 'General Consent',
-                'doc_privacy' => 'Privacy Notice',
-                'doc_mdr' => 'PhilHealth MDR',
-            ];
-
-            foreach ($fileMap as $inputName => $docType) {
-                if ($request->hasFile($inputName)) {
-                    $oldFile = PatientFile::where('admission_id', $admission->id)
-                        ->where('document_type', $docType)
-                        ->first();
-
-                    if ($oldFile && Storage::exists($oldFile->file_path)) {
-                        Storage::delete($oldFile->file_path);
-                    }
-
-                    $file = $request->file($inputName);
-                    $storagePath = 'private/patient_records/' . $admission->patient_id . '/' . $admission->id;
-                    $path = $file->storeAs($storagePath, $file->getClientOriginalName(), 'private');
-
-                    if ($oldFile) {
-                        $oldFile->update([
-                            'file_name' => $file->getClientOriginalName(),
-                            'file_path' => $storagePath . '/' . $file->getClientOriginalName(),
-                            'document_type' => $docType,
-                            'uploaded_by_id' => Auth::id(),
-                        ]);
-                    } else {
-                        PatientFile::create([
-                            'admission_id' => $admission->id,
-                            'patient_id' => $admission->patient_id,
-                            'file_name' => $file->getClientOriginalName(),
-                            'file_path' => $storagePath . '/' . $file->getClientOriginalName(),
-                            'document_type' => $docType,
-                            'uploaded_by_id' => Auth::id(),
-                        ]);
-                    }
-                }
-            }
+            // Handle file updates using the service
+            $patientFileService = app(PatientFileService::class);
+            $patientFileService->updateFromRequest($request, $admission->patient_id, $admission->id);
 
             DB::commit();
             return redirect()->route('nurse.admitting.admissions.show', $admission->id)

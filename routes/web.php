@@ -120,6 +120,10 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // Upload Lab Result
     Route::post('/orders/upload-result', [OrderExecutionController::class, 'uploadLabResult'])
         ->name('orders.upload_result');
+
+    // Request Transfer
+    Route::post('/orders/transfer', [OrderExecutionController::class, 'requestTransfer'])
+        ->name('orders.transfer');
 });
 
 //  Physicians

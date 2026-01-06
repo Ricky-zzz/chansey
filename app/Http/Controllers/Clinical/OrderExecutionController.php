@@ -7,6 +7,7 @@ use App\Models\MedicalOrder;
 use App\Models\PatientFile;
 use App\Models\ClinicalLog;
 use App\Models\BillableItem;
+use App\Models\TransferRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +78,39 @@ class OrderExecutionController extends Controller
 
             DB::commit();
             return back()->with('success', 'Lab result uploaded and order completed.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    public function requestTransfer(Request $request)
+    {
+        $request->validate([
+            'admission_id' => 'required|exists:admissions,id',
+            'medical_order_id' => 'required|exists:medical_orders,id',
+            'target_bed_id' => 'required|exists:beds,id',
+            'target_station_id' => 'required|exists:stations,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            TransferRequest::create([
+                'admission_id' => $request->admission_id,
+                'medical_order_id' => $request->medical_order_id,
+                'requested_by_user_id' => Auth::id(),
+                'target_station_id' => $request->target_station_id,
+                'target_bed_id' => $request->target_bed_id,
+                'remarks' => $request->remarks,
+                'status' => 'Pending'
+            ]);
+
+            MedicalOrder::where('id', $request->medical_order_id)
+                ->update(['status' => 'Active']);
+
+            DB::commit();
+            return back()->with('success', 'Transfer request sent to Admissions Office.');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Error: ' . $e->getMessage());

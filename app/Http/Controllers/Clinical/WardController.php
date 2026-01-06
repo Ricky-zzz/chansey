@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Clinical;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admission;
+use App\Models\Station;
+use App\Models\Bed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -84,6 +86,21 @@ class WardController extends Controller
             ];
         }
 
-        return view('nurse.clinical.ward.show', compact('admission', 'activeOrders', 'latestLog', 'vitals', 'clinicalLogs'));
+        $stations = Station::select('id', 'station_name')->get()->toArray();
+        
+        $transferBeds = Bed::with('room.station')
+            ->where('status', 'Available')
+            ->get()
+            ->map(function ($bed) {
+                return [
+                    'id' => $bed->id,
+                    'bed_code' => $bed->bed_code,
+                    'station_id' => $bed->room->station_id,
+                    'room_number' => $bed->room->room_number
+                ];
+            })
+            ->toArray();
+
+        return view('nurse.clinical.ward.show', compact('admission', 'activeOrders', 'latestLog', 'vitals', 'clinicalLogs', 'stations', 'transferBeds'));
     }
 }

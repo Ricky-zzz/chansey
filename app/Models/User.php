@@ -98,6 +98,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(MedicalOrder::class, 'fulfilled_by_user_id');
     }
 
+    public function transferRequests()
+    {
+        return $this->hasMany(TransferRequest::class, 'requested_by_user_id');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
