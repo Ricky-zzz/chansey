@@ -6,7 +6,18 @@
         <div class="grid grid-cols-2 gap-4 text-sm mb-4">
             <div>
                 <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Type</span>
-                <div class="badge badge-lg font-bold" x-text="viewLogData.type"></div>
+                <div class="px-3 py-2 rounded-full text-sm font-bold text-white inline-block"
+                    :class="{
+                        'bg-emerald-600': viewLogData.type === 'Medication',
+                        'bg-sky-600': viewLogData.type === 'Vitals',
+                        'bg-amber-600': viewLogData.type === 'Laboratory',
+                        'bg-rose-600': viewLogData.type === 'Transfer',
+                        'bg-purple-600': viewLogData.type === 'Utility',
+                        'bg-lime-600': viewLogData.type === 'Discharge',
+                        'bg-slate-500': !['Medication', 'Vitals', 'Laboratory', 'Transfer', 'Utility', 'Discharge'].includes(viewLogData.type)
+                    }"
+                    x-text="viewLogData.type">
+                </div>
             </div>
             <div>
                 <span class="text-xs text-gray-400 uppercase font-bold block mb-1">Recorded By</span>
@@ -171,6 +182,66 @@
                                     </svg>
                                     View
                                 </a>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- DISCHARGE LOG LAYOUT -->
+            <template x-if="viewLogData.type === 'Discharge'">
+                <div class="space-y-3">
+                    <!-- Note/Reason -->
+                    <template x-if="viewLogData.data.note">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">STATUS</span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.note"></span>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- UTILITY LOG LAYOUT -->
+            <template x-if="viewLogData.type === 'Utility'">
+                <div class="space-y-3">
+                    <!-- Item Used -->
+                    <template x-if="viewLogData.data.note">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">ITEM USED</span>
+                            <span class="font-mono text-slate-800 font-bold" x-text="viewLogData.data.note"></span>
+                        </div>
+                    </template>
+
+                    <!-- Quantity -->
+                    <template x-if="viewLogData.data.qty">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">QUANTITY</span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.qty + ' unit(s)'"></span>
+                        </div>
+                    </template>
+
+                    <!-- Price -->
+                    <template x-if="viewLogData.data.price">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">UNIT PRICE</span>
+                            <span class="font-mono text-slate-800" x-text="'₱' + parseFloat(viewLogData.data.price).toFixed(2)"></span>
+                        </div>
+                    </template>
+
+                    <!-- Total (calculated) -->
+                    <template x-if="viewLogData.data.price && viewLogData.data.qty">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2 font-bold">
+                            <span class="font-semibold text-slate-600">TOTAL</span>
+                            <span class="font-mono text-slate-800 text-lg" x-text="'₱' + (parseFloat(viewLogData.data.price) * parseInt(viewLogData.data.qty)).toFixed(2)"></span>
+                        </div>
+                    </template>
+
+                    <!-- Remarks -->
+                    <template x-if="viewLogData.data.remarks">
+                        <div class="mt-3 pt-3 border-t border-base-300">
+                            <div class="text-xs font-bold text-gray-500 mb-2">REMARKS</div>
+                            <div class="bg-white p-3 rounded border border-base-300">
+                                <p class="text-sm text-slate-800" x-text="viewLogData.data.remarks"></p>
                             </div>
                         </div>
                     </template>

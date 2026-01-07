@@ -107,7 +107,7 @@ class OrderExecutionController extends Controller
             ]);
 
             MedicalOrder::where('id', $request->medical_order_id)
-                ->update(['status' => 'Active']);
+                ->update(['status' => 'Waiting']);
 
             DB::commit();
             return back()->with('success', 'Transfer request sent to Admissions Office.');

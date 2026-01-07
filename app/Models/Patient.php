@@ -58,10 +58,10 @@ class Patient extends Model
 
     public function getFullNameAttribute(): string
     {
-        return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+        $middleInitial = $this->middle_name ? ' ' . strtoupper($this->middle_name[0]) . '.' : '';
+        return trim("{$this->last_name}, {$this->first_name}".$middleInitial);
     }
     
-    // Calculate Age automatically
     public function getAgeAttribute(): int
     {
         return $this->date_of_birth->diffInYears();

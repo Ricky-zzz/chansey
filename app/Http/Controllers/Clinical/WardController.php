@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admission;
 use App\Models\Station;
 use App\Models\Bed;
+use App\Models\InventoryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +22,7 @@ class WardController extends Controller
 
         $query = Admission::query()
             ->with(['patient', 'bed.room', 'attendingPhysician'])
-            ->where('admissions.status', 'Admitted')
+            ->whereIn('admissions.status', ['Admitted', 'Ready for Discharge'])
             ->whereHas('bed.room', function ($q) use ($nurse) {
                 $q->where('station_id', $nurse->station_id);
             });
@@ -55,12 +56,12 @@ class WardController extends Controller
             'patient',
             'bed.room.station',
             'nursingCarePlans',
-            'medicalOrders.medicine', 
+            'medicalOrders.medicine',
             'medicalOrders.latestLog',
         ])->findOrFail($id);
 
         $activeOrders = $admission->medicalOrders
-            ->whereIn('status', ['Pending', 'Active'])
+            ->whereIn('status', ['Pending', 'Active', 'Waiting'])
             ->sortByDesc(function ($order) {
                 return $order->frequency === 'Once' ? 1 : 0;
             });
@@ -86,8 +87,10 @@ class WardController extends Controller
             ];
         }
 
+        $supplies = InventoryItem::where('quantity', '>', 0)->get();
+
         $stations = Station::select('id', 'station_name')->get()->toArray();
-        
+
         $transferBeds = Bed::with('room.station')
             ->where('status', 'Available')
             ->get()
@@ -101,6 +104,17 @@ class WardController extends Controller
             })
             ->toArray();
 
-        return view('nurse.clinical.ward.show', compact('admission', 'activeOrders', 'latestLog', 'vitals', 'clinicalLogs', 'stations', 'transferBeds'));
+        return view(
+            'nurse.clinical.ward.show',compact(
+                'admission',
+                'activeOrders',
+                'latestLog',
+                'vitals',
+                'clinicalLogs',
+                'stations',
+                'transferBeds',
+                'supplies'
+            )
+        );
     }
 }

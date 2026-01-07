@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-full mx-auto" x-data="clinicalChart()">
-        <!-- BREADCRUMB -->
+    <!-- BREADCRUMB -->
     <div class="text-sm breadcrumbs mb-3">
         <ul>
             <li><a href="{{ route('physician.dashboard') }}" class="link link-hover">Dashboard</a></li>
@@ -89,7 +89,13 @@
                             <div class="card-body p-3">
                                 <div class="flex justify-between items-start mb-1">
                                     <div class="flex gap-2 items-center">
-                                        <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold
+                                        {{ $order->type === 'Medication' ? 'bg-emerald-600 text-white' : 
+                                  ($order->type === 'Monitoring' ? 'bg-sky-600 text-white' : 
+                                  ($order->type === 'Laboratory' ? 'bg-amber-600 text-white' :
+                                  ($order->type === 'Transfer' ? 'bg-rose-600 text-white' : 'bg-lime-600 text-white'))) }}">
+                                            {{ $order->type }}
+                                        </span>
                                         <span class="badge badge-sm {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
                                             {{ $order->status }}
                                         </span>
@@ -109,17 +115,17 @@
                                 </div>
                                 <div class="flex flex-col gap-3">
                                     @if($order->status === 'Pending' && $order->clinicalLogs->count() === 0)
-                                        <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="w-full">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-error btn-outline w-full">Delete</button>
-                                        </form>
+                                    <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="w-full">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-error btn-outline w-full">Delete</button>
+                                    </form>
                                     @elseif($order->status === 'Pending' || $order->status === 'Active')
-                                        <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="w-full">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button class="btn btn-sm btn-error btn-outline w-full">Stop</button>
-                                        </form>
+                                    <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="w-full">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button class="btn btn-sm btn-error btn-outline w-full">Stop</button>
+                                    </form>
                                     @endif
                                 </div>
                             </div>
@@ -140,7 +146,14 @@
                             <div class="card-body p-3">
                                 <div class="flex justify-between items-start mb-1">
                                     <div class="flex gap-2 items-center">
-                                        <div class="badge badge-sm badge-outline">{{ $order->type }}</div>
+                                        <span class="px-3 py-1 rounded-full text-sm font-bold
+                                            {{ $order->type === 'Medication' ? 'bg-emerald-100 text-emerald-800' : 
+                                              ($order->type === 'Monitoring' ? 'bg-sky-100 text-sky-800' : 
+                                              ($order->type === 'Laboratory' ? 'bg-amber-100 text-amber-800' :
+                                              ($order->type === 'Transfer' ? 'bg-rose-100 text-rose-800' : 
+                                              ($order->type === 'Discharge' ? 'bg-lime-100 text-lime-800' : 'bg-slate-100 text-slate-800')))) }}">
+                                            {{ $order->type }}
+                                        </span>
                                         <span class="badge badge-sm {{ $order->status === 'Done' ? 'badge-success' : 'badge-error' }}">
                                             {{ $order->status }}
                                         </span>
@@ -196,9 +209,9 @@
                             Current Vitals
                             <span class="text-info">
                                 @if($latestLog && isset($latestLog->data['bp_systolic']))
-                                    {{ $latestLog->created_at->diffForHumans() }}
+                                {{ $latestLog->created_at->diffForHumans() }}
                                 @else
-                                    Admission ({{ $admission->admission_date->format('M d H:i') }})
+                                Admission ({{ $admission->admission_date->format('M d H:i') }})
                                 @endif
                             </span>
                         </h3>
@@ -277,103 +290,102 @@
             <h3 class="font-bold text-xl mb-6">Create Physician Order</h3>
 
             <form action="{{ route('physician.orders.store') }}" method="POST" class="space-y-4">
-            @csrf
-            <input type="hidden" name="admission_id" value="{{ $admission->id }}">
+                @csrf
+                <input type="hidden" name="admission_id" value="{{ $admission->id }}">
 
-            <!-- 1. ORDER TYPE -->
-            <div class="form-control w-full">
-                <label class="label">
-                    <span class="label-text font-semibold">Order Type</span>
-                </label>
-                <select name="type" x-model="orderType" class="select select-bordered w-full">
-                    <option value="Medication">Medication</option>
-                    <option value="Monitoring">Monitoring / Vitals</option>
-                    <option value="Laboratory">Laboratory Request</option>
-                    <option value="Utility">General/Utility</option>
-                    <option value="Transfer">Transfer Patient</option>
-                    <option value="Discharge">Ready for Discharge</option>
-                </select>
-            </div>
-
-            <!-- 2. MEDICATION SPECIFICS  -->
-            <div x-show="orderType === 'Medication'" x-cloak class="space-y-4">
+                <!-- 1. ORDER TYPE -->
                 <div class="form-control w-full">
                     <label class="label">
-                        <span class="label-text font-semibold">Select Medicine</span>
+                        <span class="label-text font-semibold">Order Type</span>
                     </label>
-                    <select name="medicine_id" class="select select-bordered w-full">
-                        <option value="">-- Choose from Pharmacy --</option>
-                        @foreach($medicines as $med)
-                        <option value="{{ $med->id }}">{{ $med->generic_name }} {{ $med->brand_name ? "({$med->brand_name})" : '' }} {{ $med->dosage }} - {{ $med->stock_on_hand }} avail</option>
-                        @endforeach
+                    <select name="type" x-model="orderType" class="select select-bordered w-full">
+                        <option value="Medication">Medication</option>
+                        <option value="Monitoring">Monitoring / Vitals</option>
+                        <option value="Laboratory">Laboratory Request</option>
+                        <option value="Transfer">Transfer Patient</option>
+                        <option value="Discharge">Ready for Discharge</option>
                     </select>
                 </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Quantity</span>
-                    </label>
-                    <input type="number" name="quantity" class="input input-bordered w-full" value="1" min="1">
+
+                <!-- 2. MEDICATION SPECIFICS  -->
+                <div x-show="orderType === 'Medication'" x-cloak class="space-y-4">
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Select Medicine</span>
+                        </label>
+                        <select name="medicine_id" class="select select-bordered w-full">
+                            <option value="">-- Choose from Pharmacy --</option>
+                            @foreach($medicines as $med)
+                            <option value="{{ $med->id }}">{{ $med->generic_name }} {{ $med->brand_name ? "({$med->brand_name})" : '' }} {{ $med->dosage }} - {{ $med->stock_on_hand }} avail</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Quantity</span>
+                        </label>
+                        <input type="number" name="quantity" class="input input-bordered w-full" value="1" min="1">
+                    </div>
                 </div>
-            </div>
 
-            <!-- 3. FREQUENCY -->
-            <div x-show="orderType === 'Medication' || orderType === 'Monitoring'" x-cloak class="form-control w-full">
-                <label class="label">
-                    <span class="label-text font-semibold">Frequency</span>
-                </label>
-                <select name="frequency" class="select select-bordered w-full">
-                    <option value="Once">Stat / Once Only</option>
-                    <option value="Every 1 Hour">Every 1 Hour (q1h)</option>
-                    <option value="Every 2 Hours">Every 2 Hours (q2h)</option>
-                    <option value="Every 4 Hours">Every 4 Hours (q4h)</option>
-                    <option value="Every 6 Hours">Every 6 Hours (q6h)</option>
-                    <option value="Every 8 Hours">Every 8 Hours (q8h)</option>
-                    <option value="Every 12 Hours">Every 12 Hours (BID)</option>
-                    <option value="Daily">Daily (OD)</option>
-                    <option value="PRN">PRN (As Needed)</option>
-                </select>
-            </div>
+                <!-- 3. FREQUENCY -->
+                <div x-show="orderType === 'Medication' || orderType === 'Monitoring'" x-cloak class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Frequency</span>
+                    </label>
+                    <select name="frequency" class="select select-bordered w-full">
+                        <option value="Once">Stat / Once Only</option>
+                        <option value="Every 1 Hour">Every 1 Hour (q1h)</option>
+                        <option value="Every 2 Hours">Every 2 Hours (q2h)</option>
+                        <option value="Every 4 Hours">Every 4 Hours (q4h)</option>
+                        <option value="Every 6 Hours">Every 6 Hours (q6h)</option>
+                        <option value="Every 8 Hours">Every 8 Hours (q8h)</option>
+                        <option value="Every 12 Hours">Every 12 Hours (BID)</option>
+                        <option value="Daily">Daily (OD)</option>
+                        <option value="PRN">PRN (As Needed)</option>
+                    </select>
+                </div>
 
-            <!-- 4. THE UNIVERSAL INSTRUCTION BOX -->
-            <div x-show="orderType !== 'Discharge'" x-cloak class="form-control w-full">
-                <label class="label">
-                    <span class="label-text font-semibold" x-text="
+                <!-- 4. THE UNIVERSAL INSTRUCTION BOX -->
+                <div x-show="orderType !== 'Discharge'" x-cloak class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold" x-text="
                         orderType === 'Medication' ? 'Special Instructions (Optional)' :
                         orderType === 'Monitoring' ? 'What to Monitor?' :
-                        orderType === 'Dietary' ? 'Diet Details' :
+                        orderType === 'Laboratory' ? 'Lab:
                         'Request Details'
                     "></span>
-                </label>
-                <textarea name="instruction" class="textarea textarea-bordered w-full h-24"
-                    :placeholder="
+                    </label>
+                    <textarea name="instruction" class="textarea textarea-bordered w-full h-24"
+                        :placeholder="
                         orderType === 'Medication' ? 'e.g. Give after meals' :
                         orderType === 'Monitoring' ? 'e.g. Check BP and Neuro Vitals' :
                         orderType === 'Laboratory' ? 'e.g. CBC, Chest X-Ray' :
                         'Enter details...'
                     "></textarea>
-            </div>
+                </div>
 
-            <!-- 5. DISCHARGE NOTICE -->
-            <div x-show="orderType === 'Discharge'" x-cloak class="alert alert-success">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>This will flag the patient as ready for discharge.</span>
-            </div>
+                <!-- 5. DISCHARGE NOTICE -->
+                <div x-show="orderType === 'Discharge'" x-cloak class="alert alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>This will flag the patient as ready for discharge.</span>
+                </div>
 
-            <!-- MODAL ACTIONS -->
-            <div class="modal-action pt-2">
-                <form method="dialog">
-                    <button class="btn btn-outline btn-error">Cancel</button>
-                </form>
-                <button type="submit" class="btn btn-primary">Submit Order</button>
-            </div>
+                <!-- MODAL ACTIONS -->
+                <div class="modal-action pt-2">
+                    <form method="dialog">
+                        <button class="btn btn-outline btn-error">Cancel</button>
+                    </form>
+                    <button type="submit" class="btn btn-primary">Submit Order</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
-    </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+    </dialog>
 
     <!-- VIEW LOG DETAILS MODAL -->
     <x-clinical-log-modal />

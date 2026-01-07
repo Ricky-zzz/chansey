@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Physician;
 use App\Http\Controllers\Controller;
 use App\Models\MedicalOrder;
 use App\Models\Admission;
+use App\Models\ClinicalLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +23,10 @@ class OrderController extends Controller
         ]);
 
         if ($request->type === 'Discharge') {
-            $instructionText = "Patient cleared for discharge. Please process billing.";
+            $instructionText = "Patient good for discharge. Please process billing.";
+            
+            $admission = Admission::find($request->admission_id);
+            $admission->update(['status' => 'Ready for Discharge']);
         } else {
             $instructionText = $request->instruction ?? 'No specific instructions.';
         }
@@ -31,12 +35,12 @@ class OrderController extends Controller
             ? $request->frequency
             : 'Once';
 
-        MedicalOrder::create([
+        $order = MedicalOrder::create([
             'admission_id' => $request->admission_id,
             'physician_id' => Auth::user()->physician->id,
 
             'type' => $request->type,
-            'instruction' => $instructionText, // Uses our calculated variable
+            'instruction' => $instructionText,
 
             'medicine_id' => $request->medicine_id,
             'quantity' => $request->quantity ?? 1,
@@ -44,6 +48,16 @@ class OrderController extends Controller
 
             'status' => 'Pending',
         ]);
+
+        if ($request->type === 'Discharge') {
+            ClinicalLog::create([
+                'admission_id' => $request->admission_id,
+                'user_id' => Auth::id(),
+                'medical_order_id' => $order->id,
+                'type' => 'Discharge',
+                'data' => ['note' => 'Physician cleared patient for discharge.']
+            ]);
+        }
 
         return back()->with('success', 'Order created successfully.');
     }

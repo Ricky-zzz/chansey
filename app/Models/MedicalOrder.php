@@ -141,9 +141,21 @@ class MedicalOrder extends Model
             ];
         }
 
+        if ($minutesRemaining <= 1440) {  // Up to 24 hours, show relative time
+            $hoursRemaining = ceil($minutesRemaining / 60);
+            return [
+                'color' => 'neutral',
+                'label' => "Due in {$hoursRemaining}h",
+                'disabled' => true, 
+                'is_due' => false
+            ];
+        }
+
+        // For orders more than 24 hours away
+        $daysRemaining = ceil($minutesRemaining / 1440);
         return [
             'color' => 'neutral',
-            'label' => "Next: " . $nextDue->format('H:i'), 
+            'label' => "Due in {$daysRemaining}d",
             'disabled' => true, 
             'is_due' => false
         ];

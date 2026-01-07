@@ -18,7 +18,7 @@ class MyPatientController extends Controller
 
         // Base Query: 
         $query = Admission::with(['patient', 'bed.room.station'])
-            ->where('admissions.status', 'Admitted')
+            ->whereIn('admissions.status', ['Admitted', 'Ready for Discharge'])
             ->where('admissions.attending_physician_id', $physician->id);
 
         // Search Logic 

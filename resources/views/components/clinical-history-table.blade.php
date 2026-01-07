@@ -1,4 +1,4 @@
-@props(['clinicalLogs', 'displayMode' => 'physician']) {{-- 'physician' or 'nurse' --}}
+@props(['clinicalLogs', 'displayMode' => 'physician']) 
 
 <div class="card bg-base-100 shadow-xl border border-base-200">
     <div class="card-body p-4">
@@ -14,9 +14,6 @@
                         <th>Type</th>
                         <th>Data</th>
                         <th>Staff</th>
-                        @if($displayMode === 'nurse')
-                        <th>View</th>
-                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -36,12 +33,13 @@
                     })">
                         <td class="font-mono text-xs">{{ $log->created_at->format('M d H:i') }}</td>
                         <td>
-                            <div class="badge badge-sm 
-                                {{ $displayMode === 'nurse' 
-                                    ? ($log->type === 'Medication' ? 'badge-success text-white' : 
-                                      ($log->type === 'Vitals' ? 'badge-info text-white' : 
-                                      ($log->type === 'Laboratory' ? 'badge-warning text-white' : 'badge-ghost')))
-                                    : 'badge-outline' }}">
+                            <div class="px-2 py-1 rounded-full text-xs font-bold text-white inline-block
+                                {{ $log->type === 'Medication' ? 'bg-emerald-600' : 
+                                  ($log->type === 'Vitals' ? 'bg-sky-600' : 
+                                  ($log->type === 'Laboratory' ? 'bg-amber-600' :
+                                  ($log->type === 'Transfer' ? 'bg-rose-600' :
+                                  ($log->type === 'Utility' ? 'bg-purple-600' :
+                                  ($log->type === 'Discharge' ? 'bg-lime-600' : 'bg-slate-400')))))}}">
                                 {{ $log->type }}
                             </div>
                         </td>
@@ -55,32 +53,17 @@
                                 @if($log->labResultFile)
                                 <div class="text-xs text-gray-500 mt-1 line-clamp-1">{{ $log->labResultFile->file_name }}</div>
                                 @endif
+                            @elseif($log->type === 'Discharge')
+                                {{ $log->data['note'] ?? 'Patient discharged' }}
                             @else
                                 {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
                             @endif
                         </td>
                         <td class="text-xs text-gray-500">{{ $log->user->name ?? 'Unknown' }}</td>
-                        @if($displayMode === 'nurse')
-                        <td class="text-center">
-                            <button type="button" @click.stop="viewLog({
-                                type: '{{ $log->type }}',
-                                data: {{ json_encode($log->data) }},
-                                created_at: '{{ $log->created_at }}',
-                                user: {
-                                    name: '{{ $log->user->name ?? 'Unknown' }}'
-                                }
-                                {{ $log->type === 'Laboratory' && $log->labResultFile ? ',labResultFile: ' . json_encode([
-                                    'id' => $log->labResultFile->id,
-                                    'file_name' => $log->labResultFile->file_name,
-                                    'file_size_readable' => $log->labResultFile->file_size_readable ?? 'Unknown'
-                                ]) : '' }}
-                            })" class="btn btn-xs btn-ghost">View</button>
-                        </td>
-                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="{{ $displayMode === 'nurse' ? '5' : '4' }}" class="text-center text-gray-400 italic py-6">No clinical logs recorded yet.</td>
+                        <td colspan="4" class="text-center text-gray-400 italic py-6">No clinical logs recorded yet.</td>
                     </tr>
                     @endforelse
                 </tbody>

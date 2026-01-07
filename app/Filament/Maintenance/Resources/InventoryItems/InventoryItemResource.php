@@ -51,6 +51,11 @@ class InventoryItemResource extends Resource
                                 ])
                                 ->required(),
                         ]),
+                        TextInput::make('price')
+                            ->numeric()
+                            ->label('Price per count')
+                            ->prefix('₱')
+                            ->required(),
 
                         Grid::make(2)->schema([
                             TextInput::make('quantity')
@@ -80,7 +85,10 @@ class InventoryItemResource extends Resource
                 TextColumn::make('category')
                     ->badge(),
 
-                // SMART COLUMN: Changes color based on stock level
+                TextColumn::make('price')
+                    ->badge()
+                    ->color('info'),
+
                 TextColumn::make('quantity')
                     ->label('In Stock')
                     ->sortable()
@@ -95,7 +103,6 @@ class InventoryItemResource extends Resource
                     ->since(),
             ])
             ->filters([
-                // Filter to quickly see what is running low
                 Filter::make('low_stock')
                     ->query(fn($query) => $query->whereColumn('quantity', '<=', 'critical_level'))
                     ->label('Low Stock Only'),
