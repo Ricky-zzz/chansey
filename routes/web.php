@@ -40,6 +40,10 @@ Route::get('/dashboard', function () {
         return redirect()->route('physician.dashboard');
     }
 
+    if ($user->user_type === 'accountant') {
+        return redirect()->route('accountant.dashboard');
+    }
+
     return redirect('/login')->with('error', 'Unauthorized user type.');
 })->middleware(['auth'])->name('dashboard');
 
@@ -47,6 +51,7 @@ Route::get('/dashboard', function () {
 require __DIR__ . '/admitting.php';
 require __DIR__ . '/clinical.php';
 require __DIR__ . '/physician.php';
+require __DIR__ . '/accountant.php';
 
 // File viewing route
 Route::middleware(['auth'])->get('/document/view/{id}', [FileController::class, 'view'])->name('document.view');

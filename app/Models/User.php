@@ -103,6 +103,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(TransferRequest::class, 'requested_by_user_id');
     }
 
+    public function accountant()
+    {
+        return $this->hasOne(Accountant::class);
+    }
+
+    public function processedBillings()
+    {
+        return $this->hasMany(Billing::class, 'processed_by');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {

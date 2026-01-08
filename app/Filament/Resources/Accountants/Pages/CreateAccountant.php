@@ -1,33 +1,29 @@
 <?php
 
-namespace App\Filament\Resources\Pharmacists\Pages;
+namespace App\Filament\Resources\Accountants\Pages;
 
-use App\Filament\Resources\Pharmacists\PharmacistResource;
+use App\Filament\Resources\Accountants\AccountantResource;
 use App\Models\User;
 use App\Services\BadgeGenerator;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 
-class CreatePharmacist extends CreateRecord
+class CreateAccountant extends CreateRecord
 {
-    protected static string $resource = PharmacistResource::class;
+    protected static string $resource = AccountantResource::class;
 
     protected function handleRecordCreation(array $data): Model
     {
-        
-        $nameParts = explode(' ', $data['full_name'], 2);
-        $firstName = $nameParts[0];
-        $lastName = $nameParts[1] ?? $firstName;
+        $badgeId = BadgeGenerator::generate('accountant', $data['first_name'], $data['last_name']);
 
-        $badgeId = BadgeGenerator::generate('pharmacist', $firstName, $lastName);
-
+        // Create User
         $user = User::create([
-            'name' => $data['full_name'],
+            'name' => $data['first_name'] . ' ' . $data['last_name'],
             'badge_id' => $badgeId,
             'email' => strtolower($badgeId) . '@chansey.local',
             'password' => Hash::make($data['password']),
-            'user_type' => 'pharmacist',
+            'user_type' => 'accountant',
         ]);
 
         unset($data['password']);
@@ -35,8 +31,8 @@ class CreatePharmacist extends CreateRecord
         return static::getModel()::create([
             'user_id' => $user->id,
             'employee_id' => $badgeId,
-            'full_name' => $data['full_name'],
-            'license_number' => $data['license_number'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
         ]);
     }
 

@@ -110,4 +110,9 @@ class Admission extends Model
     {
         return $this->hasMany(PatientMovement::class);
     }
+
+    public function billings(): HasMany
+    {
+        return $this->hasMany(Billing::class);
+    }
 }

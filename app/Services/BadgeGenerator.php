@@ -14,6 +14,7 @@ class BadgeGenerator
             'physician' => 'DOC',
             'general_service' => 'SVC',
             'pharmacist' => 'PHR',
+            'accountant' => 'ACC',
             'admin' => 'ADM',
             default => 'STF',
         };

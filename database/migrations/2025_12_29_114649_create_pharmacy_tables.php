@@ -19,7 +19,7 @@ public function up(): void
         $table->foreignId('user_id')->constrained()->cascadeOnDelete();
         $table->string('employee_id')->unique();
         $table->string('full_name');
-        $table->string('license_number'); // Professional license
+        $table->string('license_number'); 
         $table->timestamps();
     });
 
