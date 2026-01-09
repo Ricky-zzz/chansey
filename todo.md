@@ -73,3 +73,6 @@ Your plan is pragmatic and perfect for the deadline.
 *   **Workflow:** Complete (Doctor -> Accountant -> Nurse).
 
 **Go ahead and build the `Accountant` role and migration.** You are ready.
+
+
+reciept views then move to discharge views refactor view designs then go to appintments

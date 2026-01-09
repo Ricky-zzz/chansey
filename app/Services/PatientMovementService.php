@@ -45,10 +45,10 @@ class PatientMovementService
     {
         return DB::transaction(function () use ($admission, $newBed, $transferReason) {
             $currentMovement = $this->getCurrentMovement($admission);
-            
+
             if ($currentMovement) {
                 $this->endMovement($currentMovement);
-                
+
                 $oldBed = Bed::find($currentMovement->bed_id);
                 if ($oldBed) {
                     $oldBed->update(['status' => 'Available']);
@@ -143,10 +143,11 @@ class PatientMovementService
         foreach ($movements as $movement) {
             $endTime = $movement->ended_at ?? now();
             $startTime = $movement->started_at;
-            
-            // Calculate days (minimum 1 day charge)
-            $days = max(1, $startTime->diffInDays($endTime) + 1);
-            
+
+            $days = $startTime->startOfDay()->diffInDays($endTime->endOfDay()) + 1;
+
+            $days = max(1, (int) $days);
+
             $totalCharge += $movement->room_price * $days;
         }
 
@@ -174,7 +175,7 @@ class PatientMovementService
             ->first();
 
         $endTime = $lastMovement->ended_at ?? now();
-        
+
         return $firstMovement->started_at->diffInDays($endTime) + 1;
     }
 }

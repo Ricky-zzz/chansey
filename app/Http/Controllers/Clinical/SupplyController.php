@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 use App\Models\InventoryItem;
 use App\Models\BillableItem;
 use App\Models\ClinicalLog;
+use App\Services\BillableItemService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class SupplyController extends Controller
 {
+    protected $billableItemService;
+
+    public function __construct(BillableItemService $billableItemService)
+    {
+        $this->billableItemService = $billableItemService;
+    }
     public function store(Request $request)
     {
         $request->validate([
@@ -31,14 +38,13 @@ class SupplyController extends Controller
 
             $item->decrement('quantity', $request->quantity);
 
-            BillableItem::create([
-                'admission_id' => $request->admission_id,
-                'name' => $item->item_name, // e.g. "Admission Kit"
-                'amount' => $item->price,
-                'quantity' => $request->quantity,
-                'total' => $item->price * $request->quantity,
-                'status' => 'Unpaid'
-            ]);
+            $this->billableItemService->create(
+                $request->admission_id,
+                $item->item_name,
+                $item->price,
+                $request->quantity,
+                'inventory'
+            );
 
             ClinicalLog::create([
                 'admission_id' => $request->admission_id,

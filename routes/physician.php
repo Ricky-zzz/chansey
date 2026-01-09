@@ -12,21 +12,15 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
     // Physician Dashboard
     Route::get('/dashboard', [PhysicianDash::class, 'index'])->name('dashboard');
 
-    // my patient list
-    Route::get('/mypatients', [MyPatientController::class, 'index'])->name('patients.index');
+    // My Patients - Standard CRUD Resource (index & show only)
+    Route::resource('mypatients', MyPatientController::class)->only(['index', 'show']);
 
-    // patient chart view
-    Route::get('/mypatients/{admission}', [MyPatientController::class, 'show'])->name('patients.show');
-
-    // patient order make
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-
-    // discontinue order
+    // Orders - Standard CRUD Resource (store & destroy only)
+    Route::resource('orders', OrderController::class)->only(['store', 'destroy']);
+    
+    // Custom order action
     Route::patch('/orders/{order}/discontinue', [OrderController::class, 'discontinue'])
         ->name('orders.discontinue');
-
-    // delete order
-    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Treatment Plan Routes
     Route::get('/admission/{id}/plan', [TreatmentPlanController::class, 'edit'])

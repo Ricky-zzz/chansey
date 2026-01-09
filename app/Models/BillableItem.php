@@ -12,6 +12,7 @@ class BillableItem extends Model
         'name',
         'amount',
         'quantity',
+        'type',
         'total',
         'status',
     ];

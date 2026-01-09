@@ -5,39 +5,39 @@
 
     <!-- 1. HEADER & STATS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="card bg-warning text-warning-content shadow-lg">
+        <div class="card bg-orange-400 text-black shadow-lg">
             <div class="card-body p-6 flex flex-row items-center justify-between">
                 <div>
                     <h2 class="text-4xl font-black">{{ $pendingCount }}</h2>
                     <p class="uppercase text-xs font-bold opacity-80">Pending Clearance</p>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
         </div>
 
         <!-- Sales Today -->
-        <div class="card bg-success text-success-content shadow-lg">
+        <div class="card bg-emerald-400 text-black shadow-lg">
             <div class="card-body p-6 flex flex-row items-center justify-between">
                 <div>
                     <h2 class="text-4xl font-black">₱{{ number_format($collectedToday) }}</h2>
                     <p class="uppercase text-xs font-bold opacity-80">Collected Today</p>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
             </div>
         </div>
 
         <!-- Processed -->
-        <div class="card bg-base-100 border border-base-200 shadow-lg">
+        <div class="card bg-sky-400 text-black shadow-lg">
             <div class="card-body p-6 flex flex-row items-center justify-between">
                 <div>
-                    <h2 class="text-4xl font-black text-slate-700">{{ $dischargedToday }}</h2>
-                    <p class="uppercase text-xs font-bold text-slate-400">Discharged Today</p>
+                    <h2 class="text-4xl font-black text-black">{{ $dischargedToday }}</h2>
+                    <p class="uppercase text-xs font-bold text-black">Discharged Today</p>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
@@ -100,8 +100,8 @@
                         </td>
 
                         <td class="text-right">
-                            <a href=""
-                                class="btn btn-sm btn-primary gap-2">
+                            <a href="{{route('accountant.billing.show', $admission->id)}}"
+                                class="btn btn-sm bg-orange-500 text-white gap-2 border border-black">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>

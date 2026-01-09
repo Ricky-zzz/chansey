@@ -7,12 +7,19 @@ use App\Models\ClinicalLog;
 use App\Models\MedicalOrder;
 use App\Models\Medicine;
 use App\Models\BillableItem;
+use App\Services\BillableItemService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ClinicalLogController extends Controller
 {
+    protected $billableItemService;
+
+    public function __construct(BillableItemService $billableItemService)
+    {
+        $this->billableItemService = $billableItemService;
+    }
     public function store(Request $request, $admission)
     {
         $user = Auth::user();
@@ -68,14 +75,13 @@ class ClinicalLogController extends Controller
                     $order->medicine->decrement('stock_on_hand', $order->quantity);
 
                     // Add to Bill
-                    BillableItem::create([
-                        'admission_id' => $order->admission_id,
-                        'name' => $order->medicine->name . ' (' . $order->quantity . ')',
-                        'amount' => $order->medicine->price,
-                        'quantity' => $order->quantity,
-                        'total' => $order->medicine->price * $order->quantity,
-                        'status' => 'Unpaid'
-                    ]);
+                    $this->billableItemService->create(
+                        $order->admission_id,
+                        $order->medicine->brand_name,
+                        $order->medicine->price,
+                        $order->quantity,
+                        'medical'
+                    );
                 }
 
                 if ($order->frequency === 'Once' || $order->type === 'Utility') {
