@@ -7,7 +7,8 @@
 
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
-                <h2 class="text-3xl font-bold text-neutral">Admission Registry</h2>
+                <h2 class="text-3xl font-bold text-neutral">Ready for Discharge</h2>
+                <p>These patients have settled their bills. Discharge them to free up beds.</p>
             </div>
 
             <div class="flex gap-2 w-full md:w-auto">
@@ -45,13 +46,13 @@
                             <td class="text-base font-mono font-semibold text-black">
                                 {{ $admission->admission_number }} |
                                 @php
-                                    $badgeClass = match($admission->admission_type) {
-                                        'Inpatient' => 'bg-blue-50 text-blue-700 border border-blue-100',
-                                        'Outpatient' => 'bg-orange-50 text-orange-700 border border-orange-100',
-                                        'Emergency' => 'bg-red-50 text-red-700 border border-red-100',
-                                        'Transfer' => 'bg-stone-50 text-stone-700 border border-stone-100',
-                                        default => 'bg-gray-50 text-gray-600 border border-gray-200'
-                                    };
+                                $badgeClass = match($admission->admission_type) {
+                                'Inpatient' => 'bg-blue-50 text-blue-700 border border-blue-100',
+                                'Outpatient' => 'bg-orange-50 text-orange-700 border border-orange-100',
+                                'Emergency' => 'bg-red-50 text-red-700 border border-red-100',
+                                'Transfer' => 'bg-stone-50 text-stone-700 border border-stone-100',
+                                default => 'bg-gray-50 text-gray-600 border border-gray-200'
+                                };
                                 @endphp
                                 <div class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $badgeClass }}">{{ $admission->admission_type }}</div>
                             </td>
@@ -77,25 +78,44 @@
                                 </div>
                             </td>
                             </td>
+                            <!-- STATUS BADGE -->
                             <td>
-                                @if($admission->status === 'Admitted')
-                                <span class="inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm font-semibold bg-emerald-600 text-white">
-                                    <span class="w-2 h-2 rounded-full bg-sky-300 animate-pulse"></span>
-                                    Active
+                                @if($admission->status === 'Cleared')
+                                <span class="inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-600 animate-pulse"></span>
+                                    Cleared to Go
                                 </span>
                                 @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-gray-600 bg-gray-100 border border-gray-200">
-                                    {{ ucfirst($admission->status) }}
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-sm font-semibold bg-gray-100 text-gray-700 border border-gray-300">
+                                    Discharged
                                 </span>
                                 @endif
                             </td>
+
+                            <!-- ACTION BUTTON -->
                             <td>
-                                <a href="{{ route('nurse.admitting.admissions.show', $admission->id) }}" class="btn btn-xs md:btn-sm btn-primary text-white gap-1 md:gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                    View 
+                                @if($admission->status === 'Cleared')
+                                <form action="{{ route('nurse.admitting.discharge', $admission->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm font-bold bg-orange-600 text-white w-full" onclick="return confirm('Confirm patient has physically left the bed?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 md:h-5 md:w-5 inline-block " aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                        </svg>
+
+                                        Confirm Discharge
+                                    </button>
+                                </form>
+                                @else
+                                <a href="{{ route('nurse.admitting.admissions.show', $admission->id) }}" class="btn btn-xs md:btn-sm btn-neutral w-full inline-flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 md:h-5 md:w-5 inline-block mr-2" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                    <span>View History</span>
                                 </a>
+                                @endif
                             </td>
-                            </td>
+
                         </tr>
 
                         @empty

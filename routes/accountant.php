@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->prefix('accountant')->name('accountant.')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/history', [DashboardController::class, 'history'])->name('history');
 
 
     Route::resource('/fees', \App\Http\Controllers\Accountant\HospitalFeeController::class)
@@ -21,4 +22,6 @@ Route::middleware(['auth'])->prefix('accountant')->name('accountant.')->group(fu
 
     Route::delete('/billing/item/{id}', [BillingController::class, 'removeItem'])
         ->name('billing.remove_item');
+
+    Route::get('/billing/{id}/print', [BillingController::class, 'print'])->name('billing.print');
 });

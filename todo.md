@@ -76,3 +76,5 @@ Your plan is pragmatic and perfect for the deadline.
 
 
 reciept views then move to discharge views refactor view designs then go to appintments
+
+Ready for Discharge

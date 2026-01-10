@@ -12,6 +12,7 @@ use App\Services\BillableItemService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BillingController extends Controller
 {
@@ -26,6 +27,14 @@ class BillingController extends Controller
 
     public function show($id)
     {
+
+        $admission = Admission::with('billingInfo')->findOrFail($id);
+
+        if ($admission->status === 'Cleared' || $admission->status === 'Discharged') {
+            $billing = Billing::where('admission_id', $id)->first();
+            return view('accountant.billing.receipt', compact('billing', 'admission'));
+        }
+
         $admission = Admission::with(['patient', 'billableItems', 'billingInfo'])->findOrFail($id);
 
         $roomTotal = $this->movementService->calculateTotalRoomCharges($admission);
@@ -106,6 +115,8 @@ class BillingController extends Controller
                 throw new \Exception("Insufficient cash. Need ₱" . number_format($finalAmount, 2));
             }
 
+            $movements = $this->movementService->getMovementHistory($admission);
+
             $billing = Billing::create([
                 'admission_id' => $admission->id,
                 'processed_by' => Auth::id(),
@@ -116,10 +127,34 @@ class BillingController extends Controller
                     'items_total' => $itemsTotal,
                     'pf_fee' => $pf,
                     'deductions' => [
-                        'philhealth' => $request->philhealth,
-                        'hmo' => $request->hmo
+                        'philhealth' => $request->philhealth ?? 0,
+                        'hmo' => $request->hmo ?? 0
                     ],
-                    'items_list' => $admission->billableItems->where('status', 'Unpaid')->toArray()
+                    'items_list' => $admission->billableItems->where('status', 'Unpaid')
+                        ->groupBy('name')
+                        ->map(function ($group) {
+                            return [
+                                'name' => $group->first()->name,
+                                'quantity' => $group->sum('quantity'),
+                                'amount' => $group->first()->amount,
+                                'total' => $group->sum('total'),
+                                'type' => $group->first()->type
+                            ];
+                        })->values()->toArray(),
+                    'movements' => $movements->map(function ($mov) {
+                        $end = $mov->ended_at ?? now();
+                        $days = $mov->started_at->startOfDay()->diffInDays($end->endOfDay()) + 1;
+                        $days = (int) $days;
+                        return [
+                            'room_number' => $mov->room->room_number,
+                            'bed_code' => $mov->bed->bed_code,
+                            'started_at' => $mov->started_at->format('M d, Y'),
+                            'ended_at' => $mov->ended_at ? $mov->ended_at->format('M d, Y') : 'Present',
+                            'days' => $days,
+                            'price' => (float) $mov->room_price,
+                            'total' => round($days * (float) $mov->room_price, 2)
+                        ];
+                    })->toArray()
                 ],
 
                 'gross_total' => $subtotal,
@@ -137,7 +172,7 @@ class BillingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('accountant.dashboard')
+            return redirect()->route('accountant.billing.show', $admission->id)
                 ->with('success', 'Payment successful! Patient cleared for discharge.');
         } catch (\Exception $e) {
             DB::rollback();
@@ -157,4 +192,14 @@ class BillingController extends Controller
 
         return back()->with('success', 'Fee removed from bill.');
     }
+
+    public function print($id)
+    {
+        $billing = Billing::with('admission.patient')->findOrFail($id);
+
+        $pdf = Pdf::loadView('accountant.billing.pdf', compact('billing'));
+
+        return $pdf->stream("Receipt-{$billing->receipt_number}.pdf");
+    }
+
 }

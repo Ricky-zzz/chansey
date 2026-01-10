@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    
+
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-2 md:gap-4">
         <div class="text-xs md:text-lg  breadcrumbs text-slate-900 font-bold">
             <ul>
@@ -12,11 +12,19 @@
             </ul>
         </div>
 
-        <div class="join w-full md:w-auto">
-            <a href="{{ route('nurse.admitting.patients.edit', $patient) }}" class="btn btn-accent join-item btn-sm md:btn-md text-white">Edit Profile</a>           
-            <a href="{{ route('nurse.admitting.admissions.create', $patient) }}" class="btn btn-secondary join-item btn-sm md:btn-md gap-2 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                New Admission
+        <div class="flex gap-2 w-full md:w-auto">
+            <a href="{{ route('nurse.admitting.patients.edit', $patient) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-blue-500 text-white text-sm md:text-base hover:bg-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h6M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7M6 7h.01" />
+                </svg>
+                <span>Edit Profile</span>
+            </a>
+
+            <a href="{{ route('nurse.admitting.admissions.create', $patient) }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-orange-500 text-white text-sm md:text-base hover:bg-orange-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>New Admission</span>
             </a>
         </div>
     </div>
@@ -34,7 +42,7 @@
                     {{ $patient->last_name }}, {{ $patient->first_name }}
                 </h2>
                 @if($patient->middle_name)
-                    <p class="text-xs font-semibold text-gray-700 mt-1">{{ $patient->middle_name }}</p>
+                <p class="text-xs font-semibold text-gray-700 mt-1">{{ $patient->middle_name }}</p>
                 @endif
                 <div class="mt-3 w-full">
                     <p class="text-xs text-gray-700 uppercase font-semibold mb-1">Patient ID</p>
@@ -54,7 +62,7 @@
 
                 <!-- Patient Info Grid -->
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 ">
-                    
+
                     <!-- Name & ID Section -->
                     <div class="space-y-2 md:space-y-4 ">
                         <div>
@@ -62,7 +70,7 @@
                                 {{ $patient->last_name }}, {{ $patient->first_name }}
                             </h2>
                             @if($patient->middle_name)
-                                <p class="text-xs md:text-xs  font-semibold text-gray-700 mb-1 md:mb-2 ">Middle Name: {{ $patient->middle_name }}</p>
+                            <p class="text-xs md:text-xs  font-semibold text-gray-700 mb-1 md:mb-2 ">Middle Name: {{ $patient->middle_name }}</p>
                             @endif
                             <div class="pt-1 md:pt-2  border-t border-gray-200">
                                 <p class="text-xs text-gray-700 uppercase font-semibold mb-0.5 md:mb-1">Patient ID</p>
@@ -123,7 +131,7 @@
 
                 </div>
             </div>
-            
+
             <div class="md:hidden space-y-4">
                 <!-- Personal Information Section -->
                 <div class="space-y-2">
@@ -201,13 +209,20 @@
                                 <div class="font-bold text-xs md:text-sm">{{ $admission->admission_date->format('M d, Y') }}</div>
                                 <div class="text-xs md:text-xs text-gray-600">{{ $admission->admission_date->format('h:i A') }}</div>
                             </td>
-                            
+
                             <td class="font-mono text-xs md:text-sm font-semibold text-neutral">{{ $admission->admission_number }}</td>
-                            
-                            <td>
-                                <div class="badge badge-xs md:badge-sm {{ $admission->admission_type === 'Emergency' ? 'badge-error text-white' : 'badge-info' }} font-semibold">
-                                    {{ $admission->admission_type }}
-                                </div>
+
+                            <td class="text-base font-mono font-semibold text-black">
+                                @php
+                                    $badgeClass = match($admission->admission_type) {
+                                        'Inpatient' => 'bg-blue-50 text-blue-700 border border-blue-100',
+                                        'Outpatient' => 'bg-orange-50 text-orange-700 border border-orange-100',
+                                        'Emergency' => 'bg-red-50 text-red-700 border border-red-100',
+                                        'Transfer' => 'bg-stone-50 text-stone-700 border border-stone-100',
+                                        default => 'bg-gray-50 text-gray-600 border border-gray-200'
+                                    };
+                                @endphp
+                                <div class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $badgeClass }}">{{ $admission->admission_type }}</div>
                             </td>
 
                             <td>
@@ -216,19 +231,21 @@
                             </td>
 
                             <td>
-                                @if($admission->status === 'Admitted')
-                                    <span class="badge badge-xs md:badge-sm badge-success gap-2 font-semibold">
-                                        <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                                        Active
-                                    </span>
+                                @if($admission->status === 'Discharged')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200">Discharged</span>
+                                @elseif($admission->status === 'Cleared')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-yellow-800 bg-yellow-50 border border-yellow-200">Ready to Go</span>
                                 @else
-                                    <span class="badge badge-xs md:badge-sm badge-neutral font-semibold">Discharged</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600">Admitted</span>
                                 @endif
                             </td>
 
                             <td>
                                 <a href="{{ route('nurse.admitting.admissions.show', $admission->id) }}" class="btn btn-xs md:btn-xs btn-primary text-white gap-1 md:gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                     View <span class="hidden sm:block">Admission</span>
                                 </a>
                             </td>
@@ -243,7 +260,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- Pagination -->
             <div class="mt-4">
                 {{ $admissions->links() }}

@@ -224,4 +224,62 @@ class AdmissionController extends Controller
             return back()->withInput()->withErrors(['error' => 'Error updating admission: ' . $e->getMessage()]);
         }
     }
+
+    public function clearanceList(Request $request)
+    {
+        $query = Admission::with(['patient', 'bed.room', 'attendingPhysician'])
+            ->whereIn('status', ['Cleared', 'Discharged'])
+            ->orderByRaw("CASE WHEN status = 'Cleared' THEN 0 WHEN status = 'Discharged' THEN 1 END")
+            ->latest('updated_at');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('admission_number', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($subQ) use ($search) {
+                        $subQ->where('last_name', 'like', "{$search}%")
+                            ->orWhere('first_name', 'like', "{$search}%")
+                            ->orWhere('patient_unique_id', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $admissions = $query->paginate(10)->appends(['search' => $search]);
+
+        return view('nurse.admitting.admissions.clearance', compact('admissions'));
+    }
+
+    public function discharge($id, PatientMovementService $movementService)
+    {
+        try {
+            DB::beginTransaction();
+
+            $admission = Admission::with('bed')->findOrFail($id);
+
+            if ($admission->status !== 'Cleared') {
+                abort(403, 'Patient has not settled their bill.');
+            }
+
+            if ($admission->bed) {
+                $admission->bed->update(['status' => 'Cleaning']);
+            }
+
+            $movementService->endAllMovements($admission);
+
+            $admission->update([
+                'status' => 'Discharged',
+                'discharge_date' => now()
+            ]);
+
+            $admission->medicalOrders()
+                ->whereIn('status', ['Pending', 'Active', 'In Progress'])
+                ->update(['status' => 'Discontinued']);
+
+            DB::commit();
+            return back()->with('success', 'Patient Discharged. Bed marked for cleaning.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Discharge Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Error during discharge: ' . $e->getMessage()]);
+        }
+    }
 }

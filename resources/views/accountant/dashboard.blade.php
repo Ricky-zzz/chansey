@@ -68,7 +68,7 @@
                         <th>Admission #</th>
                         <th>Patient</th>
                         <th>Room / Accommodation</th>
-                        <th>Cleared Date</th>
+                        <th>Discharge Aproval Date</th>
                         <th class="text-right">Action</th>
                     </tr>
                 </thead>

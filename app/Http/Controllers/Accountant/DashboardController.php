@@ -11,16 +11,13 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-    $query = Admission::with(['patient', 'bed.room', 'attendingPhysician', 'billingInfo']) // Added billingInfo
+    $query = Admission::with(['patient', 'bed.room', 'attendingPhysician', 'billingInfo']) 
         ->where('status', 'Ready for Discharge');
 
-    // SEARCH LOGIC
     if ($search = $request->input('search')) {
         $query->where(function($q) use ($search) {
-            // 1. Admission Number
             $q->where('admission_number', 'like', "%{$search}%")
             
-            // 2. Patient Name
               ->orWhereHas('patient', function($subQ) use ($search) {
                   $subQ->where('last_name', 'like', "{$search}%")
                        ->orWhere('first_name', 'like', "{$search}%");
@@ -28,7 +25,6 @@ class DashboardController extends Controller
         });
     }
 
-    // Sort and Paginate
     $readyForBilling = $query->latest('updated_at')
         ->paginate(10)
         ->appends(['search' => $search]); // Keep search in URL
@@ -48,5 +44,26 @@ class DashboardController extends Controller
             'collectedToday', 
             'dischargedToday'
         ));
+    }
+
+    public function history(Request $request)
+    {
+        $query = Billing::with(['admission.patient'])
+            ->latest('created_at');
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('receipt_number', 'like', "%{$search}%")
+                  ->orWhereHas('admission.patient', function($subQ) use ($search) {
+                      $subQ->where('last_name', 'like', "{$search}%")
+                           ->orWhere('first_name', 'like', "{$search}%");
+                  });
+            });
+        }
+
+        $billings = $query->paginate(10)
+            ->appends(['search' => $search]);
+
+        return view('accountant.history.index', compact('billings'));
     }
 }

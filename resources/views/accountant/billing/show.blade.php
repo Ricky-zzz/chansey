@@ -16,9 +16,9 @@
                 | ID: {{ $admission->admission_number }}
             </div>
         </div>
-        <div class="text-right">
+            <div class="text-right">
             <div class="text-xs uppercase font-bold text-gray-400">Current Status</div>
-            <div class="badge badge-lg {{ $admission->status === 'Ready for Discharge' ? 'badge-warning' : 'badge-ghost' }}">
+            <div class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold {{ $admission->status === 'Ready for Discharge' ? 'bg-red-500 text-white border-2 border-red-200' : 'bg-gray-50 text-gray-600 border border-gray-200' }}">
                 {{ $admission->status }}
             </div>
         </div>
@@ -32,7 +32,7 @@
             <!-- A. ROOM CHARGES -->
             <div class="card bg-white shadow-sm border border-slate-200">
                 <div class="card-body p-0">
-                    <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl font-bold text-slate-700">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl font-bold text-black">
                         Room & Board Charges
                     </div>
                     <div class="overflow-x-auto max-h-64">
@@ -84,7 +84,7 @@
             <div class="card bg-white shadow-sm border border-slate-200">
                 <div class="card-body p-0">
                     <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl flex justify-between items-center">
-                        <span class="font-bold text-slate-700">Medications, Labs & Other Fees</span>
+                        <span class="font-bold text-black">Medications, Labs & Other Fees</span>
 
                         <!-- ADD FEE BUTTON -->
                         <button onclick="fee_modal.showModal()" class="btn btn-xs btn-primary">+ Add Fee</button>
@@ -153,14 +153,14 @@
 
                 <div class="card bg-white shadow-lg border-t-4 border-primary">
                     <div class="card-body p-6 space-y-4">
-                        <h3 class="text-lg font-bold text-slate-700">Billing Adjustments</h3>
+                        <h3 class="text-lg font-bold text-black">Billing Adjustments</h3>
 
                         <!-- 1. PROFESSIONAL FEE -->
                         <div class="form-control">
-                            <label class="label text-xs font-bold uppercase">Professional Fee (Doctor)</label>
+                            <label class="label text-xs text-black font-bold uppercase">Professional Fee (Doctor)</label>
                             <div class="input-group">
                                 <span>₱</span>
-                                <input type="number" step="0.01" name="pf_fee" x-model.number="pf" class="input input-bordered w-full font-mono text-right">
+                                <input type="number" step="0.01" name="pf_fee" x-model.number="pf" class="input text-2xl input-bordered w-full font-mono text-right">
                             </div>
                         </div>
 
@@ -171,7 +171,7 @@
                             <label class="label text-xs font-bold uppercase text-emerald-600">PhilHealth</label>
                             <div class="input-group">
                                 <span>- ₱</span>
-                                <input type="number" step="0.01" name="philhealth" x-model.number="philhealth" class="input input-bordered w-full font-mono text-right text-emerald-600">
+                                <input type="number" step="0.01" name="philhealth" x-model.number="philhealth" class="input input-bordered text-2xl w-full font-mono text-right text-emerald-600">
                             </div>
                         </div>
 
@@ -179,7 +179,7 @@
                             <label class="label text-xs font-bold uppercase text-emerald-600">HMO / Insurance</label>
                             <div class="input-group">
                                 <span>- ₱</span>
-                                <input type="number" step="0.01" name="hmo" x-model.number="hmo" class="input input-bordered w-full font-mono text-right text-emerald-600">
+                                <input type="number" step="0.01" name="hmo" x-model.number="hmo" class="input input-bordered w-full text-2xl font-mono text-right text-emerald-600">
                             </div>
                         </div>
 
@@ -196,28 +196,33 @@
                             <div class="divider my-1"></div>
                             <div class="flex justify-between items-end">
                                 <span class="font-bold text-lg">NET AMOUNT DUE</span>
-                                <span class="font-black text-3xl text-primary">₱<span x-text="netAmount.toFixed(2)"></span></span>
+                                <span class="font-black text-3xl text-red-500">₱<span x-text="netAmount.toFixed(2)"></span></span>
                             </div>
                         </div>
 
                         <!-- 4. PAYMENT -->
                         <div class="form-control mt-4">
-                            <label class="label text-xs font-bold uppercase">Cash Tendered</label>
+                            <label class="label text-xs text-black font-bold uppercase">Cash Tendered</label>
                             <div class="input-group">
                                 <span>₱</span>
-                                <input type="number" step="0.01" name="cash_tendered" x-model.number="cash" class="input input-bordered w-full font-mono text-right input-lg">
+                                <input type="number" step="0.01" name="cash_tendered" x-model.number="cash" class="input text-3xl text-black bg-yellow-300 input-bordered w-full font-mono text-right input-lg">
                             </div>
                         </div>
 
                         <div class="flex justify-between text-sm px-2">
-                            <span class="font-bold text-gray-500">Change:</span>
+                            <span class="font-bold text-gray-800">Change:</span>
                             <span class="font-mono font-bold text-lg" :class="change < 0 ? 'text-error' : 'text-slate-700'">
                                 ₱<span x-text="change.toFixed(2)"></span>
                             </span>
                         </div>
 
                         <!-- SUBMIT -->
-                        <button type="submit" class="btn btn-primary w-full btn-lg mt-4" :disabled="change < 0 || netAmount <= 0">
+                        <button type="submit" class="btn font-bold w-full btn-lg mt-4"
+                            :class="{
+                                'bg-gray-300 text-gray-600 opacity-70 cursor-not-allowed': change < 0 || netAmount <= 0,
+                                'bg-red-500 text-white': !(change < 0 || netAmount <= 0)
+                            }"
+                            :disabled="change < 0 || netAmount <= 0">
                             Confirm Payment & Discharge
                         </button>
 

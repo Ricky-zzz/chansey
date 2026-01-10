@@ -326,7 +326,7 @@
                     <div class="grid grid-cols-1 gap-6">
                         <label class="floating-label w-full">
                             <span>Chief Complaint</span>
-                            <textarea name="chief_complaint" class="textarea textarea-bordered w-full"
+                            <textarea name="chief_complaint" data-step="2" class="textarea textarea-bordered w-full"
                                 placeholder="Describe the patient's primary complaint req" required></textarea>
                         </label>
 
