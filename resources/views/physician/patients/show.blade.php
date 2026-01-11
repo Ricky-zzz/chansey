@@ -6,7 +6,7 @@
     <div class="text-sm breadcrumbs mb-3">
         <ul>
             <li><a href="{{ route('physician.dashboard') }}" class="link link-hover">Dashboard</a></li>
-            <li><a href="{{ route('physician.patients.index') }}" class="link link-hover">My Patients</a></li>
+            <li><a href="{{ route('physician.mypatients.index') }}" class="link link-hover">My Patients</a></li>
             <li class="text-slate-700 font-semibold">
                 {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
             </li>

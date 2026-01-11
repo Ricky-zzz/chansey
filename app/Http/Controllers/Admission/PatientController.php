@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admission;
 use App\Models\Station;
 use App\Models\Patient;
 use App\Models\Physician;
+use App\Models\Appointment;
 use App\Models\Bed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,9 +43,32 @@ class PatientController extends Controller
         return view('nurse.admitting.patients.index', compact('patients'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $physicians = Physician::select('id', 'first_name', 'last_name', 'specialization')->get();
+        $prefillData = [];
+        
+        if ($appId = $request->query('prefill')) {
+            $appointment = Appointment::findOrFail($appId);
+
+            $existingPatient = Patient::whereRaw('LOWER(first_name) = ?', [strtolower($appointment->first_name)])
+                ->whereRaw('LOWER(last_name) = ?', [strtolower($appointment->last_name)])
+                ->first();
+
+            if ($existingPatient) {
+                return redirect()->route('nurse.admitting.patients.show', $existingPatient->id)
+                    ->with('warning', "Found existing profile for {$appointment->first_name} {$appointment->last_name}. Continue admission here.");
+            }
+
+            $prefillData = [
+                'first_name' => $appointment->first_name,
+                'last_name' => $appointment->last_name,
+                'contact_number' => $appointment->contact_number,
+                'email' => $appointment->email,
+                'appointment_id' => $appointment->id
+            ];
+        }
+
+        $physicians = Physician::with('department')->select('id', 'first_name', 'last_name', 'department_id')->get();
         $stations = Station::select('id', 'station_name')->get();
 
         $rawBeds = Bed::with('room.station')
@@ -59,7 +83,7 @@ class PatientController extends Controller
                 ];
             });
 
-        return view('nurse.admitting.patients.create', compact('physicians', 'stations', 'rawBeds'));
+        return view('nurse.admitting.patients.create', compact('physicians', 'stations', 'rawBeds', 'prefillData'));
     }
 
     public function store(StoreAdmissionRequest $request)
@@ -114,7 +138,7 @@ class PatientController extends Controller
                 // Details
                 'admission_type' => $data['admission_type'],
                 'station_id' => $data['station_id'],
-                'bed_id' => $data['bed_id'],
+                'bed_id' => $data['admission_type'] === 'Outpatient' ? null : ($data['bed_id'] ?? null),
                 'case_type' => $data['case_type'],
                 'mode_of_arrival' => $data['mode_of_arrival'],
                 'chief_complaint' => $data['chief_complaint'],
@@ -132,13 +156,14 @@ class PatientController extends Controller
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            $bed = Bed::findOrFail($data['bed_id']);
-            $bed->update(['status' => 'Occupied']);
+            if ($admission->bed_id) {
+                $bed = Bed::findOrFail($admission->bed_id);
+                $bed->update(['status' => 'Occupied']);
 
-            // Create initial patient movement using the service
-            $bed->load('room');
-            $movementService = app(PatientMovementService::class);
-            $movementService->createInitialMovement($admission, $bed);
+                $bed->load('room');
+                $movementService = app(PatientMovementService::class);
+                $movementService->createInitialMovement($admission, $bed);
+            }
 
             // --- 4. CREATE BILLING INFO ---
             AdmissionBillingInfo::create([

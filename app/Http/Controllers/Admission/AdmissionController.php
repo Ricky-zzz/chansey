@@ -70,7 +70,7 @@ class AdmissionController extends Controller
                 ->with('error', 'Patient is currently admitted! Cannot create new admission.');
         }
 
-        $physicians = Physician::select('id', 'first_name', 'last_name', 'specialization')->get();
+        $physicians = Physician::with('department')->select('id', 'first_name', 'last_name', 'department_id')->get();
         $stations = Station::select('id', 'station_name')->get();
 
         $rawBeds = Bed::with('room.station')
@@ -110,7 +110,7 @@ class AdmissionController extends Controller
                 // Details
                 'admission_type' => $data['admission_type'],
                 'station_id' => $data['station_id'],
-                'bed_id' => $data['bed_id'],
+                'bed_id' => $data['admission_type'] === 'Outpatient' ? null : ($data['bed_id'] ?? null),
                 'case_type' => $data['case_type'],
                 'mode_of_arrival' => $data['mode_of_arrival'],
                 'chief_complaint' => $data['chief_complaint'],
@@ -127,12 +127,14 @@ class AdmissionController extends Controller
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            $bed = Bed::with('room')->findOrFail($data['bed_id']);
-            $bed->update(['status' => 'Occupied']);
+            // ONLY CREATE BED ASSIGNMENT IF THERE IS A BED
+            if ($admission->bed_id) {
+                $bed = Bed::with('room')->findOrFail($admission->bed_id);
+                $bed->update(['status' => 'Occupied']);
 
-
-            $movementService = app(PatientMovementService::class);
-            $movementService->createInitialMovement($admission, $bed);
+                $movementService = app(PatientMovementService::class);
+                $movementService->createInitialMovement($admission, $bed);
+            }
 
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
@@ -162,7 +164,7 @@ class AdmissionController extends Controller
 
     public function edit($id)
     {
-        $physicians = Physician::select('id', 'first_name', 'last_name', 'specialization')->get();
+        $physicians = Physician::with('department')->select('id', 'first_name', 'last_name', 'department_id')->get();
         $beds = Bed::where('status', 'Available')->get();
         $admission = Admission::with([
             'patient',

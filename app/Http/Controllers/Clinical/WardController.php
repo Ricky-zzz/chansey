@@ -23,9 +23,7 @@ class WardController extends Controller
         $query = Admission::query()
             ->with(['patient', 'bed.room', 'attendingPhysician'])
             ->whereIn('admissions.status', ['Admitted', 'Ready for Discharge'])
-            ->whereHas('bed.room', function ($q) use ($nurse) {
-                $q->where('station_id', $nurse->station_id);
-            });
+            ->where('admissions.station_id', $nurse->station_id);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -40,8 +38,8 @@ class WardController extends Controller
         }
 
         $patients = $query
-            ->join('beds', 'admissions.bed_id', '=', 'beds.id')
-            ->orderBy('beds.bed_code', 'asc')
+            ->leftJoin('beds', 'admissions.bed_id', '=', 'beds.id')
+            ->orderByRaw('COALESCE(beds.bed_code, "Outpatient") ASC')
             ->select('admissions.*')
             ->paginate(10)
             ->appends(['search' => $search]);

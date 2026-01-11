@@ -52,7 +52,7 @@ class AdmissionRequest extends FormRequest
             $rules['station_id'] = 'required|exists:stations,id';
             
             $rules['bed_id'] = [
-                'required',
+                Rule::requiredIf($this->input('admission_type') !== 'Outpatient'),
                 Rule::exists('beds', 'id')->where('status', 'Available')
             ];
         }

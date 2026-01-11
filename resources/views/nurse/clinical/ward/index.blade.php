@@ -3,28 +3,30 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div>
-            <h2 class="text-3xl font-black text-slate-800">Station Roster</h2>
-            <p class="text-sm text-slate-500 font-bold uppercase tracking-wider">
-                {{ $nurse->station->station_name ?? 'Unassigned Station' }}
-            </p>
+    <!-- PATIENT LIST -->
+    <div class="bg-white rounded-lg p-6 shadow-xl border border-base-200">
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800">Station Roster</h2>
+                <p class="text-sm text-slate-500 font-bold uppercase tracking-wider">
+                    {{ $nurse->station->station_name ?? 'Unassigned Station' }}
+                </p>
+            </div>
+
+            <!-- SEARCH -->
+            <form action="{{ route('nurse.clinical.ward.index') }}" method="GET" class="join w-full md:w-96">
+                <input type="text" name="search" class="input input-bordered join-item w-full" 
+                       placeholder="Find Patient or Bed..." 
+                       value="{{ request('search') }}">
+                <button type="submit" class="btn btn-primary join-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </button>
+            </form>
         </div>
 
-        <!-- SEARCH -->
-        <form action="{{ route('nurse.clinical.ward.index') }}" method="GET" class="join w-full md:w-96">
-            <input type="text" name="search" class="input input-bordered join-item w-full" 
-                   placeholder="Find Patient or Bed..." 
-                   value="{{ request('search') }}">
-            <button type="submit" class="btn btn-primary join-item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </button>
-        </form>
-    </div>
+        <div class="border-t border-base-200 pt-6"></div>
 
-    <!-- PATIENT LIST -->
-    <div class="card bg-base-100 shadow-xl border border-base-200">
         <div class="overflow-x-auto">
             <table class="table table-zebra table-lg">
                 <!-- Head -->
@@ -46,10 +48,14 @@
                         <td>
                             <div class="flex flex-col">
                                 <span class="font-mono font-black text-lg text-primary">
+                                    @if($admission->bed?->bed_code)
                                     {{ $admission->bed->bed_code }}
+                                    @else
+                                    <span class="italic text-gray-400">Outpatient</span>
+                                    @endif
                                 </span>
                                 <span class="text-xs text-gray-500 font-bold">
-                                    {{ $admission->bed->room->room_type }}
+                                    {{ $admission->bed?->room->room_type ?? 'Waiting Area' }}
                                 </span>
                             </div>
                         </td>

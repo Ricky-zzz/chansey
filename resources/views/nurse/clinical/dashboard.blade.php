@@ -91,7 +91,11 @@
                     <tr class="hover group">
                         <td>
                             <div class="font-black text-md text-primary font-mono">
-                                {{ $admission->bed->bed_code ?? '---' }}
+                                @if($admission->bed?->bed_code)
+                                {{ $admission->bed->bed_code }}
+                                @else
+                                <span class="italic text-gray-400">Outpatient</span>
+                                @endif
                             </div>
                         </td>
 
@@ -112,8 +116,8 @@
                         <!-- DOCTOR -->
                         <td>
                             <div class="flex items-center text-md">
-                                <span class="font-semibold text-slate-700">
-                                    Dr. {{ $admission->attendingPhysician->last_name }},{{ $admission->attendingPhysician->first_name }}
+                                <span class=" text-sm font-semibold text-slate-700">
+                                    Dr. {{ $admission->attendingPhysician->getFullNameAttribute() }}
                                 </span>
                             </div>
                         </td>

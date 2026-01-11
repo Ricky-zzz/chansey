@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admission\PatientController;
 use App\Http\Controllers\Admission\AdmissionController;
 use App\Http\Controllers\Admission\TransferController;
+use App\Http\Controllers\Admission\AppointmentController;
 use App\Http\Controllers\Admission\DashboardController as AdmissionDash;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +18,10 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
 
     // Clearance List for Discharge
     Route::get('/admissions/clearance', [AdmissionController::class, 'clearanceList'])
-    ->name('admissions.clearance');
+        ->name('admissions.clearance');
+
+    Route::get('/appointments', [AppointmentController::class, 'index'])
+        ->name('appointments.index');
 
     // Admissions 
     Route::resource('admissions', AdmissionController::class)->only(['index', 'show', 'edit', 'update']);
@@ -31,5 +35,11 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
 
     // Discharge Admission
     Route::post('/admissions/{id}/discharge', [AdmissionController::class, 'discharge'])
-    ->name('discharge');
+        ->name('discharge');
+
+    Route::post('/appointments/{id}/approve', [AppointmentController::class, 'approve'])
+        ->name('appointments.approve');
+
+    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])
+        ->name('appointments.cancel');
 });

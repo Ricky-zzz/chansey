@@ -7,20 +7,35 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Nurse;
-use App\Models\GeneralService; 
+use App\Models\GeneralService;
 use App\Models\Physician;
+use App\Models\Pharmacist; // Make sure this model exists
+use App\Models\Accountant; // Make sure this model exists
 use App\Models\Station;
 use App\Models\Room;
 use App\Models\Bed;
+use App\Models\Department; // New
+use App\Models\Medicine;   // New
+use App\Models\InventoryItem; // New
+use App\Models\HospitalFee; // New
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $password = Hash::make('password'); 
+        $password = Hash::make('password'); // Unified password
 
         // ==========================================
-        // 1. ADMIN ACCOUNT
+        // 0. CREATE DEPARTMENTS (Prerequisite)
+        // ==========================================
+        $deptNames = ['Cardiology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Surgery', 'OB-GYN'];
+        $depts = [];
+        foreach ($deptNames as $name) {
+            $depts[$name] = Department::create(['name' => $name])->id;
+        }
+
+        // ==========================================
+        // 1. ADMIN
         // ==========================================
         $adminUser = User::create([
             'name' => 'System Admin',
@@ -35,28 +50,73 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ==========================================
-        // 2. ADMITTING NURSE (Steph Torres)
+        // 2. ACCOUNTANT (Billing)
         // ==========================================
-        $nurseUser = User::create([
+        $accUser = User::create([
+            'name' => 'Gwen Perez',
+            'email' => 'gwen.perez@chansey.test',
+            'password' => $password,
+            'user_type' => 'accountant',
+            'badge_id' => 'ACC-GP-001',
+        ]);
+        Accountant::create([
+            'user_id' => $accUser->id,
+            'employee_id' => 'ACC-GP-001',
+            'first_name' => 'Gwen',
+            'last_name' => 'Perez',
+        ]);
+
+        // ==========================================
+        // 3. PHARMACIST (Pharmacy)
+        // ==========================================
+        $pharmUser = User::create([
+            'name' => 'Gabriel Hosmillo',
+            'email' => 'gabriel.hosmillo@chansey.test',
+            'password' => $password,
+            'user_type' => 'pharmacist',
+            'badge_id' => 'PHR-GH-001',
+        ]);
+        Pharmacist::create([
+            'user_id' => $pharmUser->id,
+            'employee_id' => 'PHR-GH-001',
+            'full_name' => 'Gabriel Hosmillo',
+            'license_number' => '0123456788'
+        ]);
+
+        // ==========================================
+        // 4. NURSES
+        // ==========================================
+        // A. Admitting
+        $admitNurse = User::create([
             'name' => 'Steph Torres',
-            'email' => 'steph@chansey.test',
+            'email' => 'steph.torres@chansey.test',
             'password' => $password,
             'user_type' => 'nurse',
             'badge_id' => 'NUR-ST-001',
         ]);
         Nurse::create([
-            'user_id' => $nurseUser->id,
+            'user_id' => $admitNurse->id,
             'employee_id' => 'NUR-ST-001',
             'first_name' => 'Steph',
             'last_name' => 'Torres',
             'license_number' => 'RN-1001',
-            'designation' => 'Admitting', // 
+            'designation' => 'Admitting',
+            'station_id' => null,
             'shift_start' => '06:00:00',
             'shift_end' => '14:00:00',
         ]);
 
+        // B. Clinical (North Wing)
+        $clinNurse = User::create([
+            'name' => 'Riovel Dane',
+            'email' => 'riovel.dane@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-RD-001',
+        ]);
+
         // ==========================================
-        // 3. GENERAL SERVICE (Firan Maravilla)
+        // 5. GENERAL SERVICE
         // ==========================================
         $gsUser = User::create([
             'name' => 'Firan Maravilla',
@@ -76,13 +136,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ==========================================
-        // 4. PHYSICIANS (The Jallores Trio)
+        // 6. PHYSICIANS (Updated with Department IDs)
         // ==========================================
-        
         $doctors = [
-            ['first' => 'Shimi', 'last' => 'Jallores', 'dept' => 'Cardiology', 'id' => 'DOC-SJ-001'],
-            ['first' => 'Bato', 'last' => 'Jallores', 'dept' => 'Pediatrics', 'id' => 'DOC-BJ-001'],
-            ['first' => 'Loyd', 'last' => 'Jallores', 'dept' => 'Neurology', 'id' => 'DOC-LJ-001'],
+            ['first' => 'Shimi', 'last' => 'Jallores', 'dept_name' => 'Cardiology', 'id' => 'DOC-SJ-001'],
+            ['first' => 'Bato', 'last' => 'Jallores', 'dept_name' => 'Pediatrics', 'id' => 'DOC-BJ-001'],
+            ['first' => 'Loyd', 'last' => 'Jallores', 'dept_name' => 'Neurology', 'id' => 'DOC-LJ-001'],
         ];
 
         foreach ($doctors as $doc) {
@@ -99,50 +158,127 @@ class DatabaseSeeder extends Seeder
                 'employee_id' => $doc['id'],
                 'first_name' => $doc['first'],
                 'last_name' => $doc['last'],
-                'specialization' => $doc['dept'],
+                'department_id' => $depts[$doc['dept_name']], // Link to Dept ID
                 'employment_type' => 'Consultant',
             ]);
         }
 
         // ==========================================
-        // 5. INFRASTRUCTURE (4 Wings, 1 Room Each, 4 Beds Each)
+        // 7. INFRASTRUCTURE & Clinical Nurse Link
         // ==========================================
-
         $wings = [
-            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'],
+            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'], // ID 1
             ['name' => 'East Wing',  'code' => 'EW', 'floor' => '1st Floor'],
             ['name' => 'West Wing',  'code' => 'WW', 'floor' => '2nd Floor'],
             ['name' => 'South Wing', 'code' => 'SW', 'floor' => '2nd Floor'],
         ];
 
+        $firstStationId = null;
+
         foreach ($wings as $i => $wing) {
-            // 1. Create Station
             $station = Station::create([
                 'station_name' => $wing['name'],
                 'station_code' => $wing['code'],
                 'floor_location' => $wing['floor'],
             ]);
 
-            // 2. Create Room (e.g., 101, 201, 301, 401)
+            if ($i === 0) $firstStationId = $station->id; // Save North Wing ID
+
+            // Room logic (Same as before)
             $roomNum = ($i + 1) . "01"; 
-            
             $room = Room::create([
                 'station_id' => $station->id,
                 'room_number' => $roomNum,
                 'room_type' => 'Ward',
                 'capacity' => 4,
+                'price_per_night' => 1500.00, // Added Price
                 'status' => 'Active',
             ]);
 
-
             for ($b = 1; $b <= 4; $b++) {
-                $letter = chr(64 + $b); // A, B, C, D
+                $letter = chr(64 + $b); 
                 Bed::create([
                     'room_id' => $room->id,
                     'bed_code' => "{$station->station_code}-{$room->room_number}-{$letter}",
                     'status' => 'Available',
                 ]);
             }
+        }
+
+        // Link the Clinical Nurse to North Wing (Station 1)
+        Nurse::create([
+            'user_id' => $clinNurse->id,
+            'employee_id' => 'NUR-RD-001',
+            'first_name' => 'Riovel',
+            'last_name' => 'Dane',
+            'license_number' => '21212123',
+            'designation' => 'Clinical',
+            'station_id' => 2, // Linked to East Wing (Station 2)
+            'shift_start' => '11:10:00',
+            'shift_end' => '23:10:00',
+        ]);
+
+        // ==========================================
+        // 8. MEDICINES (Pharmacy Stock)
+        // ==========================================
+        $meds = [
+            ['Biogesic', 'Paracetamol', '500mg', 'Tablet', 5.00],
+            ['Neozep', 'Phenylephrine', '10mg', 'Tablet', 7.00],
+            ['Amoxil', 'Amoxicillin', '500mg', 'Capsule', 15.00],
+            ['Solmux', 'Carbocisteine', '500mg', 'Capsule', 12.00],
+            ['PNSS 1L', 'Sodium Chloride', '1L', 'IV Bag', 150.00],
+        ];
+
+        foreach ($meds as $m) {
+            Medicine::create([
+                'brand_name' => $m[0],
+                'generic_name' => $m[1],
+                'dosage' => $m[2],
+                'form' => $m[3],
+                'price' => $m[4],
+                'stock_on_hand' => 100, // Start with stock
+                'expiry_date' => '2026-01-01',
+            ]);
+        }
+
+        // ==========================================
+        // 9. INVENTORY ITEMS (Gen Service Stock)
+        // ==========================================
+        $items = [
+            ['Admission Kit', 'Hygiene', 350.00],
+            ['Extra Pillow', 'Linens', 100.00],
+            ['Wool Blanket', 'Linens', 150.00],
+            ['Nebulizer Kit', 'Medical', 150.00],
+            ['Underpad', 'Medical', 50.00],
+        ];
+
+        foreach ($items as $item) {
+            InventoryItem::create([
+                'item_name' => $item[0],
+                'category' => $item[1],
+                'price' => $item[2],
+                'quantity' => 50,
+            ]);
+        }
+
+        // ==========================================
+        // 10. HOSPITAL FEES (Accountant Menu)
+        // ==========================================
+        $fees = [
+            ['Ambulance Service', 2500.00, 'per_use'],
+            ['Emergency Room Fee', 1000.00, 'flat'],
+            ['Oxygen Tank Use', 500.00, 'per_hour'],
+            ['Medical Certificate', 150.00, 'flat'],
+            ['Electricity / TV', 100.00, 'per_day'],
+        ];
+
+        foreach ($fees as $fee) {
+            HospitalFee::create([
+                'name' => $fee[0],
+                'price' => $fee[1],
+                'unit' => $fee[2],
+                'is_active' => true,
+            ]);
         }
     }
 }

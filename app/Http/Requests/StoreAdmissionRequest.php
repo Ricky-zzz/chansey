@@ -43,9 +43,9 @@ class StoreAdmissionRequest extends FormRequest
             'admission_type' => 'required',
             'station_id' => 'required|exists:stations,id',
 
-            // FIXED BED VALIDATION
+            // BED_ID: ONLY REQUIRED IF NOT OUTPATIENT
             'bed_id' => [
-                'required',
+                Rule::requiredIf($this->input('admission_type') !== 'Outpatient'),
                 Rule::exists(Bed::class, 'id')->where('status', 'Available')
             ],
 

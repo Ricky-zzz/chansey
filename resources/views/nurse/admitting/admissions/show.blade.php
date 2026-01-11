@@ -71,7 +71,7 @@
 
                 <div class="mb-2">
                     <div class="text-xs text-slate-600 uppercase font-semibold">Station</div>
-                    <div class="text-md font-bold text-slate-700">{{ $admission->bed->room->station->station_name }}</div>
+                    <div class="text-md font-bold text-slate-700">{{ $admission->station->station_name ?? 'N/A' }}</div>
                 </div>
 
                 <div class="mb-3">
@@ -80,7 +80,7 @@
                         @if($admission->bed)
                         {{ $admission->bed->bed_code }}
                         @else
-                        <span class="text-sm text-gray-400">No Bed Assigned</span>
+                        <span class="text-sm text-gray-400">Outpatient / Waiting</span>
                         @endif
                     </div>
                 </div>

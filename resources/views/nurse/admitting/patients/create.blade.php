@@ -89,11 +89,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <label class="floating-label w-full">
                             <span>First Name</span>
-                            <input type="text" name="first_name" data-step="1" class="input input-md w-full" placeholder="First Name" required>
+                            <input type="text" name="first_name" data-step="1" class="input input-md w-full" placeholder="First Name" value="{{ old('first_name', $prefillData['first_name'] ?? '') }}" required>
                         </label>
                         <label class="floating-label w-full">
                             <span>Last Name</span>
-                            <input type="text" name="last_name" data-step="1" class="input input-md w-full" placeholder="Last Name" required>
+                            <input type="text" name="last_name" data-step="1" class="input input-md w-full" placeholder="Last Name" value="{{ old('last_name', $prefillData['last_name'] ?? '') }}" required>
                         </label>
                         <label class="floating-label w-full">
                             <span>Middle Name</span>
@@ -157,11 +157,11 @@
                         </label>
                         <label class="floating-label w-full">
                             <span>Contact Number</span>
-                            <input type="text" name="contact_number" data-step="1" class="input input-md w-full" placeholder="Contact Number" required>
+                            <input type="text" name="contact_number" data-step="1" class="input input-md w-full" placeholder="Contact Number" value="{{ old('contact_number', $prefillData['contact_number'] ?? '') }}" required>
                         </label>
                         <label class="floating-label w-full">
                             <span>Email Address</span>
-                            <input type="text" name="email" data-step="1" class="input input-md w-full" placeholder="email@example.com" required>
+                            <input type="text" name="email" data-step="1" class="input input-md w-full" placeholder="email@example.com" value="{{ old('email', $prefillData['email'] ?? '') }}" required>
                         </label>
                     </div>
                 </fieldset>
@@ -232,6 +232,7 @@
                                     stations: {{ Js::from($stations) }},
                                     allBeds: {{ Js::from($rawBeds) }},
                                     selectedStation: '',
+                                    admissionType: '',
 
                                     get filteredBeds() {
                                         if (!this.selectedStation) return [];
@@ -257,9 +258,9 @@
                         </label>
 
                         <!-- 2. SELECT BED (Filtered Results) -->
-                        <label class="floating-label w-full">
+                        <label class="floating-label w-full" :hidden="admissionType === 'Outpatient'">
                             <span>Room and Bed Assignment</span>
-                            <select name="bed_id" data-step="2" class="select select-bordered w-full" :disabled="!selectedStation" required>
+                            <select name="bed_id" data-step="2" class="select select-bordered w-full" :disabled="!selectedStation">
                                 <option value="" disabled selected x-text="selectedStation ? 'Select Available Bed' : 'Please Select Station First'"></option>
 
                                 <template x-for="bed in filteredBeds" :key="bed.id">
@@ -275,7 +276,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
                             <label class="floating-label w-full">
                                 <span>Admission Type</span>
-                                <select name="admission_type" data-step="2" class="select select-bordered w-full" required>
+                                <select name="admission_type" data-step="2" x-model="admissionType" class="select select-bordered w-full" required>
                                     <option value="" disabled selected>Select Admission Type</option>
                                     <option value="Emergency">Emergency</option>
                                     <option value="Outpatient">Outpatient</option>
@@ -289,7 +290,7 @@
                                 <select name="attending_physician_id" data-step="2" class="select select-bordered w-full" required>
                                     <option value="">Select an Attending Physician</option>
                                     @foreach($physicians as $doc)
-                                    <option value="{{ $doc->id }}">Dr. {{ $doc->last_name }}, {{ $doc->first_name }} ({{ $doc->specialization }})</option>
+                                    <option value="{{ $doc->id }}">Dr. {{ $doc->getFullNameAttribute() }}</option>
                                     @endforeach
                                 </select>
                             </label>

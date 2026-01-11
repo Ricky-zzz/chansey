@@ -13,7 +13,7 @@
             </div>
 
             <!-- SEARCH -->
-            <form action="{{ route('physician.patients.index') }}" method="GET" class="join w-full md:w-96">
+            <form action="{{ route('physician.mypatients.index') }}" method="GET" class="join w-full md:w-96">
                 <input type="text" name="search" class="input input-bordered join-item w-full" placeholder="Search Patient..." value="{{ request('search') }}">
                 <button type="submit" class="btn btn-primary join-item">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -88,7 +88,7 @@
 
                         <!-- Action -->
                         <td class="text-right">
-                            <a href="{{ route('physician.patients.show', $admission->id) }}" class="btn btn-sm btn-primary gap-2">
+                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn btn-sm btn-primary gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 Open Chart
                             </a>

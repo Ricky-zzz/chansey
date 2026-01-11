@@ -120,6 +120,7 @@
                                     stations: {{ Js::from($stations) }},
                                     allBeds: {{ Js::from($rawBeds) }},
                                     selectedStation: '',
+                                    admissionType: '',
 
                                     get filteredBeds() {
                                         if (!this.selectedStation) return [];
@@ -145,9 +146,9 @@
                         </label>
 
                         <!-- 2. SELECT BED (Filtered Results) -->
-                        <label class="floating-label w-full">
+                        <label class="floating-label w-full" :hidden="admissionType === 'Outpatient'">
                             <span>Room and Bed Assignment</span>
-                            <select name="bed_id" data-step="1" class="select select-bordered w-full" :disabled="!selectedStation" required>
+                            <select name="bed_id" data-step="1" class="select select-bordered w-full" :disabled="!selectedStation">
                                 <option value="" disabled selected x-text="selectedStation ? 'Select Available Bed' : 'Please Select Station First'"></option>
 
                                 <template x-for="bed in filteredBeds" :key="bed.id">
@@ -163,7 +164,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
                             <label class="floating-label w-full">
                                 <span>Admission Type</span>
-                                <select name="admission_type" data-step="1" class="select select-bordered w-full" required>
+                                <select name="admission_type" data-step="1" x-model="admissionType" class="select select-bordered w-full" required>
                                     <option value="" disabled selected>Select Admission Type</option>
                                     <option value="Emergency">Emergency</option>
                                     <option value="Outpatient">Outpatient</option>
@@ -177,7 +178,7 @@
                                 <select name="attending_physician_id" data-step="1" class="select select-bordered w-full" required>
                                     <option value="">Select an Attending Physician</option>
                                     @foreach($physicians as $doc)
-                                    <option value="{{ $doc->id }}">Dr. {{ $doc->last_name }}, {{ $doc->first_name }} ({{ $doc->specialization }})</option>
+                                    <option value="{{ $doc->id }}">Dr. {{ $doc->getFullNameAttribute() }}</option>
                                     @endforeach
                                 </select>
                             </label>

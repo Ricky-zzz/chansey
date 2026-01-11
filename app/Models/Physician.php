@@ -14,7 +14,7 @@ class Physician extends Model
         'employee_id',
         'first_name',
         'last_name',
-        'specialization',
+        'department_id',
         'employment_type',
     ];
 
@@ -36,5 +36,20 @@ class Physician extends Model
     public function medicalOrders()
     {
         return $this->hasMany(MedicalOrder::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name} ({$this->department?->name})";
     }
 }

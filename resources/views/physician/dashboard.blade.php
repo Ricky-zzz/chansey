@@ -18,7 +18,7 @@
                 <div>
                     <div class="text-xs text-slate-400 uppercase tracking-widest font-bold">Department</div>
                     <div class="text-lg font-black text-slate-800">
-                        {{ $physician->specialization }}
+                        {{ $physician->department->name }}
                     </div>
                 </div>
             </div>
@@ -151,7 +151,7 @@
                         <!-- Action -->
                         <td class="text-right">
                             <!-- Link to Physician's View of Patient (To be built next) -->
-                            <a href="#" class="btn btn-outline btn-primary btn-sm">
+                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn btn-outline btn-primary btn-sm">
                                 View Chart
                             </a>
                         </td>

@@ -3,10 +3,15 @@
 use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Public\AppointmentRequestController;
 
-Route::get('/', function () {
-    return redirect('/login');
-});
+
+// Landing Page
+Route::get('/', [AppointmentRequestController::class, 'create'])->name('welcome');
+
+// Public Action
+Route::post('/appointment/request', [AppointmentRequestController::class, 'store'])
+    ->name('public.appointment.store');
 
 // AUTH
 Route::get('/dashboard', function () {

@@ -59,26 +59,13 @@ class PhysicianResource extends Resource
                             TextInput::make('last_name')->required(),
                         ]),
 
-                        // 1. SPECIALIZATION (Searchable Select)
-                        Select::make('specialization')
+
+
+                        Select::make('department_id')
                             ->label('Department / Specialization')
-                            ->searchable() // Allows typing to find "Cardiology" fast
+                            ->relationship('department', 'name')
+                            ->searchable()
                             ->preload()
-                            ->options([
-                                'General Practice' => 'General Practice / Family Medicine',
-                                'Internal Medicine' => 'Internal Medicine',
-                                'Pediatrics' => 'Pediatrics',
-                                'Ob-Gyn' => 'Obstetrics & Gynecology (OB-GYN)',
-                                'General Surgery' => 'General Surgery',
-                                'Emergency Medicine' => 'Emergency Medicine',
-                                'Cardiology' => 'Cardiology',
-                                'Anesthesiology' => 'Anesthesiology',
-                                'Neurology' => 'Neurology',
-                                'Psychiatry' => 'Psychiatry',
-                                'Orthopedics' => 'Orthopedics',
-                                'Radiology' => 'Radiology',
-                                'Oncology' => 'Oncology',
-                            ])
                             ->required(),
 
                         // 2. EMPLOYMENT TYPE (Your Specific List)
@@ -118,9 +105,10 @@ class PhysicianResource extends Resource
                     ->label('First Name')
                     ->searchable(),
 
-                TextColumn::make('specialization')
+                TextColumn::make('department.name')
                     ->label('Department')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('employment_type')
                     ->label('Type')

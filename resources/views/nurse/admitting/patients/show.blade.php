@@ -226,8 +226,7 @@
                             </td>
 
                             <td>
-                                <div class="text-xs md:text-sm text-neutral">Dr. {{ $admission->attendingPhysician->last_name ?? 'Unassigned' }}</div>
-                                <div class="text-xs text-gray-600">{{ $admission->attendingPhysician->specialization ?? 'N/A' }}</div>
+                                <div class="text-xs md:text-sm text-neutral">Dr. {{ $admission->attendingPhysician->getFullNameAttribute() ?? 'Unassigned' }}</div>
                             </td>
 
                             <td>
