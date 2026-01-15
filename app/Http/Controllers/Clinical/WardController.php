@@ -66,10 +66,16 @@ class WardController extends Controller
 
         $latestLog = $admission->clinicalLogs()->latest()->first();
 
-        $clinicalLogs = $admission->clinicalLogs()
+        $clinicalLogsQuery = $admission->clinicalLogs()
             ->with('user', 'labResultFile')
-            ->latest()
-            ->paginate(15);
+            ->latest();
+
+        // Filter by type if provided
+        if ($type = request('type')) {
+            $clinicalLogsQuery->where('type', $type);
+        }
+
+        $clinicalLogs = $clinicalLogsQuery->paginate(10);
 
         $vitals = null;
         if ($latestLog && isset($latestLog->data['bp_systolic'])) {

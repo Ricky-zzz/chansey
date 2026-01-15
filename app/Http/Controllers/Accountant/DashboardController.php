@@ -27,7 +27,7 @@ class DashboardController extends Controller
 
     $readyForBilling = $query->latest('updated_at')
         ->paginate(10)
-        ->appends(['search' => $search]); // Keep search in URL
+        ->appends(['search' => $search]); 
 
         $pendingCount = Admission::where('status', 'Ready for Discharge')->count();
         

@@ -42,11 +42,14 @@
                     <div class="text-center py-10 text-gray-400 italic">No pending requests.</div>
                 @endforelse
             </div>
+            <div class="mt-4">
+                {{ $pending->links() }}
+            </div>
         </div>
 
         <!-- COLUMN 2: UPCOMING SCHEDULE -->
         <div>
-            <h3 class="font-bold text-lg mb-4">Upcoming Schedule</h3>
+            <h3 class="font-bold text-lg mb-4">Scheduled Appointments for Today</h3>
             <div class="card bg-base-100 border shadow-sm">
                 <div class="card-body p-0">
                     <table class="table table-sm">
@@ -76,11 +79,14 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-center p-4 text-gray-400">No approved appointments.</td></tr>
+                            <tr><td colspan="4" class="text-center p-4 text-gray-400">No appoinments for today.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="mt-4">
+                {{ $upcoming->links() }}
             </div>
         </div>
     </div>

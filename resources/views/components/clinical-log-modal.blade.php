@@ -188,6 +188,37 @@
                 </div>
             </template>
 
+            <!-- TRANSFER LOG LAYOUT -->
+            <template x-if="viewLogData.type === 'Transfer'">
+                <div class="space-y-3">
+                    <!-- From Bed -->
+                    <template x-if="viewLogData.data.from_bed">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">FROM BED</span>
+                            <span class="font-mono text-slate-800 font-bold" x-text="viewLogData.data.from_bed"></span>
+                        </div>
+                    </template>
+
+                    <!-- To Bed -->
+                    <template x-if="viewLogData.data.to_bed">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">TO BED</span>
+                            <span class="font-mono text-slate-800 font-bold" x-text="viewLogData.data.to_bed"></span>
+                        </div>
+                    </template>
+
+                    <!-- Remarks -->
+                    <template x-if="viewLogData.data.remarks">
+                        <div class="mt-3 pt-3 border-t border-base-300">
+                            <div class="text-xs font-bold text-gray-500 mb-2">REMARKS</div>
+                            <div class="bg-white p-3 rounded border border-base-300">
+                                <p class="text-sm text-slate-800" x-text="viewLogData.data.remarks"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
             <!-- DISCHARGE LOG LAYOUT -->
             <template x-if="viewLogData.type === 'Discharge'">
                 <div class="space-y-3">

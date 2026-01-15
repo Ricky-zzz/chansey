@@ -95,6 +95,7 @@ class MedicalOrder extends Model
 
     public function getTimerStatusAttribute()
     {
+        // 1. EXCEPTIONS (PRN and Once)
         if ($this->frequency === 'PRN') {
             return [
                 'color' => 'success', 
@@ -113,12 +114,25 @@ class MedicalOrder extends Model
             ];
         }
 
-        $lastAction = $this->latestLog ? $this->latestLog->created_at : $this->created_at;
+        // 2. NEW ORDER LOGIC (No logs yet - brand new order)
+        if (!$this->latestLog) {
+            return [
+                'color' => 'error',
+                'label' => 'START NOW',
+                'disabled' => false,
+                'is_due' => true,
+                'animate' => true
+            ];
+        }
+
+        // 3. RECURRING LOGIC (Only runs if logs EXIST)
+        // Anchor time is the LAST LOG
+        $lastAction = $this->latestLog->created_at;
         
         $nextDue = $lastAction->copy()->addHours($this->interval_in_hours);
         $now = now();
 
-        
+        // 4. COMPARE AND DECIDE
         if ($now->greaterThanOrEqualTo($nextDue)) {
             $overdueBy = $now->diffForHumans($nextDue, ['syntax' => Carbon::DIFF_ABSOLUTE]);
             return [

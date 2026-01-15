@@ -4,15 +4,16 @@ namespace App\Http\Controllers\Admission;
 
 use App\Http\Controllers\Controller;
 use App\Models\TransferRequest;
-use App\Services\PatientMovementService; // Import your service
+use App\Models\ClinicalLog;
+use App\Services\PatientMovementService; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TransferController extends Controller
 {
     protected $movementService;
 
-    // Inject the service
     public function __construct(PatientMovementService $movementService)
     {
         $this->movementService = $movementService;
@@ -20,7 +21,6 @@ class TransferController extends Controller
 
     public function index()
     {
-        // Fetch only Pending requests
         $requests = TransferRequest::with([
                 'admission.patient',
                 'admission.bed.room.station',
@@ -36,6 +36,8 @@ class TransferController extends Controller
 
     public function approve($id)
     {
+        $user = Auth::user();
+
         $request = TransferRequest::with('admission', 'targetBed')->findOrFail($id);
 
         if ($request->targetBed->status !== 'Available') {
@@ -52,6 +54,18 @@ class TransferController extends Controller
             ]);
 
             $request->medicalOrder->update(['status' => 'Done']);
+
+            $logdata['from_bed'] = $request->admission->bed->bed_code;
+            $logdata['to_bed'] = $request->targetBed->bed_code;
+            $logdata['remarks'] = $request->targetBed->remarks;
+
+            ClinicalLog::create([
+                'admission_id' => $request->admission->id,
+                'user_id' => $user->id,
+                'medical_order_id' => $request->medical_order_id,
+                'type' => 'Transfer',
+                'data' => $logdata,
+            ]);
 
             DB::commit();
             return back()->with('success', 'Transfer approved and executed.');

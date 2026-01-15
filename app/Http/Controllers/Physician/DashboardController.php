@@ -32,11 +32,11 @@ class DashboardController extends Controller
 
         // Main List
         $myPatients = $query
-            ->join('beds', 'admissions.bed_id', '=', 'beds.id')
-            ->join('rooms', 'beds.room_id', '=', 'rooms.id')
-            ->join('stations', 'rooms.station_id', '=', 'stations.id')
-            ->orderBy('stations.station_name') 
-            ->orderBy('rooms.room_number')    
+            ->leftJoin('beds', 'admissions.bed_id', '=', 'beds.id')
+            ->leftJoin('rooms', 'beds.room_id', '=', 'rooms.id')
+            ->leftJoin('stations', 'rooms.station_id', '=', 'stations.id')
+            ->orderByRaw('COALESCE(stations.station_name, "") ASC')
+            ->orderByRaw('COALESCE(rooms.room_number, "") ASC')    
             ->select('admissions.*')
             ->get();
 

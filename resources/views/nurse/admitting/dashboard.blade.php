@@ -116,7 +116,7 @@
                         @if($admission->bed)
                         <span class="font-bold text-slate-700">{{ $admission->bed->bed_code }}</span>
                         @else
-                        <span class="text-xs text-warning">Waiting for Assignment</span>
+                        <span class="text-xs text-red-600">Outpatient/Waiting</span>
                         @endif
                     </td>
 

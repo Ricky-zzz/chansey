@@ -26,7 +26,9 @@
                     {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
                 </h1>
                 <div class="flex gap-2 items-center mt-1">
-                    <span class="badge badge-lg badge-primary font-mono">{{ $admission->bed->bed_code }}</span>
+                    <span class="badge badge-lg badge-primary font-mono">
+                        {{ $admission->bed ? $admission->bed->bed_code : 'Outpatient' }}
+                    </span>
                     <span class="text-sm text-gray-500">{{ $admission->patient->age }}yo / {{ $admission->patient->sex }}</span>
                     <span class="text-sm text-gray-500">• Admitted: {{ $admission->admission_date->format('M d') }}</span>
                 </div>

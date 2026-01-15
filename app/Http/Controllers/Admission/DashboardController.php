@@ -25,6 +25,7 @@ class DashboardController extends Controller
 
         $recentAdmissions = Admission::with(['patient', 'bed.room']) 
             ->orderBy('created_at', 'desc') 
+            ->where('status', 'Admitted')
             ->take(5)
             ->get();
 

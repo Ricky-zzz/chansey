@@ -7,8 +7,8 @@ use App\Models\Appointment;
 use App\Models\Physician;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail; // Prepare for email later
-// use App\Mail\AppointmentApproved; 
+use Illuminate\Support\Facades\Mail; 
+use App\Mail\AppointmentApproved; 
 
 class AppointmentController extends Controller
 {
@@ -17,13 +17,13 @@ class AppointmentController extends Controller
         $pending = Appointment::with('department')
             ->where('status', 'Pending')
             ->orderBy('created_at', 'asc')
-            ->get();
+            ->paginate(10);
 
         $upcoming = Appointment::with(['physician', 'department'])
             ->where('status', 'Approved')
-            ->whereDate('scheduled_at', '>=', today())
+            ->whereDate('scheduled_at', '=', today())
             ->orderBy('scheduled_at', 'asc')
-            ->get();
+            ->paginate(10);
 
         $physicians = Physician::with('department')->get();
 
@@ -62,7 +62,7 @@ class AppointmentController extends Controller
             'status' => 'Approved'
         ]);
 
-        // if($appointment->email) Mail::to($appointment->email)->send(new AppointmentApproved($appointment));
+        if($appointment->email) Mail::to($appointment->email)->send(new AppointmentApproved($appointment));
 
         return back()->with('success', 'Appointment Scheduled!');
     }

@@ -26,7 +26,9 @@ class AdmissionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Admission::with(['patient', 'bed.room', 'attendingPhysician']);
+        $query = Admission::with(['patient', 'bed.room', 'attendingPhysician'])
+        ->whereIn('admissions.status', ['Admitted', 'Ready for Discharge']);
+
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('admission_number', 'like', "%{$search}%")

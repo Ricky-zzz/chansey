@@ -39,6 +39,6 @@ class AppointmentRequestController extends Controller
             'status' => 'Pending',
         ]);
 
-        return back()->with('success', 'Appointment requested successfully! Wait for confirmation via email of phone.');
+        return back()->with('success', 'Appointment requested successfully! Wait for confirmation via email or phone.');
     }
 }

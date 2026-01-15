@@ -24,4 +24,6 @@ Route::middleware(['auth'])->prefix('accountant')->name('accountant.')->group(fu
         ->name('billing.remove_item');
 
     Route::get('/billing/{id}/print', [BillingController::class, 'print'])->name('billing.print');
+
+    Route::get('/billing/{id}/bill', [BillingController::class, 'bill'])->name('billing.bill');
 });

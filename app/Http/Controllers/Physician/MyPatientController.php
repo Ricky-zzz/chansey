@@ -34,9 +34,9 @@ class MyPatientController extends Controller
 
         // Pagination & Ordering
         $myPatients = $query
-            ->join('beds', 'admissions.bed_id', '=', 'beds.id')
-            ->join('rooms', 'beds.room_id', '=', 'rooms.id')
-            ->join('stations', 'rooms.station_id', '=', 'stations.id')
+            ->leftjoin('beds', 'admissions.bed_id', '=', 'beds.id')
+            ->leftjoin('rooms', 'beds.room_id', '=', 'rooms.id')
+            ->leftjoin('stations', 'rooms.station_id', '=', 'stations.id')
             ->orderBy('stations.station_name')
             ->orderBy('rooms.room_number')
             ->select('admissions.*') // Prevent ID collision
@@ -65,10 +65,16 @@ class MyPatientController extends Controller
             ->where('attending_physician_id', $physician->id)
             ->firstOrFail();
 
-        $clinicalLogs = $admission->clinicalLogs()
-            ->with(['user', 'labResultFile']) 
-            ->latest()
-            ->paginate(15);
+        $clinicalLogsQuery = $admission->clinicalLogs()
+            ->with(['user', 'labResultFile'])
+            ->latest();
+
+        
+        if ($type = request('type')) {
+            $clinicalLogsQuery->where('type', $type);
+        }
+
+        $clinicalLogs = $clinicalLogsQuery->paginate(10);
 
         $latestLog = $admission->clinicalLogs()->latest()->first();
 

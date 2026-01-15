@@ -40,10 +40,10 @@
                         <!-- Location -->
                         <td>
                             <div class="font-bold text-slate-700">
-                                {{ $admission->bed->room->station->station_name ?? 'Floating' }}
+                                {{ $admission->station->station_name ?? 'Floating' }}
                             </div>
                             <div class="badge badge-neutral font-mono text-xs">
-                                {{ $admission->bed->bed_code ?? '--' }}
+                                {{ $admission->bed->bed_code ?? 'Outpatient' }}
                             </div>
                         </td>
 

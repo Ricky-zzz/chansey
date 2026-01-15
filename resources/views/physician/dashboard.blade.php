@@ -96,15 +96,14 @@
                 <tbody>
                     @forelse($myPatients as $admission)
                     <tr class="hover">
-                        <!-- Location: Critical because doctor needs to know where to walk -->
                         <td>
                             <div class="font-bold text-slate-700">
-                                {{ $admission->bed->room->station->station_name ?? 'Floating' }}
+                                {{ $admission->station->station_name ?? 'Floating' }}
                             </div>
                             <div class="badge badge-outline text-xs font-mono bg-white">
-                                {{ $admission->bed->bed_code ?? '---' }}
+                                {{ $admission->bed->bed_code ?? 'Outpatient/Waiting' }}
                             </div>
-                        </td>
+                        </td> 
 
                         <!-- Identity -->
                         <td>

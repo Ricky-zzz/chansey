@@ -51,11 +51,10 @@ class PatientMovementService
 
                 $oldBed = Bed::find($currentMovement->bed_id);
                 if ($oldBed) {
-                    $oldBed->update(['status' => 'Available']);
+                    $oldBed->update(['status' => 'Cleaning']);
                 }
             }
 
-            // Load room relationship for new bed
             $newBed->loadMissing('room');
 
             $newBed->update(['status' => 'Occupied']);

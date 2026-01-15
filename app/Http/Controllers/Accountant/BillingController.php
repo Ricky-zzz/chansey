@@ -202,4 +202,70 @@ class BillingController extends Controller
         return $pdf->stream("Receipt-{$billing->receipt_number}.pdf");
     }
 
+    public function bill($id)
+    {
+        $admission = Admission::with('billingInfo')->findOrFail($id);
+
+        if ($admission->status === 'Cleared' || $admission->status === 'Discharged') {
+            $billing = Billing::where('admission_id', $id)->first();
+            $pdf = Pdf::loadView('accountant.billing.pdf', compact('billing'));
+            return $pdf->stream("Receipt-{$billing->receipt_number}.pdf");
+        }
+
+        $admission = Admission::with(['patient', 'billableItems', 'billingInfo'])->findOrFail($id);
+
+        $roomTotal = $this->movementService->calculateTotalRoomCharges($admission);
+        $movements = $this->movementService->getMovementHistory($admission);
+
+        $rawItems = $admission->billableItems->where('status', 'Unpaid');
+
+        $itemsTotal = $rawItems->sum('total');
+
+        $itemsList = $rawItems
+            ->groupBy('name')
+            ->map(function ($group) {
+                return [
+                    'name' => $group->first()->name,
+                    'quantity' => $group->sum('quantity'),
+                    'amount' => $group->first()->amount,
+                    'total' => $group->sum('total'),
+                    'type' => $group->first()->type
+                ];
+            })->values()->toArray();
+
+        $movementsList = $movements->map(function ($mov) {
+            $end = $mov->ended_at ?? now();
+            $days = $mov->started_at->startOfDay()->diffInDays($end->endOfDay()) + 1;
+            $days = (int) $days;
+            return [
+                'room_number' => $mov->room->room_number,
+                'bed_code' => $mov->bed->bed_code,
+                'days' => $days,
+                'price' => (float) $mov->room_price,
+                'total' => round($days * (float) $mov->room_price, 2)
+            ];
+        })->toArray();
+
+        $billing = (object) [
+            'receipt_number' => 'BILL-' . date('Ymd') . '-' . str_pad($admission->id, 4, '0', STR_PAD_LEFT),
+            'admission' => $admission,
+            'created_at' => now(),
+            'final_total' => $roomTotal + $itemsTotal,
+            'breakdown' => [
+                'room_total' => $roomTotal,
+                'items_total' => $itemsTotal,
+                'pf_fee' => 0,
+                'deductions' => [
+                    'philhealth' => 0,
+                    'hmo' => 0
+                ],
+                'items_list' => $itemsList,
+                'movements' => $movementsList
+            ]
+        ];
+
+        $pdf = Pdf::loadView('accountant.billing.bill', compact('billing'));
+        return $pdf->stream("Bill-{$billing->receipt_number}.pdf");
+    }
+    
 }

@@ -1,10 +1,47 @@
-@props(['clinicalLogs', 'displayMode' => 'physician']) 
+@props(['clinicalLogs', 'admission' => null, 'displayMode' => 'physician']) 
 
 <div class="card bg-base-100 shadow-xl border border-base-200">
     <div class="card-body p-4">
-        <h3 class="card-title text-slate-700 text-lg">
-            {{ $displayMode === 'nurse' ? 'Clinical History' : 'Clinical Log History' }}
-        </h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="card-title text-slate-700 text-lg">
+                {{ $displayMode === 'nurse' ? 'Clinical History' : 'Clinical Log History' }}
+            </h3>
+            <div class="flex gap-2 flex-wrap justify-end">
+                @php
+                    $currentType = request('type');
+                    $routeName = $displayMode === 'nurse' ? 'nurse.clinical.ward.show' : 'physician.mypatients.show';
+                    $patientId = $admission?->id ?? request()->route('id');
+                @endphp
+                <a href="{{ route($routeName, ['id' => $patientId]) }}" 
+                   class="btn btn-xs {{ !$currentType ? 'btn-active' : 'btn-outline' }}">
+                    All
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Medication']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Medication' ? 'btn-active' : 'btn-outline' }}">
+                    Medication
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Vitals']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Vitals' ? 'btn-active' : 'btn-outline' }}">
+                    Vitals
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Laboratory']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Laboratory' ? 'btn-active' : 'btn-outline' }}">
+                    Lab
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Transfer']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Transfer' ? 'btn-active' : 'btn-outline' }}">
+                    Transfer
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Utility']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Utility' ? 'btn-active' : 'btn-outline' }}">
+                    Utility
+                </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Discharge']) }}" 
+                   class="btn btn-xs {{ $currentType === 'Discharge' ? 'btn-active' : 'btn-outline' }}">
+                    Discharge
+                </a>
+            </div>
+        </div>
 
         <div class="overflow-x-auto max-h-96">
             <table class="table table-sm">
@@ -53,6 +90,8 @@
                                 @if($log->labResultFile)
                                 <div class="text-xs text-gray-500 mt-1 line-clamp-1">{{ $log->labResultFile->file_name }}</div>
                                 @endif
+                            @elseif($log->type === 'Transfer')
+                                Moved: <strong>{{ $log->data['from_bed'] ?? 'Unknown' }}</strong> → <strong>{{ $log->data['to_bed'] ?? 'Unknown' }}</strong>
                             @elseif($log->type === 'Discharge')
                                 {{ $log->data['note'] ?? 'Patient discharged' }}
                             @else

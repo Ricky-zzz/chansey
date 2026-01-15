@@ -74,7 +74,6 @@ class ClinicalLogController extends Controller
 
                     $order->medicine->decrement('stock_on_hand', $order->quantity);
 
-                    // Add to Bill
                     $this->billableItemService->create(
                         $order->admission_id,
                         $order->medicine->brand_name,

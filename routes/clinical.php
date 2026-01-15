@@ -18,7 +18,7 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
         ->name('ward.index');
 
     // PATIENT CHART 
-    Route::get('/patient/{admission}', [WardController::class, 'show'])
+    Route::get('/patient/{id}', [WardController::class, 'show'])
         ->name('ward.show');
 
     // NURSING CARE PLAN ROUTES
