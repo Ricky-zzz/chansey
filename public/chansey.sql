@@ -16,10 +16,12 @@
 
 
 -- Dumping database structure for chansey
+DROP DATABASE IF EXISTS `chansey`;
 CREATE DATABASE IF NOT EXISTS `chansey` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `chansey`;
 
 -- Dumping structure for table chansey.accountants
+DROP TABLE IF EXISTS `accountants`;
 CREATE TABLE IF NOT EXISTS `accountants` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -41,6 +43,7 @@ INSERT INTO `accountants` (`id`, `user_id`, `employee_id`, `first_name`, `last_n
 	(1, 2, 'ACC-GP-001', 'Gwen', 'Perez', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.admins
+DROP TABLE IF EXISTS `admins`;
 CREATE TABLE IF NOT EXISTS `admins` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -58,6 +61,7 @@ INSERT INTO `admins` (`id`, `user_id`, `full_name`, `created_at`, `updated_at`) 
 	(1, 1, 'Super Administrator', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.admissions
+DROP TABLE IF EXISTS `admissions`;
 CREATE TABLE IF NOT EXISTS `admissions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `patient_id` bigint unsigned NOT NULL,
@@ -96,15 +100,17 @@ CREATE TABLE IF NOT EXISTS `admissions` (
   CONSTRAINT `admissions_bed_id_foreign` FOREIGN KEY (`bed_id`) REFERENCES `beds` (`id`),
   CONSTRAINT `admissions_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
   CONSTRAINT `admissions_station_id_foreign` FOREIGN KEY (`station_id`) REFERENCES `stations` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.admissions: ~0 rows (approximately)
+-- Dumping data for table chansey.admissions: ~3 rows (approximately)
 DELETE FROM `admissions`;
 INSERT INTO `admissions` (`id`, `patient_id`, `admission_number`, `station_id`, `bed_id`, `attending_physician_id`, `admitting_clerk_id`, `admission_date`, `discharge_date`, `admission_type`, `case_type`, `status`, `chief_complaint`, `initial_diagnosis`, `mode_of_arrival`, `temp`, `bp_systolic`, `bp_diastolic`, `pulse_rate`, `respiratory_rate`, `o2_sat`, `known_allergies`, `created_at`, `updated_at`) VALUES
-	(1, 1, 'ADM-20260111-001', 2, 5, 1, 4, '2026-01-11 09:39:57', NULL, 'Inpatient', 'New Case', 'Admitted', 'patient experience severe stomach aches', 'must be ulcer', 'Wheelchair', 12.0, 12, 12, 12, 12, 12, '["peanuts"]', '2026-01-11 01:39:57', '2026-01-11 01:39:57'),
-	(2, 2, 'ADM-20260111-002', 2, NULL, 1, 4, '2026-01-11 11:06:53', NULL, 'Outpatient', 'New Case', 'Admitted', 'fdsadsad', 'adasd', 'Walk-in', NULL, NULL, NULL, NULL, NULL, NULL, '[]', '2026-01-11 03:06:53', '2026-01-11 03:06:53');
+	(1, 1, 'ADM-20260111-001', 2, 7, 1, 4, '2026-01-11 09:39:57', '2026-01-13 08:36:53', 'Inpatient', 'New Case', 'Discharged', 'patient experience severe stomach aches', 'must be ulcer', 'Wheelchair', 12.0, 12, 12, 12, 12, 12, '["peanuts"]', '2026-01-11 01:39:57', '2026-01-13 00:36:53'),
+	(2, 2, 'ADM-20260111-002', 2, 5, 1, 4, '2026-01-11 11:06:53', '2026-01-15 13:11:18', 'Outpatient', 'New Case', 'Discharged', 'fdsadsad', 'adasd', 'Walk-in', NULL, NULL, NULL, NULL, NULL, NULL, '[]', '2026-01-11 03:06:53', '2026-01-15 05:11:18'),
+	(3, 3, 'ADM-20260113-001', 2, 6, 1, 4, '2026-01-13 08:11:08', NULL, 'Inpatient', 'New Case', 'Admitted', 'Head hurts', NULL, 'Walk-in', NULL, NULL, NULL, NULL, NULL, NULL, '["peanut"]', '2026-01-13 00:11:08', '2026-01-13 00:11:08');
 
 -- Dumping structure for table chansey.admission_billing_infos
+DROP TABLE IF EXISTS `admission_billing_infos`;
 CREATE TABLE IF NOT EXISTS `admission_billing_infos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -120,15 +126,40 @@ CREATE TABLE IF NOT EXISTS `admission_billing_infos` (
   PRIMARY KEY (`id`),
   KEY `admission_billing_infos_admission_id_foreign` (`admission_id`),
   CONSTRAINT `admission_billing_infos_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.admission_billing_infos: ~0 rows (approximately)
+-- Dumping data for table chansey.admission_billing_infos: ~2 rows (approximately)
 DELETE FROM `admission_billing_infos`;
 INSERT INTO `admission_billing_infos` (`id`, `admission_id`, `payment_type`, `primary_insurance_provider`, `policy_number`, `approval_code`, `guarantor_name`, `guarantor_relationship`, `guarantor_contact`, `created_at`, `updated_at`) VALUES
 	(1, 1, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 01:39:57', '2026-01-11 01:39:57'),
-	(2, 2, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:06:53');
+	(2, 2, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:06:53'),
+	(3, 3, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-13 00:11:08', '2026-01-13 00:11:08');
 
+-- Dumping structure for table chansey.departments
+DROP TABLE IF EXISTS `departments`;
+CREATE TABLE IF NOT EXISTS `departments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `departments_name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table chansey.departments: ~6 rows (approximately)
+DELETE FROM `departments`;
+INSERT INTO `departments` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+	(1, 'Cardiology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(2, 'Pediatrics', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(3, 'Neurology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(4, 'Internal Medicine', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(5, 'Surgery', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(6, 'OB-GYN', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
+
+  
 -- Dumping structure for table chansey.appointments
+DROP TABLE IF EXISTS `appointments`;
 CREATE TABLE IF NOT EXISTS `appointments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `first_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -149,14 +180,17 @@ CREATE TABLE IF NOT EXISTS `appointments` (
   KEY `appointments_department_id_foreign` (`department_id`),
   CONSTRAINT `appointments_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL,
   CONSTRAINT `appointments_physician_id_foreign` FOREIGN KEY (`physician_id`) REFERENCES `physicians` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.appointments: ~0 rows (approximately)
+-- Dumping data for table chansey.appointments: ~3 rows (approximately)
 DELETE FROM `appointments`;
 INSERT INTO `appointments` (`id`, `first_name`, `last_name`, `email`, `contact_number`, `purpose`, `physician_id`, `scheduled_at`, `end_time`, `status`, `created_at`, `updated_at`, `department_id`) VALUES
-	(1, 'Jacob', 'Wesley', 'dfaye@gmail.com', '09123472922', 'wants to see if has barin cancer (Prefers: 2026-01-12)', 1, '2026-01-12 09:00:00', '2026-01-12 09:30:00', 'Approved', '2026-01-11 06:04:00', '2026-01-11 06:15:09', 1);
+	(1, 'Jacob', 'Wesley', 'dfaye@gmail.com', '09123472922', 'wants to see if has barin cancer (Prefers: 2026-01-12)', 1, '2026-01-12 09:00:00', '2026-01-12 09:30:00', 'Approved', '2026-01-11 06:04:00', '2026-01-11 06:15:09', 1),
+	(2, 'Joyce', 'Torres', 'john@example', '1313131313', 'head hurts (Prefers: 2026-01-14)', 1, '2026-01-14 08:00:00', '2026-01-14 08:30:00', 'Approved', '2026-01-13 00:06:40', '2026-01-13 00:12:03', 1),
+	(3, 'Shaula', 'Ramos', 'josephleviramos2006@gmail.com', '0909090909', 'feels bad (Prefers: 2026-01-16)', 2, '2026-01-16 08:30:00', '2026-01-16 09:00:00', 'Approved', '2026-01-14 22:24:07', '2026-01-14 22:27:03', 2);
 
 -- Dumping structure for table chansey.beds
+DROP TABLE IF EXISTS `beds`;
 CREATE TABLE IF NOT EXISTS `beds` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `room_id` bigint unsigned NOT NULL,
@@ -178,9 +212,9 @@ INSERT INTO `beds` (`id`, `room_id`, `bed_code`, `status`, `created_at`, `update
 	(2, 1, 'NW-101-B', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(3, 1, 'NW-101-C', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(4, 1, 'NW-101-D', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(5, 2, 'EW-201-A', 'Occupied', '2026-01-11 01:12:36', '2026-01-11 01:39:57'),
-	(6, 2, 'EW-201-B', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(7, 2, 'EW-201-C', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(5, 2, 'EW-201-A', 'Cleaning', '2026-01-11 01:12:36', '2026-01-15 05:11:18'),
+	(6, 2, 'EW-201-B', 'Occupied', '2026-01-11 01:12:36', '2026-01-13 00:11:08'),
+	(7, 2, 'EW-201-C', 'Available', '2026-01-11 01:12:36', '2026-01-13 00:36:53'),
 	(8, 2, 'EW-201-D', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(9, 3, 'WW-301-A', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(10, 3, 'WW-301-B', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
@@ -192,6 +226,7 @@ INSERT INTO `beds` (`id`, `room_id`, `bed_code`, `status`, `created_at`, `update
 	(16, 4, 'SW-401-D', 'Available', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.billable_items
+DROP TABLE IF EXISTS `billable_items`;
 CREATE TABLE IF NOT EXISTS `billable_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -206,12 +241,19 @@ CREATE TABLE IF NOT EXISTS `billable_items` (
   PRIMARY KEY (`id`),
   KEY `billable_items_admission_id_foreign` (`admission_id`),
   CONSTRAINT `billable_items_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.billable_items: ~0 rows (approximately)
+-- Dumping data for table chansey.billable_items: ~2 rows (approximately)
 DELETE FROM `billable_items`;
+INSERT INTO `billable_items` (`id`, `admission_id`, `name`, `amount`, `quantity`, `total`, `status`, `created_at`, `updated_at`, `type`) VALUES
+	(1, 1, 'x ray', 500.00, 1, 500.00, 'Paid', '2026-01-13 00:20:11', '2026-01-13 00:35:38', 'medical'),
+	(2, 1, 'Biogesic', 5.00, 1, 5.00, 'Paid', '2026-01-13 00:30:52', '2026-01-13 00:35:38', 'medical'),
+	(3, 1, 'Extra Pillow', 100.00, 1, 100.00, 'Paid', '2026-01-13 00:31:57', '2026-01-13 00:35:38', 'inventory'),
+	(4, 2, 'Neozep', 7.00, 1, 7.00, 'Paid', '2026-01-15 04:44:11', '2026-01-15 05:10:44', 'medical'),
+	(5, 2, 'Neozep', 7.00, 1, 7.00, 'Paid', '2026-01-15 04:44:23', '2026-01-15 05:10:44', 'medical');
 
 -- Dumping structure for table chansey.billings
+DROP TABLE IF EXISTS `billings`;
 CREATE TABLE IF NOT EXISTS `billings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -231,12 +273,16 @@ CREATE TABLE IF NOT EXISTS `billings` (
   KEY `billings_processed_by_foreign` (`processed_by`),
   CONSTRAINT `billings_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `billings_processed_by_foreign` FOREIGN KEY (`processed_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table chansey.billings: ~0 rows (approximately)
 DELETE FROM `billings`;
+INSERT INTO `billings` (`id`, `admission_id`, `processed_by`, `breakdown`, `gross_total`, `final_total`, `amount_paid`, `change`, `status`, `receipt_number`, `created_at`, `updated_at`) VALUES
+	(1, 1, 2, '{"pf_fee": "12000", "movements": [{"days": 3, "price": 1500, "total": 4500, "bed_code": "EW-201-A", "ended_at": "Jan 13, 2026", "started_at": "Jan 11, 2026", "room_number": "201"}, {"days": 1, "price": 1500, "total": 1500, "bed_code": "EW-201-C", "ended_at": "Present", "started_at": "Jan 13, 2026", "room_number": "201"}], "deductions": {"hmo": "100", "philhealth": "500"}, "items_list": [{"name": "x ray", "type": "medical", "total": 500, "amount": "500.00", "quantity": 1}, {"name": "Biogesic", "type": "medical", "total": 5, "amount": "5.00", "quantity": 1}, {"name": "Extra Pillow", "type": "inventory", "total": 100, "amount": "100.00", "quantity": 1}], "room_total": 6000, "items_total": 605}', 18605.00, 18005.00, 19000.00, 995.00, 'Paid', 'OR-20260113-0001', '2026-01-13 00:35:38', '2026-01-13 00:35:38'),
+	(2, 2, 2, '{"pf_fee": "1000", "movements": [{"days": 1, "price": 1500, "total": 1500, "bed_code": "EW-201-A", "ended_at": "Present", "started_at": "Jan 15, 2026", "room_number": "201"}], "deductions": {"hmo": "0", "philhealth": "0"}, "items_list": [{"name": "Neozep", "type": "medical", "total": 14, "amount": "7.00", "quantity": 2}], "room_total": 1500, "items_total": 14}', 2514.00, 2514.00, 3000.00, 486.00, 'Paid', 'OR-20260115-0002', '2026-01-15 05:10:44', '2026-01-15 05:10:44');
 
 -- Dumping structure for table chansey.cache
+DROP TABLE IF EXISTS `cache`;
 CREATE TABLE IF NOT EXISTS `cache` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -248,6 +294,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 DELETE FROM `cache`;
 
 -- Dumping structure for table chansey.cache_locks
+DROP TABLE IF EXISTS `cache_locks`;
 CREATE TABLE IF NOT EXISTS `cache_locks` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -259,6 +306,7 @@ CREATE TABLE IF NOT EXISTS `cache_locks` (
 DELETE FROM `cache_locks`;
 
 -- Dumping structure for table chansey.clinical_logs
+DROP TABLE IF EXISTS `clinical_logs`;
 CREATE TABLE IF NOT EXISTS `clinical_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -276,33 +324,25 @@ CREATE TABLE IF NOT EXISTS `clinical_logs` (
   CONSTRAINT `clinical_logs_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clinical_logs_medical_order_id_foreign` FOREIGN KEY (`medical_order_id`) REFERENCES `medical_orders` (`id`) ON DELETE SET NULL,
   CONSTRAINT `clinical_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.clinical_logs: ~0 rows (approximately)
+-- Dumping data for table chansey.clinical_logs: ~9 rows (approximately)
 DELETE FROM `clinical_logs`;
+INSERT INTO `clinical_logs` (`id`, `admission_id`, `user_id`, `medical_order_id`, `type`, `data`, `created_at`, `updated_at`) VALUES
+	(1, 1, 5, 3, 'Laboratory', '{"note": "Lab Result Uploaded: x ray", "finding": "abnormal"}', '2026-01-13 00:20:11', '2026-01-13 00:20:11'),
+	(2, 1, 5, 1, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Biogesic", "bp_systolic": "12", "observation": "patient godd", "bp_diastolic": "12"}', '2026-01-13 00:30:52', '2026-01-13 00:30:52'),
+	(3, 1, 5, 2, 'Vitals', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "bp_systolic": "12", "observation": "kjkjsAS", "bp_diastolic": "12"}', '2026-01-13 00:31:14', '2026-01-13 00:31:14'),
+	(4, 1, 5, NULL, 'Utility', '{"qty": "1", "note": "Used Item: Extra Pillow", "price": "100.00", "remarks": "patient wants another pillow"}', '2026-01-13 00:31:57', '2026-01-13 00:31:57'),
+	(5, 1, 7, 5, 'Discharge', '{"note": "Physician cleared patient for discharge."}', '2026-01-13 00:32:53', '2026-01-13 00:32:53'),
+	(6, 2, 7, 7, 'Discharge', '{"note": "Physician cleared patient for discharge."}', '2026-01-15 04:42:59', '2026-01-15 04:42:59'),
+	(7, 2, 5, 6, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Neozep", "bp_systolic": "12", "observation": "ewweqwe", "bp_diastolic": "12"}', '2026-01-15 04:44:11', '2026-01-15 04:44:11'),
+	(8, 2, 5, 6, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Neozep", "bp_systolic": "12", "observation": "aSaS", "bp_diastolic": "12"}', '2026-01-15 04:44:23', '2026-01-15 04:44:23'),
+	(9, 2, 4, 8, 'Transfer', '{"to_bed": "EW-201-A", "remarks": null, "from_bed": "EW-201-A"}', '2026-01-15 04:48:03', '2026-01-15 04:48:03');
 
--- Dumping structure for table chansey.departments
-CREATE TABLE IF NOT EXISTS `departments` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `departments_name_unique` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.departments: ~6 rows (approximately)
-DELETE FROM `departments`;
-INSERT INTO `departments` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
-	(1, 'Cardiology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(2, 'Pediatrics', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(3, 'Neurology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(4, 'Internal Medicine', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(5, 'Surgery', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(6, 'OB-GYN', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.failed_jobs
+DROP TABLE IF EXISTS `failed_jobs`;
 CREATE TABLE IF NOT EXISTS `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -319,6 +359,7 @@ CREATE TABLE IF NOT EXISTS `failed_jobs` (
 DELETE FROM `failed_jobs`;
 
 -- Dumping structure for table chansey.general_services
+DROP TABLE IF EXISTS `general_services`;
 CREATE TABLE IF NOT EXISTS `general_services` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -345,6 +386,7 @@ INSERT INTO `general_services` (`id`, `user_id`, `employee_id`, `first_name`, `l
 	(1, 6, 'SVC-FM-001', 'Firan', 'Maravilla', 'Lobby / Wards', '08:00:00', '17:00:00', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.hospital_fees
+DROP TABLE IF EXISTS `hospital_fees`;
 CREATE TABLE IF NOT EXISTS `hospital_fees` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -366,6 +408,7 @@ INSERT INTO `hospital_fees` (`id`, `name`, `price`, `unit`, `is_active`, `create
 	(5, 'Electricity / TV', 100.00, 'per_day', 1, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.inventory_items
+DROP TABLE IF EXISTS `inventory_items`;
 CREATE TABLE IF NOT EXISTS `inventory_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `item_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -384,12 +427,13 @@ CREATE TABLE IF NOT EXISTS `inventory_items` (
 DELETE FROM `inventory_items`;
 INSERT INTO `inventory_items` (`id`, `item_name`, `category`, `price`, `quantity`, `critical_level`, `created_at`, `updated_at`) VALUES
 	(1, 'Admission Kit', 'Hygiene', 350.00, 50, 10, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(2, 'Extra Pillow', 'Linens', 100.00, 50, 10, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(2, 'Extra Pillow', 'Linens', 100.00, 49, 10, '2026-01-11 01:12:36', '2026-01-13 00:31:57'),
 	(3, 'Wool Blanket', 'Linens', 150.00, 50, 10, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(4, 'Nebulizer Kit', 'Medical', 150.00, 50, 10, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(5, 'Underpad', 'Medical', 50.00, 50, 10, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.jobs
+DROP TABLE IF EXISTS `jobs`;
 CREATE TABLE IF NOT EXISTS `jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -406,6 +450,7 @@ CREATE TABLE IF NOT EXISTS `jobs` (
 DELETE FROM `jobs`;
 
 -- Dumping structure for table chansey.job_batches
+DROP TABLE IF EXISTS `job_batches`;
 CREATE TABLE IF NOT EXISTS `job_batches` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -424,6 +469,7 @@ CREATE TABLE IF NOT EXISTS `job_batches` (
 DELETE FROM `job_batches`;
 
 -- Dumping structure for table chansey.medical_orders
+DROP TABLE IF EXISTS `medical_orders`;
 CREATE TABLE IF NOT EXISTS `medical_orders` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -449,12 +495,22 @@ CREATE TABLE IF NOT EXISTS `medical_orders` (
   CONSTRAINT `medical_orders_fulfilled_by_user_id_foreign` FOREIGN KEY (`fulfilled_by_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `medical_orders_medicine_id_foreign` FOREIGN KEY (`medicine_id`) REFERENCES `medicines` (`id`),
   CONSTRAINT `medical_orders_physician_id_foreign` FOREIGN KEY (`physician_id`) REFERENCES `physicians` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.medical_orders: ~0 rows (approximately)
+-- Dumping data for table chansey.medical_orders: ~5 rows (approximately)
 DELETE FROM `medical_orders`;
+INSERT INTO `medical_orders` (`id`, `admission_id`, `physician_id`, `type`, `instruction`, `medicine_id`, `quantity`, `frequency`, `status`, `fulfilled_by_user_id`, `fulfilled_at`, `created_at`, `updated_at`) VALUES
+	(1, 1, 1, 'Medication', 'give after meals', 1, 1, 'Every 2 Hours', 'Discontinued', NULL, NULL, '2026-01-13 00:18:05', '2026-01-13 00:36:53'),
+	(2, 1, 1, 'Monitoring', 'check vitals', NULL, 1, 'Every 2 Hours', 'Discontinued', NULL, NULL, '2026-01-13 00:18:18', '2026-01-13 00:36:53'),
+	(3, 1, 1, 'Laboratory', 'x ray', NULL, 1, 'Once', 'Done', 5, '2026-01-13 00:20:11', '2026-01-13 00:18:28', '2026-01-13 00:20:11'),
+	(4, 1, 1, 'Transfer', 'transfer patient to anbother bed for testing', NULL, 1, 'Once', 'Done', NULL, NULL, '2026-01-13 00:18:45', '2026-01-13 00:21:15'),
+	(5, 1, 1, 'Discharge', 'Patient good for discharge. Please process billing.', NULL, 1, 'Once', 'Discontinued', NULL, NULL, '2026-01-13 00:32:53', '2026-01-13 00:36:53'),
+	(6, 2, 1, 'Medication', 'give as needed', 2, 1, 'PRN', 'Discontinued', NULL, NULL, '2026-01-15 04:42:49', '2026-01-15 05:11:18'),
+	(7, 2, 1, 'Discharge', 'Patient good for discharge. Please process billing.', NULL, 1, 'Once', 'Discontinued', NULL, NULL, '2026-01-15 04:42:59', '2026-01-15 05:11:18'),
+	(8, 2, 1, 'Transfer', 'just move to other room', NULL, 1, 'Once', 'Done', NULL, NULL, '2026-01-15 04:45:27', '2026-01-15 04:48:03');
 
 -- Dumping structure for table chansey.medicines
+DROP TABLE IF EXISTS `medicines`;
 CREATE TABLE IF NOT EXISTS `medicines` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `generic_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -474,13 +530,14 @@ CREATE TABLE IF NOT EXISTS `medicines` (
 -- Dumping data for table chansey.medicines: ~5 rows (approximately)
 DELETE FROM `medicines`;
 INSERT INTO `medicines` (`id`, `generic_name`, `brand_name`, `dosage`, `form`, `stock_on_hand`, `critical_level`, `price`, `expiry_date`, `created_at`, `updated_at`) VALUES
-	(1, 'Paracetamol', 'Biogesic', '500mg', 'Tablet', 100, 20, 5.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(2, 'Phenylephrine', 'Neozep', '10mg', 'Tablet', 100, 20, 7.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(1, 'Paracetamol', 'Biogesic', '500mg', 'Tablet', 99, 20, 5.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-13 00:30:52'),
+	(2, 'Phenylephrine', 'Neozep', '10mg', 'Tablet', 98, 20, 7.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-15 04:44:23'),
 	(3, 'Amoxicillin', 'Amoxil', '500mg', 'Capsule', 100, 20, 15.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(4, 'Carbocisteine', 'Solmux', '500mg', 'Capsule', 100, 20, 12.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(5, 'Sodium Chloride', 'PNSS 1L', '1L', 'IV Bag', 100, 20, 150.00, '2026-01-01', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.migrations
+DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE IF NOT EXISTS `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -510,6 +567,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(17, '2026_01_11_085815_create_departments_structure', 1);
 
 -- Dumping structure for table chansey.nurses
+DROP TABLE IF EXISTS `nurses`;
 CREATE TABLE IF NOT EXISTS `nurses` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -541,6 +599,7 @@ INSERT INTO `nurses` (`id`, `user_id`, `employee_id`, `first_name`, `last_name`,
 	(2, 5, 'NUR-RD-001', 'Riovel', 'Dane', '21212123', 'Clinical', 2, '11:10:00', '23:10:00', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.nursing_care_plans
+DROP TABLE IF EXISTS `nursing_care_plans`;
 CREATE TABLE IF NOT EXISTS `nursing_care_plans` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -559,12 +618,15 @@ CREATE TABLE IF NOT EXISTS `nursing_care_plans` (
   KEY `nursing_care_plans_nurse_id_foreign` (`nurse_id`),
   CONSTRAINT `nursing_care_plans_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `nursing_care_plans_nurse_id_foreign` FOREIGN KEY (`nurse_id`) REFERENCES `nurses` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table chansey.nursing_care_plans: ~0 rows (approximately)
 DELETE FROM `nursing_care_plans`;
+INSERT INTO `nursing_care_plans` (`id`, `admission_id`, `nurse_id`, `assessment`, `diagnosis`, `planning`, `interventions`, `rationale`, `evaluation`, `status`, `created_at`, `updated_at`) VALUES
+	(1, 1, 2, 'patient is handsaome', 'acute pain', '["help patient"]', '["care for patient"]', 'to help patient', 'patient feels good', 'Active', '2026-01-13 00:15:33', '2026-01-13 00:15:33');
 
 -- Dumping structure for table chansey.password_reset_tokens
+DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -576,6 +638,7 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
 DELETE FROM `password_reset_tokens`;
 
 -- Dumping structure for table chansey.patients
+DROP TABLE IF EXISTS `patients`;
 CREATE TABLE IF NOT EXISTS `patients` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `patient_unique_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -606,15 +669,17 @@ CREATE TABLE IF NOT EXISTS `patients` (
   KEY `patients_last_name_index` (`last_name`),
   KEY `patients_date_of_birth_index` (`date_of_birth`),
   CONSTRAINT `patients_created_by_user_id_foreign` FOREIGN KEY (`created_by_user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.patients: ~0 rows (approximately)
+-- Dumping data for table chansey.patients: ~2 rows (approximately)
 DELETE FROM `patients`;
 INSERT INTO `patients` (`id`, `patient_unique_id`, `created_by_user_id`, `first_name`, `middle_name`, `last_name`, `date_of_birth`, `sex`, `civil_status`, `nationality`, `religion`, `address_permanent`, `address_present`, `contact_number`, `email`, `emergency_contact_name`, `emergency_contact_relationship`, `emergency_contact_number`, `philhealth_number`, `senior_citizen_id`, `created_at`, `updated_at`) VALUES
 	(1, 'P-2026-00001', 4, 'Faye', 'Rua', 'Lina', '2014-01-03', 'Female', 'Married', 'Filipino', 'Catholic', 'Balibago Rosario Batangas', 'Balibago Rosario Batangas', '09123472922', 'dfaye@gmail.com', 'Lina Mark', 'Brother', '09123472928', NULL, NULL, '2026-01-11 01:39:57', '2026-01-11 01:39:57'),
-	(2, 'P-2026-00002', 4, 'John', 'Rua', 'Doe', '2000-01-14', 'Male', 'Single', 'Filipino', 'Catholic', 'Balibago Rosario Batangas', 'Balibago Rosario Batangas', '09123472922', 'rita@gmail.com', 'Lina Mark', 'Brother', '09123472928', NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:11:24');
+	(2, 'P-2026-00002', 4, 'John', 'Rua', 'Doe', '2000-01-14', 'Male', 'Single', 'Filipino', 'Catholic', 'Balibago Rosario Batangas', 'Balibago Rosario Batangas', '09123472922', 'rita@gmail.com', 'Lina Mark', 'Brother', '09123472928', NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:11:24'),
+	(3, 'P-2026-00003', 4, 'Levi', 'Lugtu', 'Ramos', '2006-01-13', 'Female', 'Single', 'Filipino', 'Catholic', 'lipa city', 'lipa city', '12121212', 'levs@gmail.com', 'nat5h ramos', 'brother', '1212121212', NULL, NULL, '2026-01-13 00:11:08', '2026-01-13 00:11:08');
 
 -- Dumping structure for table chansey.patient_files
+DROP TABLE IF EXISTS `patient_files`;
 CREATE TABLE IF NOT EXISTS `patient_files` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `patient_id` bigint unsigned NOT NULL,
@@ -637,12 +702,16 @@ CREATE TABLE IF NOT EXISTS `patient_files` (
   CONSTRAINT `patient_files_medical_order_id_foreign` FOREIGN KEY (`medical_order_id`) REFERENCES `medical_orders` (`id`) ON DELETE SET NULL,
   CONSTRAINT `patient_files_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
   CONSTRAINT `patient_files_uploaded_by_id_foreign` FOREIGN KEY (`uploaded_by_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.patient_files: ~0 rows (approximately)
+-- Dumping data for table chansey.patient_files: ~2 rows (approximately)
 DELETE FROM `patient_files`;
+INSERT INTO `patient_files` (`id`, `patient_id`, `admission_id`, `medical_order_id`, `file_path`, `file_name`, `result_type`, `description`, `document_type`, `uploaded_by_id`, `created_at`, `updated_at`) VALUES
+	(1, 3, 3, NULL, 'patient_records/3/3/id_1768291868.pdf', 'id.pdf', NULL, NULL, 'Valid ID', 4, '2026-01-13 00:11:09', '2026-01-13 00:11:09'),
+	(2, 1, 1, 3, 'patient_records/1/1/Lab_3_1768292411.pdf', 'Lab_3_1768292411.pdf', NULL, 'abnormal', 'Lab Result', 5, '2026-01-13 00:20:11', '2026-01-13 00:20:11');
 
 -- Dumping structure for table chansey.patient_movements
+DROP TABLE IF EXISTS `patient_movements`;
 CREATE TABLE IF NOT EXISTS `patient_movements` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -660,14 +729,18 @@ CREATE TABLE IF NOT EXISTS `patient_movements` (
   CONSTRAINT `patient_movements_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `patient_movements_bed_id_foreign` FOREIGN KEY (`bed_id`) REFERENCES `beds` (`id`),
   CONSTRAINT `patient_movements_room_id_foreign` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table chansey.patient_movements: ~0 rows (approximately)
 DELETE FROM `patient_movements`;
 INSERT INTO `patient_movements` (`id`, `admission_id`, `room_id`, `bed_id`, `room_price`, `started_at`, `ended_at`, `created_at`, `updated_at`) VALUES
-	(1, 1, 2, 5, 1500.00, '2026-01-11 09:39:57', NULL, '2026-01-11 01:39:57', '2026-01-11 01:39:57');
+	(1, 1, 2, 5, 1500.00, '2026-01-11 09:39:57', '2026-01-13 08:21:15', '2026-01-11 01:39:57', '2026-01-13 00:21:15'),
+	(2, 3, 2, 6, 1500.00, '2026-01-13 08:11:08', NULL, '2026-01-13 00:11:08', '2026-01-13 00:11:08'),
+	(3, 1, 2, 7, 1500.00, '2026-01-13 08:21:15', '2026-01-13 08:36:53', '2026-01-13 00:21:15', '2026-01-13 00:36:53'),
+	(4, 2, 2, 5, 1500.00, '2026-01-15 12:48:03', '2026-01-15 13:11:18', '2026-01-15 04:48:03', '2026-01-15 05:11:18');
 
 -- Dumping structure for table chansey.pharmacists
+DROP TABLE IF EXISTS `pharmacists`;
 CREATE TABLE IF NOT EXISTS `pharmacists` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -688,6 +761,7 @@ INSERT INTO `pharmacists` (`id`, `user_id`, `employee_id`, `full_name`, `license
 	(1, 3, 'PHR-GH-001', 'Gabriel Hosmillo', '0123456788', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.physicians
+DROP TABLE IF EXISTS `physicians`;
 CREATE TABLE IF NOT EXISTS `physicians` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -716,6 +790,7 @@ INSERT INTO `physicians` (`id`, `user_id`, `employee_id`, `first_name`, `last_na
 	(3, 9, 'DOC-LJ-001', 'Loyd', 'Jallores', 'Consultant', '2026-01-11 01:12:36', '2026-01-11 01:12:36', 3);
 
 -- Dumping structure for table chansey.rooms
+DROP TABLE IF EXISTS `rooms`;
 CREATE TABLE IF NOT EXISTS `rooms` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `station_id` bigint unsigned NOT NULL,
@@ -743,6 +818,7 @@ INSERT INTO `rooms` (`id`, `station_id`, `room_number`, `room_type`, `capacity`,
 	(4, 4, '401', 'Ward', 4, 1500.00, 'Active', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.sessions
+DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE IF NOT EXISTS `sessions` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
@@ -755,13 +831,15 @@ CREATE TABLE IF NOT EXISTS `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.sessions: ~1 rows (approximately)
+-- Dumping data for table chansey.sessions: ~8 rows (approximately)
 DELETE FROM `sessions`;
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-	('bo19933SwdLPKDGBJYWfGIIi23PA5z6iyRyasSAC', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVUJJZk9MZjJma2J4aTdHM3dkSlVXV3R0cmphZnhhOW16VWJKd2VWaiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7czo3OiJ3ZWxjb21lIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1768140463),
-	('iUFTejhwxvOQlcTuAufuHoEyB7FvOUPrGLN50NDT', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiSk1ac25wd202VVJwbU1hYnlOd1E1dElRa2lwMlJXd2NnUTdjbkU0MSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9waHlzaWNpYW4vYXBwb2ludG1lbnRzIjtzOjU6InJvdXRlIjtzOjI4OiJwaHlzaWNpYW4uYXBwb2ludG1lbnRzLmluZGV4Ijt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Nzt9', 1768142848);
+	('992U01Vaho6LZD5JYG60g835JDq0F6wJeHxPyKox', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiU1pMdjZrU1QyZFpOZWYwUHM1OTVmd0lFOHhhbE1KbG9HOXhoTUNDRSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7czo3OiJ3ZWxjb21lIjt9fQ==', 1768483954),
+	('BYZifiUHxlzdXFXt4hSE44hcBhiFRVLlf8UwXk4k', 5, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiT3lmUW9JM3kwVWJqWUVkZlRhTWl4dWNJWkxNR2dVSUFhZUJ3M3BVdiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9udXJzZS9jbGluaWNhbC9wYXRpZW50LzIiO3M6NToicm91dGUiO3M6MjQ6Im51cnNlLmNsaW5pY2FsLndhcmQuc2hvdyI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjU7fQ==', 1768481488),
+	('dtLVb05At2i5lMcaOqfqp0IhStT2dDLLJVcMp5jr', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidGNaWHhUQ1lNSjBIMEZyRFp2b1Mxa1ViU2lxTFlNYmlrM3FzY1lsUyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9waHlzaWNpYW4vbXlwYXRpZW50cy8yIjtzOjU6InJvdXRlIjtzOjI1OiJwaHlzaWNpYW4ubXlwYXRpZW50cy5zaG93Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Nzt9', 1768481494);
 
 -- Dumping structure for table chansey.stations
+DROP TABLE IF EXISTS `stations`;
 CREATE TABLE IF NOT EXISTS `stations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `station_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -783,6 +861,7 @@ INSERT INTO `stations` (`id`, `station_name`, `station_code`, `floor_location`, 
 	(4, 'South Wing', 'SW', '2nd Floor', '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.transfer_requests
+DROP TABLE IF EXISTS `transfer_requests`;
 CREATE TABLE IF NOT EXISTS `transfer_requests` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -805,12 +884,16 @@ CREATE TABLE IF NOT EXISTS `transfer_requests` (
   CONSTRAINT `transfer_requests_requested_by_user_id_foreign` FOREIGN KEY (`requested_by_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `transfer_requests_target_bed_id_foreign` FOREIGN KEY (`target_bed_id`) REFERENCES `beds` (`id`),
   CONSTRAINT `transfer_requests_target_station_id_foreign` FOREIGN KEY (`target_station_id`) REFERENCES `stations` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chansey.transfer_requests: ~0 rows (approximately)
+-- Dumping data for table chansey.transfer_requests: ~1 rows (approximately)
 DELETE FROM `transfer_requests`;
+INSERT INTO `transfer_requests` (`id`, `admission_id`, `medical_order_id`, `requested_by_user_id`, `target_station_id`, `target_bed_id`, `status`, `remarks`, `created_at`, `updated_at`) VALUES
+	(1, 1, 4, 5, 2, 7, 'Approved', 'maarte siya', '2026-01-13 00:20:41', '2026-01-13 00:21:15'),
+	(2, 2, 8, 5, 2, 5, 'Approved', 'he dont like current bed', '2026-01-15 04:45:51', '2026-01-15 04:48:03');
 
 -- Dumping structure for table chansey.treatment_plans
+DROP TABLE IF EXISTS `treatment_plans`;
 CREATE TABLE IF NOT EXISTS `treatment_plans` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `admission_id` bigint unsigned NOT NULL,
@@ -834,6 +917,7 @@ CREATE TABLE IF NOT EXISTS `treatment_plans` (
 DELETE FROM `treatment_plans`;
 
 -- Dumping structure for table chansey.users
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
