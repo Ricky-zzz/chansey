@@ -16,8 +16,8 @@
 
             <!-- SEARCH -->
             <form action="{{ route('nurse.clinical.ward.index') }}" method="GET" class="join w-full md:w-96">
-                <input type="text" name="search" class="input input-bordered join-item w-full" 
-                       placeholder="Find Patient or Bed..." 
+                <input type="text" name="search" class="input input-bordered join-item w-full"
+                       placeholder="Find Patient or Bed..."
                        value="{{ request('search') }}">
                 <button type="submit" class="btn btn-primary join-item">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -43,11 +43,11 @@
                 <tbody>
                     @forelse($patients as $admission)
                     <tr class="hover group">
-                        
+
                         <!-- 1. LOCATION -->
                         <td>
                             <div class="flex flex-col">
-                                <span class="font-mono font-black text-lg text-primary">
+                                <span class="font-mono font-black text-lg text-blue-600">
                                     @if($admission->bed?->bed_code)
                                     {{ $admission->bed->bed_code }}
                                     @else
@@ -62,26 +62,22 @@
 
                         <!-- 2. PATIENT -->
                         <td>
-                            <div class="font-bold text-lg text-slate-700">
-                                {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
+                            <div class="font-bold text-md text-slate-700">
+                                {{ $admission->patient->getFullNameAttribute() }}
                             </div>
-                            <div class="text-xs text-gray-500 font-mono">
+                            <div class="font-bold text-xs text-sky-600">
                                 {{ $admission->patient->patient_unique_id }}
                             </div>
-                            <div class="text-xs mt-1">
-                                <span class="badge badge-ghost badge-sm">
-                                    {{ $admission->patient->age }} yo
-                                </span>
-                                <span class="badge badge-ghost badge-sm">
-                                    {{ $admission->patient->sex }}
-                                </span>
+                            <div class="text-xs text-gray-500 font-medium">
+                                {{ $admission->patient->sex }} •
+                                {{ $admission->patient->getAgeAttribute() }} yrs old
                             </div>
                         </td>
 
                         <!-- 3. DOCTOR -->
                         <td>
                             <div class="font-semibold text-sm">
-                                Dr. {{ $admission->attendingPhysician->last_name }}
+                                Dr. {{ $admission->attendingPhysician->getFullNameAttribute() }}
                             </div>
                             <div class="text-xs text-gray-500 italic">
                                 {{ $admission->attendingPhysician->specialization }}
@@ -92,20 +88,20 @@
                         <td class="max-w-xs">
                             <!-- Show Tags if Emergency -->
                             @if($admission->admission_type === 'Emergency')
-                                <span class="badge badge-error badge-xs text-white mb-1">Emergency</span>  
+                                <span class="badge badge-error badge-xs text-white mb-1">Emergency</span>
                             @endif
-                            
+
                             <div class="text-sm font-medium text-slate-600 truncate">
                                 {{ $admission->initial_diagnosis ?? 'Pending Diagnosis' }}
                             </div>
                             <div class="text-xs text-gray-400 italic truncate">
-                                "{{ $admission->chief_complaint }}"
+                                "{{ $admission->truncatedChiefComplaint() }}"
                             </div>
                         </td>
 
                         <!-- 5. ACTION -->
                         <td class="text-right">
-                            <a href="{{ route('nurse.clinical.ward.show', $admission->id) }}" 
+                            <a href="{{ route('nurse.clinical.ward.show', $admission->id) }}"
                                class="btn btn-primary btn-sm gap-2 shadow-md">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 Open Chart

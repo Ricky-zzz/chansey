@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use \Illuminate\Support\Str;
 
 class Admission extends Model
 {
@@ -36,7 +37,7 @@ class Admission extends Model
     protected $casts = [
         'admission_date' => 'datetime',
         'discharge_date' => 'datetime',
-        'known_allergies' => 'array', 
+        'known_allergies' => 'array',
     ];
 
     // --- RELATIONSHIPS ---
@@ -114,5 +115,12 @@ class Admission extends Model
     public function billings(): HasMany
     {
         return $this->hasMany(Billing::class);
+    }
+
+    // --- ACCESSOR METHODS ---
+
+    public function truncatedChiefComplaint(int $limit = 20): string
+    {
+        return Str::limit($this->chief_complaint, $limit, '...');
     }
 }

@@ -128,6 +128,27 @@ INSERT INTO `admission_billing_infos` (`id`, `admission_id`, `payment_type`, `pr
 	(1, 1, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 01:39:57', '2026-01-11 01:39:57'),
 	(2, 2, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:06:53');
 
+-- Dumping structure for table chansey.departments
+CREATE TABLE IF NOT EXISTS `departments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `departments_name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dumping data for table chansey.departments: ~6 rows (approximately)
+DELETE FROM `departments`;
+INSERT INTO `departments` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+	(1, 'Cardiology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(2, 'Pediatrics', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(3, 'Neurology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(4, 'Internal Medicine', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(5, 'Surgery', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
+	(6, 'OB-GYN', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
+
 -- Dumping structure for table chansey.appointments
 CREATE TABLE IF NOT EXISTS `appointments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -280,27 +301,6 @@ CREATE TABLE IF NOT EXISTS `clinical_logs` (
 
 -- Dumping data for table chansey.clinical_logs: ~0 rows (approximately)
 DELETE FROM `clinical_logs`;
-
--- Dumping structure for table chansey.departments
-CREATE TABLE IF NOT EXISTS `departments` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `departments_name_unique` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dumping data for table chansey.departments: ~6 rows (approximately)
-DELETE FROM `departments`;
-INSERT INTO `departments` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
-	(1, 'Cardiology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(2, 'Pediatrics', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(3, 'Neurology', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(4, 'Internal Medicine', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(5, 'Surgery', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
-	(6, 'OB-GYN', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
 -- Dumping structure for table chansey.failed_jobs
 CREATE TABLE IF NOT EXISTS `failed_jobs` (

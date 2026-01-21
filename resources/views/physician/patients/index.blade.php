@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto">
 
     <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
-        
+
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
@@ -49,8 +49,8 @@
 
                         <!-- Patient -->
                         <td>
-                            <div class="font-bold text-lg text-primary">
-                                {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
+                            <div class="font-bold text-md text-primary">
+                                {{ $admission->patient->getFullNameAttribute() }}
                             </div>
                             <div class="text-xs text-gray-500">
                                 {{ $admission->patient->sex }} • {{ $admission->patient->age }} yo
@@ -73,10 +73,10 @@
                         <!-- Diagnosis -->
                         <td class="max-w-xs">
                             <div class="font-medium text-slate-700">
-                                {{ Str::limit($admission->initial_diagnosis ?? 'Pending Diagnosis', 40) }}
+                                {{ $admission->initial_diagnosis }}
                             </div>
                             <div class="text-xs text-gray-500 italic truncate">
-                                "{{ $admission->chief_complaint }}"
+                                "{{ $admission->truncatedChiefComplaint() }}"
                             </div>
                         </td>
 

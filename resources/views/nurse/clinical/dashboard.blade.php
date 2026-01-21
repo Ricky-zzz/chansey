@@ -7,7 +7,7 @@
         <div>
             <h1 class="text-3xl font-black text-slate-800">Clinical Console</h1>
         </div>
-        
+
         <!-- Station Badge -->
         <div class="alert bg-white shadow-sm border border-base-200 max-w-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 00-2-2H9a2 2 0 00-2 2v2m7-2a2 2 0 11-4 0v2m-5-2a2 2 0 11-4 0v2"></path></svg>
@@ -22,7 +22,7 @@
 
     <!-- 2. STATION WORKLOAD STATS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        
+
         <!-- Total Patients (My Load) -->
         <div class="card bg-base-100 shadow-md border-l-8 border-primary">
             <div class="card-body p-6">
@@ -94,22 +94,22 @@
                                 @if($admission->bed?->bed_code)
                                 {{ $admission->bed->bed_code }}
                                 @else
-                                <span class="italic text-gray-400">Outpatient</span>
+                                <span class="italic text-gray-600">Outpatient</span>
                                 @endif
                             </div>
                         </td>
 
                         <!-- PATIENT IDENTITY -->
                         <td>
-                            <div class="font-bold text-lg text-slate-800">
-                                {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
+                            <div class="font-bold text-sm text-slate-800">
+                                {{ $admission->patient->getFullNameAttribute() }}
                             </div>
                             <div class="font-bold text-xs text-sky-600">
                                 {{ $admission->patient->patient_unique_id }}
                             </div>
                             <div class="text-xs text-gray-500 font-medium">
-                                {{ $admission->patient->sex }} • 
-                                {{ \Carbon\Carbon::parse($admission->patient->date_of_birth)->age }} yrs old  
+                                {{ $admission->patient->sex }} •
+                                {{ $admission->patient->getAgeAttribute() }} yrs old
                             </div>
                         </td>
 

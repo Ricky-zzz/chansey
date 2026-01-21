@@ -1,4 +1,4 @@
-@extends('layouts.physician') 
+@extends('layouts.physician')
 
 @section('content')
 
@@ -8,7 +8,7 @@
             <h1 class="text-3xl font-black text-slate-800">Physician's Deck</h1>
             <div class="text-sm text-slate-500">Welcome back, Dr. {{ $physician->last_name }}</div>
         </div>
-        
+
         <!-- Department Badge -->
         <div class="alert bg-white shadow-sm border border-slate-200 max-w-sm">
             <div class="flex items-center gap-3">
@@ -27,7 +27,7 @@
 
     <!-- 2. STATS ROW -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        
+
         <!-- Total Load -->
         <div class="card bg-base-100 shadow-md border-l-8 border-indigo-500">
             <div class="card-body p-6">
@@ -101,9 +101,9 @@
                                 {{ $admission->station->station_name ?? 'Floating' }}
                             </div>
                             <div class="badge badge-outline text-xs font-mono bg-white">
-                                {{ $admission->bed->bed_code ?? 'Outpatient/Waiting' }}
+                                {{ $admission->bed->bed_code ?? 'Outpatient' }}
                             </div>
-                        </td> 
+                        </td>
 
                         <!-- Identity -->
                         <td>
@@ -111,7 +111,7 @@
                                 {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
                             </div>
                             <div class="text-xs text-gray-500">
-                                {{ $admission->patient->sex }} • {{ $admission->patient->age }} yo
+                                {{ $admission->patient->sex }} • {{ $admission->patient->age }} yrs
                             </div>
                         </td>
 
@@ -134,7 +134,7 @@
                                 {{ $admission->initial_diagnosis ?? 'Pending Diagnosis' }}
                             </div>
                             <div class="text-xs text-gray-500 truncate italic">
-                                "{{ $admission->chief_complaint }}"
+                                "{{ $admission->truncatedChiefComplaint() }}"
                             </div>
                             @if($admission->admission_type === 'Emergency')
                                 <span class="badge badge-error badge-xs text-white mt-1">Emergency</span>
