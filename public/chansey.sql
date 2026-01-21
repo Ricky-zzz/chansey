@@ -132,11 +132,9 @@ CREATE TABLE IF NOT EXISTS `admission_billing_infos` (
 DELETE FROM `admission_billing_infos`;
 INSERT INTO `admission_billing_infos` (`id`, `admission_id`, `payment_type`, `primary_insurance_provider`, `policy_number`, `approval_code`, `guarantor_name`, `guarantor_relationship`, `guarantor_contact`, `created_at`, `updated_at`) VALUES
 	(1, 1, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 01:39:57', '2026-01-11 01:39:57'),
-	(2, 2, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:06:53'),
-	(3, 3, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-13 00:11:08', '2026-01-13 00:11:08');
+	(2, 2, 'Cash', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-11 03:06:53', '2026-01-11 03:06:53');
 
 -- Dumping structure for table chansey.departments
-DROP TABLE IF EXISTS `departments`;
 CREATE TABLE IF NOT EXISTS `departments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -157,7 +155,6 @@ INSERT INTO `departments` (`id`, `name`, `description`, `created_at`, `updated_a
 	(5, 'Surgery', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36'),
 	(6, 'OB-GYN', NULL, '2026-01-11 01:12:36', '2026-01-11 01:12:36');
 
-  
 -- Dumping structure for table chansey.appointments
 DROP TABLE IF EXISTS `appointments`;
 CREATE TABLE IF NOT EXISTS `appointments` (
@@ -328,18 +325,6 @@ CREATE TABLE IF NOT EXISTS `clinical_logs` (
 
 -- Dumping data for table chansey.clinical_logs: ~9 rows (approximately)
 DELETE FROM `clinical_logs`;
-INSERT INTO `clinical_logs` (`id`, `admission_id`, `user_id`, `medical_order_id`, `type`, `data`, `created_at`, `updated_at`) VALUES
-	(1, 1, 5, 3, 'Laboratory', '{"note": "Lab Result Uploaded: x ray", "finding": "abnormal"}', '2026-01-13 00:20:11', '2026-01-13 00:20:11'),
-	(2, 1, 5, 1, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Biogesic", "bp_systolic": "12", "observation": "patient godd", "bp_diastolic": "12"}', '2026-01-13 00:30:52', '2026-01-13 00:30:52'),
-	(3, 1, 5, 2, 'Vitals', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "bp_systolic": "12", "observation": "kjkjsAS", "bp_diastolic": "12"}', '2026-01-13 00:31:14', '2026-01-13 00:31:14'),
-	(4, 1, 5, NULL, 'Utility', '{"qty": "1", "note": "Used Item: Extra Pillow", "price": "100.00", "remarks": "patient wants another pillow"}', '2026-01-13 00:31:57', '2026-01-13 00:31:57'),
-	(5, 1, 7, 5, 'Discharge', '{"note": "Physician cleared patient for discharge."}', '2026-01-13 00:32:53', '2026-01-13 00:32:53'),
-	(6, 2, 7, 7, 'Discharge', '{"note": "Physician cleared patient for discharge."}', '2026-01-15 04:42:59', '2026-01-15 04:42:59'),
-	(7, 2, 5, 6, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Neozep", "bp_systolic": "12", "observation": "ewweqwe", "bp_diastolic": "12"}', '2026-01-15 04:44:11', '2026-01-15 04:44:11'),
-	(8, 2, 5, 6, 'Medication', '{"hr": "12", "o2": "12", "rr": "12", "temp": "12", "dosage": 1, "remarks": null, "medicine": "Neozep", "bp_systolic": "12", "observation": "aSaS", "bp_diastolic": "12"}', '2026-01-15 04:44:23', '2026-01-15 04:44:23'),
-	(9, 2, 4, 8, 'Transfer', '{"to_bed": "EW-201-A", "remarks": null, "from_bed": "EW-201-A"}', '2026-01-15 04:48:03', '2026-01-15 04:48:03');
-
-
 
 -- Dumping structure for table chansey.failed_jobs
 DROP TABLE IF EXISTS `failed_jobs`;
