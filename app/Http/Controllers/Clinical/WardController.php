@@ -70,7 +70,6 @@ class WardController extends Controller
             ->with('user', 'labResultFile')
             ->latest();
 
-        // Filter by type if provided
         if ($type = request('type')) {
             $clinicalLogsQuery->where('type', $type);
         }
