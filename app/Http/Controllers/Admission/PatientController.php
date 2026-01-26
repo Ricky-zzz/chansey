@@ -23,6 +23,19 @@ use App\Services\PatientMovementService;
 
 class PatientController extends Controller
 {
+    protected $admissionNumberGenerator;
+    protected $patientFileService;
+    protected $patientMovementService;
+
+    public function __construct(
+        AdmissionNumberGenerator $admissionNumberGenerator,
+        PatientFileService $patientFileService,
+        PatientMovementService $patientMovementService
+    ) {
+        $this->admissionNumberGenerator = $admissionNumberGenerator;
+        $this->patientFileService = $patientFileService;
+        $this->patientMovementService = $patientMovementService;
+    }
 
     public function index(Request $request)
     {
@@ -46,7 +59,7 @@ class PatientController extends Controller
     public function create(Request $request)
     {
         $prefillData = [];
-        
+
         if ($appId = $request->query('prefill')) {
             $appointment = Appointment::findOrFail($appId);
 
@@ -78,7 +91,7 @@ class PatientController extends Controller
                 return [
                     'id' => $bed->id,
                     'bed_code' => $bed->bed_code,
-                    'station_id' => $bed->room->station_id, 
+                    'station_id' => $bed->room->station_id,
                     'room_number' => $bed->room->room_number
                 ];
             });
@@ -124,8 +137,7 @@ class PatientController extends Controller
             ]);
 
             // --- 3. CREATE ADMISSION ---
-            $admissionNumberGenerator = app(AdmissionNumberGenerator::class);
-            $admNumber = $admissionNumberGenerator->generate();
+            $admNumber = $this->admissionNumberGenerator->generate();
 
             $admission = Admission::create([
                 'patient_id' => $patient->id,
@@ -161,8 +173,7 @@ class PatientController extends Controller
                 $bed->update(['status' => 'Occupied']);
 
                 $bed->load('room');
-                $movementService = app(PatientMovementService::class);
-                $movementService->createInitialMovement($admission, $bed);
+                $this->patientMovementService->createInitialMovement($admission, $bed);
             }
 
             // --- 4. CREATE BILLING INFO ---
@@ -178,8 +189,7 @@ class PatientController extends Controller
             ]);
 
             // Handle file uploads using the service
-            $patientFileService = app(PatientFileService::class);
-            $patientFileService->uploadFromRequest($request, $patient->id, $admission->id);
+            $this->patientFileService->uploadFromRequest($request, $patient->id, $admission->id);
 
             DB::commit();
 
@@ -198,7 +208,7 @@ class PatientController extends Controller
     public function show($id)
     {
         $patient = Patient::findOrFail($id);
-        
+
         $admissions = $patient->admissions()
             ->latest('admission_date')
             ->with('attendingPhysician')

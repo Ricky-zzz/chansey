@@ -108,7 +108,8 @@ class WardController extends Controller
             ->toArray();
 
         return view(
-            'nurse.clinical.ward.show',compact(
+            'nurse.clinical.ward.show',
+            compact(
                 'admission',
                 'activeOrders',
                 'latestLog',
