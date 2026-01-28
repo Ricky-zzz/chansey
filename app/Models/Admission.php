@@ -25,12 +25,7 @@ class Admission extends Model
         'chief_complaint',
         'initial_diagnosis',
         'mode_of_arrival',
-        'temp',
-        'bp_systolic',
-        'bp_diastolic',
-        'pulse_rate',
-        'respiratory_rate',
-        'o2_sat',
+        'initial_vitals',
         'known_allergies',
     ];
 
@@ -38,6 +33,7 @@ class Admission extends Model
         'admission_date' => 'datetime',
         'discharge_date' => 'datetime',
         'known_allergies' => 'array',
+        'initial_vitals' => 'array',
     ];
 
     // --- RELATIONSHIPS ---
@@ -122,5 +118,35 @@ class Admission extends Model
     public function truncatedChiefComplaint(int $limit = 20): string
     {
         return Str::limit($this->chief_complaint, $limit, '...');
+    }
+    
+    // BMI Calculation
+    public function getBmiAttribute()
+    {
+        $vitals = $this->initial_vitals;
+
+        if (empty($vitals['height']) || empty($vitals['weight'])) {
+            return 'N/A';
+        }
+
+        $h_meters = $vitals['height'] / 100; 
+        $w_kg = $vitals['weight'];
+
+        if ($h_meters <= 0) return 'N/A';
+
+        $bmi = $w_kg / ($h_meters * $h_meters);
+
+        return number_format($bmi, 2);
+    }
+
+    public function getBmiCategoryAttribute()
+    {
+        $bmi = $this->bmi;
+        if ($bmi === 'N/A') return '';
+
+        if ($bmi < 18.5) return '(Underweight)';
+        if ($bmi < 25) return '(Normal)';
+        if ($bmi < 30) return '(Overweight)';
+        return '(Obese)';
     }
 }

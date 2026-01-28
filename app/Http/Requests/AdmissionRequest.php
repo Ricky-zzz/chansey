@@ -32,20 +32,14 @@ class AdmissionRequest extends FormRequest
             'o2_sat' => 'nullable|integer',
             'known_allergies' => 'nullable|array',
 
-            // Financials
-            'payment_type' => 'required|string',
-            'primary_insurance_provider' => 'nullable|string',
-            'policy_number' => 'nullable|string',
-            'approval_code' => 'nullable|string',
-            'guarantor_name' => 'nullable|string',
-            'guarantor_relationship' => 'nullable|string',
-            'guarantor_contact' => 'nullable|string',
 
             'doc_valid_id' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_loa' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_consent' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_privacy' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_mdr' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+
+            
         ];
 
         if ($this->isMethod('post')) {

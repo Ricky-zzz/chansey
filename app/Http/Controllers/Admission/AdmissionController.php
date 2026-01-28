@@ -129,7 +129,6 @@ class AdmissionController extends Controller
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            // ONLY CREATE BED ASSIGNMENT IF THERE IS A BED
             if ($admission->bed_id) {
                 $bed = Bed::with('room')->findOrFail($admission->bed_id);
                 $bed->update(['status' => 'Occupied']);
@@ -140,13 +139,7 @@ class AdmissionController extends Controller
 
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
-                'payment_type' => $data['payment_type'] ?? null,
-                'primary_insurance_provider' => $data['primary_insurance_provider'] ?? null,
-                'policy_number' => $data['policy_number'] ?? null,
-                'approval_code' => $data['approval_code'] ?? null,
-                'guarantor_name' => $data['guarantor_name'] ?? null,
-                'guarantor_relationship' => $data['guarantor_relationship'] ?? null,
-                'guarantor_contact' => $data['guarantor_contact'] ?? null,
+                'payment_type' => 'Cash',
             ]);
 
             DB::commit();
@@ -204,19 +197,7 @@ class AdmissionController extends Controller
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 
-            if ($admission->billingInfo) {
-                $admission->billingInfo->update([
-                    'payment_type' => $data['payment_type'],
-                    'primary_insurance_provider' => $data['primary_insurance_provider'] ?? null,
-                    'policy_number' => $data['policy_number'] ?? null,
-                    'approval_code' => $data['approval_code'] ?? null,
-                    'guarantor_name' => $data['guarantor_name'] ?? null,
-                    'guarantor_relationship' => $data['guarantor_relationship'] ?? null,
-                    'guarantor_contact' => $data['guarantor_contact'] ?? null,
-                ]);
-            }
 
-            // Handle file updates using the service
             $patientFileService = app(PatientFileService::class);
             $patientFileService->updateFromRequest($request, $admission->patient_id, $admission->id);
 

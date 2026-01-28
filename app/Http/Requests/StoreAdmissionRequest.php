@@ -64,14 +64,6 @@ class StoreAdmissionRequest extends FormRequest
             'o2_sat' => 'nullable|integer',
             'known_allergies' => 'nullable|array',
 
-            // G. Financials
-            'payment_type' => 'required|string',
-            'primary_insurance_provider' => 'nullable|string',
-            'policy_number' => 'nullable|string',
-            'approval_code' => 'nullable|string',
-            'guarantor_name' => 'nullable|string',
-            'guarantor_relationship' => 'nullable|string',
-            'guarantor_contact' => 'nullable|string',
 
             // H. Files
             'doc_valid_id' => 'nullable|file|mimes:jpg,png,pdf|max:5120',

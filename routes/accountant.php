@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Accountant\DashboardController;
 use \App\Http\Controllers\Accountant\BillingController;
-
+use \App\Http\Controllers\Accountant\HospitalFeeController;
+use \App\Http\Controllers\Accountant\BillingInfoController;
 use Illuminate\Support\Facades\Route;
 
 //  Accounting and billing routes
@@ -11,8 +12,12 @@ Route::middleware(['auth'])->prefix('accountant')->name('accountant.')->group(fu
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/history', [DashboardController::class, 'history'])->name('history');
 
+    Route::get('/billingInfo', [BillingInfoController::class, 'index'])->name('billinginfo.index');
+    Route::get('/billingInfo/{admission}', [BillingInfoController::class, 'show'])->name('billinginfo.show');
+    Route::put('/billingInfo/{admission}', [BillingInfoController::class, 'update'])->name('billinginfo.update');
 
-    Route::resource('/fees', \App\Http\Controllers\Accountant\HospitalFeeController::class)
+
+    Route::resource('/fees', HospitalFeeController::class)
         ->names('fees')
         ->except(['create', 'show', 'edit']);
 

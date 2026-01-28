@@ -65,7 +65,7 @@
                         <select name="attending_physician_id" class="select select-bordered w-full">
                             @foreach($physicians as $doc)
                             <option value="{{ $doc->id }}" {{ old('attending_physician_id', $admission->attending_physician_id) == $doc->id ? 'selected' : '' }}>
-                                Dr. {{ $doc->last_name }} ({{ $doc->specialization }})
+                                Dr. {{ $doc->getFullNameAttribute() }}
                             </option>
                             @endforeach
                         </select>
@@ -175,60 +175,7 @@
             </div>
         </div>
 
-        <!-- ACCORDION 3: FINANCIALS -->
-        <div class="collapse collapse-arrow bg-base-100 border border-base-200 shadow-sm mb-4">
-            <input type="checkbox" name="accordion-3" />
-            <div class="collapse-title text-xl font-bold text-neutral">
-                Financial Information
-            </div>
-            <div class="collapse-content">
-                <div class="pt-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>Payment Type</span>
-                            <select name="payment_type" class="select select-bordered w-full">
-                                @foreach(['Cash', 'Insurance', 'HMO', 'Company'] as $ptype)
-                                <option value="{{ $ptype }}" {{ old('payment_type', $admission->billingInfo->payment_type ?? '') == $ptype ? 'selected' : '' }}>
-                                    {{ $ptype }}
-                                </option>
-                                @endforeach
-                            </select>
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Insurance Provider</span>
-                            <input type="text" name="primary_insurance_provider " value="{{ old('primary_insurance_provider ', $admission->billingInfo->primary_insurance_provider  ?? '') }}" class="input input-bordered input-md w-full" placeholder="Insurance Provider" />
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Policy Number</span>
-                            <input type="text" name="policy_number" value="{{ old('policy_number', $admission->billingInfo->policy_number ?? '') }}" class="input input-bordered input-md w-full" placeholder="Policy Number" />
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Approval Code</span>
-                            <input type="text" name="approval_code" value="{{ old('approval_code', $admission->billingInfo->approval_code ?? '') }}" class="input input-bordered input-md w-full" placeholder="Approval Code" />
-                        </label>
-                    </div>
-
-                    <div class="divider">Guarantor</div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <label class="floating-label w-full">
-                            <span>Guarantor Name</span>
-                            <input type="text" name="guarantor_name" value="{{ old('guarantor_name', $admission->billingInfo->guarantor_name ?? '') }}" class="input input-bordered input-md w-full" placeholder="Full Name" />
-                        </label>
-                        <label class="floating-label w-full">
-                            <span>Relationship</span>
-                            <input type="text" name="guarantor_relationship" value="{{ old('guarantor_relationship', $admission->billingInfo->guarantor_relationship ?? '') }}" class="input input-bordered input-md w-full" placeholder="Relationship" />
-                        </label>
-                        <label class="floating-label w-full md:col-span-2">
-                            <span>Contact Number</span>
-                            <input type="text" name="guarantor_contact" value="{{ old('guarantor_contact', $admission->billingInfo->guarantor_contact ?? '') }}" class="input input-bordered input-md w-full" placeholder="Contact Number" />
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ACCORDION 4: DOCUMENTS -->
+        <!-- ACCORDION 3: DOCUMENTS -->
         <div class="collapse collapse-arrow bg-base-100 border border-base-200 shadow-sm mb-8">
             <input type="checkbox" name="accordion-4" />
             <div class="collapse-title text-xl font-bold text-neutral">

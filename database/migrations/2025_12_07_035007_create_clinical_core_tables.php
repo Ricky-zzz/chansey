@@ -78,13 +78,7 @@ return new class extends Migration
             // CHANGED: Enum -> String
             $table->string('mode_of_arrival'); 
             
-            // Entry Vitals (Snapshot)
-            $table->decimal('temp', 4, 1)->nullable();
-            $table->integer('bp_systolic')->nullable();
-            $table->integer('bp_diastolic')->nullable();
-            $table->integer('pulse_rate')->nullable();
-            $table->integer('respiratory_rate')->nullable();
-            $table->integer('o2_sat')->nullable();
+            $table->json('initial_vitals')->nullable(); // Stores: BP, Temp, PR, RR, O2, Height, Weight
             
             $table->json('known_allergies')->nullable(); 
             
@@ -96,8 +90,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('admission_id')->constrained()->cascadeOnDelete();
             
-            // CHANGED: Enum -> String
-            $table->string('payment_type'); // Cash, Insurance...
+        
+            $table->string('payment_type')->default('Cash'); 
             
             // Insurance / HMO Details
             $table->string('primary_insurance_provider')->nullable(); 

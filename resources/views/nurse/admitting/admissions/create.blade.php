@@ -46,18 +46,23 @@
 }'">
     <!-- DISPLAY ALL VALIDATION ERRORS -->
     @if ($errors->any())
-    <div class="alert alert-error mb-6">
+    <div class="alert alert-error mb-6 shadow-lg" x-data="{ show: true }" x-show="show" @click.outside="show = false">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div>
             <h3 class="font-bold">Validation Errors:</h3>
-            <ul class="list-disc list-inside">
+            <ul class="list-disc list-inside text-sm mt-2">
                 @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
+        <button @click="show = false" class="btn btn-sm btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
     @endif
 
@@ -86,9 +91,8 @@
 <div class=" mb-8">
     <ul class="steps w-full">
         <li class="step" :class="step >= 1 ? 'step-primary' : ''">Clinical Admission</li>
-        <li class="step" :class="step >= 2 ? 'step-primary' : ''">Billing</li>
-        <li class="step" :class="step >= 3 ? 'step-primary' : ''">Documents</li>
-        <li class="step" :class="step >= 4 ? 'step-primary' : ''">Review & Submit</li>
+        <li class="step" :class="step >= 2 ? 'step-primary' : ''">Documents</li>
+        <li class="step" :class="step >= 3 ? 'step-primary' : ''">Review & Submit</li>
     </ul>
 </div>
 
@@ -137,71 +141,89 @@
                         <!-- 1. SELECT STATION (The Filter Trigger) -->
                         <label class="floating-label w-full">
                             <span>Nursing Station / Ward</span>
-                            <select name="station_id" data-step="1" x-model="selectedStation" class="select select-bordered w-full" required>
+                            <select name="station_id" data-step="1" x-model="selectedStation" class="select select-bordered w-full @error('station_id') select-error @enderror" required>
                                 <option value="" disabled selected>Select Station First</option>
                                 <template x-for="station in stations" :key="station.id">
-                                    <option :value="station.id" x-text="station.station_name"></option>
+                                    <option :value="station.id" :selected="'{{ old('station_id') }}' == station.id" x-text="station.station_name"></option>
                                 </template>
                             </select>
+                            @error('station_id')
+                                <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                            @enderror
                         </label>
 
                         <!-- 2. SELECT BED (Filtered Results) -->
                         <label class="floating-label w-full" :hidden="admissionType === 'Outpatient'">
                             <span>Room and Bed Assignment</span>
-                            <select name="bed_id" data-step="1" class="select select-bordered w-full" :disabled="!selectedStation">
+                            <select name="bed_id" data-step="1" class="select select-bordered w-full @error('bed_id') select-error @enderror" :disabled="!selectedStation">
                                 <option value="" disabled selected x-text="selectedStation ? 'Select Available Bed' : 'Please Select Station First'"></option>
 
                                 <template x-for="bed in filteredBeds" :key="bed.id">
-                                    <option :value="bed.id" x-text="bed.bed_code + ' (Room ' + bed.room_number + ')'"></option>
+                                    <option :value="bed.id" :selected="'{{ old('bed_id') }}' == bed.id" x-text="bed.bed_code + ' (Room ' + bed.room_number + ')'"></option>
                                 </template>
 
                                 <option disabled x-show="selectedStation && filteredBeds.length === 0">
                                     No beds available in this station
                                 </option>
                             </select>
+                            @error('bed_id')
+                                <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                            @enderror
                         </label>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
                             <label class="floating-label w-full">
                                 <span>Admission Type</span>
-                                <select name="admission_type" data-step="1" x-model="admissionType" class="select select-bordered w-full" required>
+                                <select name="admission_type" data-step="1" x-model="admissionType" class="select select-bordered w-full @error('admission_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Admission Type</option>
-                                    <option value="Emergency">Emergency</option>
-                                    <option value="Outpatient">Outpatient</option>
-                                    <option value="Inpatient">Inpatient</option>
-                                    <option value="Transfer">Transfer</option>
+                                    <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
+                                    <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient</option>
+                                    <option value="Inpatient" {{ old('admission_type') == 'Inpatient' ? 'selected' : '' }}>Inpatient</option>
+                                    <option value="Transfer" {{ old('admission_type') == 'Transfer' ? 'selected' : '' }}>Transfer</option>
                                 </select>
+                                @error('admission_type')
+                                    <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                                @enderror
                             </label>
 
                             <label class="floating-label w-full">
                                 <span>Attending Physician</span>
-                                <select name="attending_physician_id" data-step="1" class="select select-bordered w-full" required>
+                                <select name="attending_physician_id" data-step="1" class="select select-bordered w-full @error('attending_physician_id') select-error @enderror" required>
                                     <option value="">Select an Attending Physician</option>
                                     @foreach($physicians as $doc)
-                                    <option value="{{ $doc->id }}">Dr. {{ $doc->getFullNameAttribute() }}</option>
+                                    <option value="{{ $doc->id }}" {{ old('attending_physician_id') == $doc->id ? 'selected' : '' }}>Dr. {{ $doc->getFullNameAttribute() }}</option>
                                     @endforeach
                                 </select>
+                                @error('attending_physician_id')
+                                    <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                                @enderror
                             </label>
 
                             <label class="floating-label w-full">
                                 <span>Case Type</span>
-                                <select name="case_type" data-step="1" class="select select-bordered w-full" required>
+                                <select name="case_type" data-step="1" class="select select-bordered w-full @error('case_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Case Type</option>
-                                    <option value="New Case">New Case</option>
-                                    <option value="Returning">Returning</option>
-                                    <option value="Follow-up">Follow-up</option>
+                                    <option value="New Case" {{ old('case_type') == 'New Case' ? 'selected' : '' }}>New Case</option>
+                                    <option value="Returning" {{ old('case_type') == 'Returning' ? 'selected' : '' }}>Returning</option>
+                                    <option value="Follow-up" {{ old('case_type') == 'Follow-up' ? 'selected' : '' }}>Follow-up</option>
                                 </select>
+                                @error('case_type')
+                                    <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                                @enderror
                             </label>
 
                             <label class="floating-label w-full">
                                 <span>Mode of Arrival</span>
-                                <select name="mode_of_arrival" data-step="1" class="select select-bordered w-full" required>
+                                <select name="mode_of_arrival" data-step="1" class="select select-bordered w-full @error('mode_of_arrival') select-error @enderror" required>
                                     <option value="" disabled selected>Select Mode of Arrival</option>
-                                    <option value="Walk-in">Walk-in</option>
-                                    <option value="Ambulance">Ambulance</option>
-                                    <option value="Wheelchair">Wheelchair</option>
-                                    <option value="Stretcher">Stretcher</option>
+                                    <option value="Walk-in" {{ old('mode_of_arrival') == 'Walk-in' ? 'selected' : '' }}>Walk-in</option>
+                                    <option value="Ambulance" {{ old('mode_of_arrival') == 'Ambulance' ? 'selected' : '' }}>Ambulance</option>
+                                    <option value="Wheelchair" {{ old('mode_of_arrival') == 'Wheelchair' ? 'selected' : '' }}>Wheelchair</option>
+                                    <option value="Stretcher" {{ old('mode_of_arrival') == 'Stretcher' ? 'selected' : '' }}>Stretcher</option>
                                 </select>
+                                @error('mode_of_arrival')
+                                    <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                                @enderror
                             </label>
                         </div>
                 </fieldset>
@@ -215,12 +237,18 @@
                     <div class="grid grid-cols-1 gap-6">
                         <label class="floating-label w-full">
                             <span>Chief Complaint</span>
-                            <textarea name="chief_complaint" data-step="1" class="textarea textarea-bordered w-full" placeholder="Describe the patient's primary complaint" required></textarea>
+                            <textarea name="chief_complaint" data-step="1" class="textarea textarea-bordered w-full @error('chief_complaint') textarea-error @enderror" placeholder="Describe the patient's primary complaint" required>{{ old('chief_complaint') }}</textarea>
+                            @error('chief_complaint')
+                                <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                            @enderror
                         </label>
 
                         <label class="floating-label w-full">
                             <span>Initial Diagnosis</span>
-                            <textarea name="initial_diagnosis" class="textarea textarea-bordered w-full" placeholder="Initial medical impression or suspected diagnosis"></textarea>
+                            <textarea name="initial_diagnosis" class="textarea textarea-bordered w-full @error('initial_diagnosis') textarea-error @enderror" placeholder="Initial medical impression or suspected diagnosis">{{ old('initial_diagnosis') }}</textarea>
+                            @error('initial_diagnosis')
+                                <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
+                            @enderror
                         </label>
                     </div>
                 </fieldset>
@@ -337,103 +365,8 @@
     </div>
 
 
-    <!-- STEP 2: BILLING -->
-    <div x-show="step === 2" class="animate-fade-in w-full max-w-5xl mx-auto" style="display: none;">
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body p-8">
-
-                <!-- MAIN TITLE -->
-                <h3 class="card-title text-3xl font-bold text-primary justify-center mb-8 border-b pb-4">
-                    Financial Information
-                </h3>
-
-                <!-- 1. PAYMENT DETAILS -->
-                <fieldset class="mb-8">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Payment Details
-                    </legend>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <!-- Payment Type -->
-                        <label class="floating-label w-full">
-                            <span>Payment Type</span>
-                            <select name="payment_type" data-step="2" class="select select-bordered w-full" required>
-                                <option value="" disabled selected>Select Payment Type</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Insurance">Insurance</option>
-                                <option value="HMO">HMO</option>
-                                <option value="Company">Company</option>
-                            </select>
-                        </label>
-
-                        <!-- Insurance Provider -->
-                        <label class="floating-label w-full">
-                            <span>Insurance Provider</span>
-                            <input type="text" name="primary_insurance_provider"
-                                class="input input-md w-full"
-                                placeholder="Insurance Provider(If applicable)">
-                        </label>
-
-                        <!-- Policy Number -->
-                        <label class="floating-label w-full">
-                            <span>Policy Number</span>
-                            <input type="text" name="policy_number"
-                                class="input input-md w-full"
-                                placeholder="Insurance Policy Number">
-                        </label>
-
-                        <!-- Approval Code -->
-                        <label class="floating-label w-full">
-                            <span>Approval Code</span>
-                            <input type="text" name="approval_code"
-                                class="input input-md w-full"
-                                placeholder="Authorization / Approval Code">
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- 2. GUARANTOR DETAILS -->
-                <fieldset class="mb-2">
-                    <legend class="text-lg font-bold text-center w-full text-slate-500 uppercase tracking-wide mb-6">
-                        Guarantor Information
-                    </legend>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <!-- Guarantor Name -->
-                        <label class="floating-label w-full">
-                            <span>Guarantor Name</span>
-                            <input type="text" name="guarantor_name"
-                                class="input input-md w-full"
-                                placeholder="Full Name of Guarantor">
-                        </label>
-
-                        <!-- Guarantor Relationship -->
-                        <label class="floating-label w-full">
-                            <span>Guarantor Relationship</span>
-                            <input type="text" name="guarantor_relationship"
-                                class="input input-md w-full"
-                                placeholder="Relation e.g. Parent, Spouse, Guardian">
-                        </label>
-
-                        <!-- Contact -->
-                        <label class="floating-label w-full md:col-span-2">
-                            <span>Guarantor Contact Number</span>
-                            <input type="text" name="guarantor_contact"
-                                class="input input-md w-full"
-                                placeholder="Contact Number of Guarantor">
-                        </label>
-
-                    </div>
-                </fieldset>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- STEP 3: DOCUMENTS -->
-    <div x-show="step === 3" style="display: none;">
+    <!-- STEP 2: DOCUMENTS -->
+    <div x-show="step === 2" style="display: none;">
         <div class="card bg-base-100 shadow border">
             <div class="card-body">
                 <h3 class="card-title text-primary">Required Documents</h3>
@@ -478,8 +411,8 @@
     </div>
 
 
-    <!-- STEP 4: REVIEW -->
-    <div x-show="step === 4" style="display: none;">
+    <!-- STEP 3: REVIEW -->
+    <div x-show="step === 3" style="display: none;">
         <div class="card bg-base-100 shadow border">
             <div class="card-body">
                 <div class="alert alert-warning">
@@ -504,14 +437,14 @@
 
         <!-- Next Button -->
         <button type="button" class="btn btn-primary text-white"
-            x-show="step < 4"
+            x-show="step < 3"
             @click="validateAndNext()">
             Next Step
         </button>
 
         <!-- Final Submit Button -->
         <button type="submit" class="btn btn-error"
-            x-show="step === 4">
+            x-show="step === 3">
             Confirm & Admit Patient
         </button>
     </div>

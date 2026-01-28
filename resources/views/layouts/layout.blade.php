@@ -39,9 +39,9 @@
 
     @if (session('error'))
     <div class="toast toast-top toast-end z-50" x-data="{ show: true }" x-show="show">
-        <div class="alert alert-error gap-3 shadow-lg text-white" @click.outside="show = false">
+        <div class="alert alert-error gap-3 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2" @click.outside="show = false">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m8-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
                 <span class="font-medium">Error!</span> {{ session('error') }}
@@ -52,6 +52,27 @@
                 </svg>
             </button>
         </div>
+    </div>
+    @endif
+    <!-- SERVER VALIDATION ERRORS DISPLAY -->
+    @if ($errors->any())
+    <div class="alert alert-error mb-6 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2" x-data="{ show: true }" x-show="show" @click.outside="show = false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+            <h3 class="font-bold">Validation Error</h3>
+            <ul class="text-sm mt-2">
+                @foreach ($errors->all() as $error)
+                <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        <button @click="show = false" class="btn btn-sm btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
     @endif
     <div class="drawer lg:drawer-open">

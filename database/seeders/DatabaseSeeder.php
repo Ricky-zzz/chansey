@@ -10,14 +10,14 @@ use App\Models\Nurse;
 use App\Models\GeneralService;
 use App\Models\Physician;
 use App\Models\Pharmacist; // Make sure this model exists
-use App\Models\Accountant; // Make sure this model exists
+use App\Models\Accountant; 
 use App\Models\Station;
 use App\Models\Room;
 use App\Models\Bed;
-use App\Models\Department; // New
-use App\Models\Medicine;   // New
-use App\Models\InventoryItem; // New
-use App\Models\HospitalFee; // New
+use App\Models\Department; 
+use App\Models\Medicine;   
+use App\Models\InventoryItem;
+use App\Models\HospitalFee; 
 
 class DatabaseSeeder extends Seeder
 {
@@ -167,7 +167,7 @@ class DatabaseSeeder extends Seeder
         // 7. INFRASTRUCTURE & Clinical Nurse Link
         // ==========================================
         $wings = [
-            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'], // ID 1
+            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'], 
             ['name' => 'East Wing',  'code' => 'EW', 'floor' => '1st Floor'],
             ['name' => 'West Wing',  'code' => 'WW', 'floor' => '2nd Floor'],
             ['name' => 'South Wing', 'code' => 'SW', 'floor' => '2nd Floor'],
@@ -191,7 +191,7 @@ class DatabaseSeeder extends Seeder
                 'room_number' => $roomNum,
                 'room_type' => 'Ward',
                 'capacity' => 4,
-                'price_per_night' => 1500.00, // Added Price
+                'price_per_night' => 1500.00, 
                 'status' => 'Active',
             ]);
 

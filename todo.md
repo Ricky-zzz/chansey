@@ -5,7 +5,7 @@ I recommend the **"Clean, Build, Add"** strategy.
 ### 1. The Quick Win: Refactor Billing (Admission Wizard)
 **Start here.**
 *   **Why?** It is mostly **deleting code** and simplifying validation.
-*   **Benefit:** It makes testing everything else faster. Every time you test your new Appointment system, you have to go through the Admission Wizard. If you remove the 10 Billing inputs *now*, you save yourself 1 minute of typing every time you test the system for the next 3 days.
+*   **Benefit:** It makes testing everything else faster. Every time you test your new Appointment system, you have to go through the Admission Wizard. If you remove the 10 Billing inputs *now*, you save yourself 1 minute of typing every time you test the system for the next 3 Tasks.
 
 ### 2. The Heavy Lift: Refactor Appointments (Slots System)
 **Do this second (while your brain is fresh).**
@@ -22,17 +22,19 @@ I recommend the **"Clean, Build, Add"** strategy.
 
 ### Summary Checklist
 
-**Day 1 (Morning): Billing Cleanup**
-*   [ ] Remove Step 3 from Blade.
-*   [ ] Update `PatientController` to remove billing validation.
-*   [ ] Hardcode default billing values in Controller.
+**Task 1 (Morning): Billing Cleanup**
+*   [X] Remove Step 3 from Blade.
+*   [X] Update `PatientController` to remove billing validation.
+*   [X] Hardcode default billing values in Controller.
+*   [ ] update vitals in admission to use json
+*   [ ] update all controllers that use old vitals in admission 
 
-**Day 1 (Afternoon): Appointment Slots**
+**Task 2 (Afternoon): Appointment Slots**
 *   [ ] Create `appointment_slots` migration & model.
 *   [ ] Create Doctor View: "Manage Slots" (Date/Time/Capacity).
 *   [ ] Update Public Landing Page: Show available dates based on slots.
 
-**Day 2: Head Nurse & DTR**
+**Task 3: Head Nurse & DTR**
 *   [ ] Create `shift_schedules` table.
 *   [ ] Create Public Kiosk View (`/dtr`).
 *   [ ] Create "Head Nurse" Dashboard.

@@ -179,16 +179,10 @@ class PatientController extends Controller
             // --- 4. CREATE BILLING INFO ---
             AdmissionBillingInfo::create([
                 'admission_id' => $admission->id,
-                'payment_type' => $data['payment_type'] ?? null,
-                'primary_insurance_provider' => $data['primary_insurance_provider'],
-                'policy_number' => $data['policy_number'],
-                'approval_code' => $data['approval_code'],
-                'guarantor_name' => $data['guarantor_name'],
-                'guarantor_relationship' => $data['guarantor_relationship'],
-                'guarantor_contact' => $data['guarantor_contact'],
+                'payment_type' => 'Cash',
             ]);
 
-            // Handle file uploads using the service
+            // --- 5. UPLOAD PATIENT FILES ---
             $this->patientFileService->uploadFromRequest($request, $patient->id, $admission->id);
 
             DB::commit();

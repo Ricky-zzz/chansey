@@ -39,7 +39,7 @@ class PatientFileService
         int $admissionId,
         string $documentType,
         ?int $uploadedById = null,
-        string $disk = 'local'
+        string $disk = 'private'
     ): PatientFile {
         $uploadedById = $uploadedById ?? Auth::id();
         $storagePath = $this->getStoragePath($patientId, $admissionId);
@@ -76,7 +76,8 @@ class PatientFileService
         int $patientId,
         int $admissionId,
         ?array $fileMap = null,
-        bool $throwOnError = false
+        bool $throwOnError = false,
+        string $disk = 'private'
     ): array {
         $fileMap = $fileMap ?? self::DOCUMENT_TYPES;
         $uploadedFiles = [];
@@ -88,7 +89,9 @@ class PatientFileService
                         $request->file($inputName),
                         $patientId,
                         $admissionId,
-                        $docType
+                        $docType,
+                        null,
+                        $disk
                     );
                 } catch (\Exception $e) {
                     if ($throwOnError) {
@@ -117,7 +120,7 @@ class PatientFileService
         int $patientId,
         int $admissionId,
         string $documentType,
-        string $disk = 'local'
+        string $disk = 'private'
     ): PatientFile {
         $oldFile = PatientFile::where('admission_id', $admissionId)
             ->where('document_type', $documentType)
@@ -166,7 +169,7 @@ class PatientFileService
         int $patientId,
         int $admissionId,
         ?array $fileMap = null,
-        string $disk = 'local'
+        string $disk = 'private'
     ): array {
         $fileMap = $fileMap ?? self::DOCUMENT_TYPES;
         $updatedFiles = [];
@@ -197,7 +200,7 @@ class PatientFileService
      * @param string $disk
      * @return bool
      */
-    public function deleteFile(PatientFile $patientFile, string $disk = 'local'): bool
+    public function deleteFile(PatientFile $patientFile, string $disk = 'private'): bool
     {
         if (Storage::disk($disk)->exists($patientFile->file_path)) {
             Storage::disk($disk)->delete($patientFile->file_path);
@@ -263,7 +266,7 @@ class PatientFileService
         int $sourceAdmissionId,
         int $targetAdmissionId,
         int $targetPatientId,
-        string $disk = 'local'
+        string $disk = 'private'
     ): array {
         $sourceFiles = PatientFile::where('admission_id', $sourceAdmissionId)->get();
         $copiedFiles = [];
