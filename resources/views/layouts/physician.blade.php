@@ -80,6 +80,8 @@
         <!-- SIDEBAR -->
         <x-physidebar />
     </div>
+
+    @stack('scripts')
 </body>
 
 </html>

@@ -84,7 +84,7 @@
                             @if($log->type === 'Medication')
                                 Given: <strong>{{ $log->data['medicine'] ?? 'Unknown' }}</strong> ({{ $log->data['dosage'] ?? '--' }})
                             @elseif($log->type === 'Vitals')
-                                BP: {{ $log->data['bp_systolic'] }}/{{ $log->data['bp_diastolic'] }} | T: {{ $log->data['temp'] }}
+                                BP: {{ $log->data['bp'] ?? '--' }} | T: {{ $log->data['temp'] ?? '--' }}°C
                             @elseif($log->type === 'Laboratory')
                                 Uploaded: <strong>{{ $log->data['note'] ?? 'Lab Result' }}</strong>
                                 @if($log->labResultFile)

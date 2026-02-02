@@ -418,28 +418,33 @@
                         </label>
 
                         <label class="floating-label w-full">
-                            <span>Systolic Blood Pressure</span>
-                            <input type="number" name="bp_systolic" class="input input-md w-full" placeholder="Systolic Blood Pressure e.g. 120">
+                            <span>Blood Pressure (e.g. 120/80)</span>
+                            <input type="text" name="bp" class="input input-md w-full" placeholder="e.g. 120/80">
                         </label>
 
                         <label class="floating-label w-full">
-                            <span>Diastolic Blood Pressure</span>
-                            <input type="number" name="bp_diastolic" class="input input-md w-full" placeholder="Diastolic Blood Pressure e.g. 80">
+                            <span>Heart Rate (bpm)</span>
+                            <input type="number" name="hr" class="input input-md w-full" placeholder="Heart Rate (bpm)">
                         </label>
 
                         <label class="floating-label w-full">
                             <span>Pulse Rate (bpm)</span>
-                            <input type="number" name="pulse_rate" class="input input-md w-full" placeholder="Pulse Rate (bpm)">
-                        </label>
-
-                        <label class="floating-label w-full">
-                            <span>Respiratory Rate (breaths/min)</span>
-                            <input type="number" name="respiratory_rate" class="input input-md w-full" placeholder="Respiratory Rate">
+                            <input type="number" name="pr" class="input input-md w-full" placeholder="Pulse Rate">
                         </label>
 
                         <label class="floating-label w-full">
                             <span>Oxygen Saturation (%)</span>
-                            <input type="number" name="o2_sat" class="input input-md w-full" placeholder="Oxygen Saturation">
+                            <input type="number" name="o2" class="input input-md w-full" placeholder="Oxygen Saturation">
+                        </label>
+
+                        <label class="floating-label w-full">
+                            <span>Height (cm)</span>
+                            <input type="number" step="0.1" name="height" class="input input-md w-full" placeholder="Height in cm">
+                        </label>
+
+                        <label class="floating-label w-full">
+                            <span>Weight (kg)</span>
+                            <input type="number" step="0.1" name="weight" class="input input-md w-full" placeholder="Weight in kg">
                         </label>
                     </div>
                 </fieldset>

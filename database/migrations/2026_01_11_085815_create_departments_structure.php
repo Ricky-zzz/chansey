@@ -24,7 +24,6 @@ public function up(): void
     });
 
     Schema::table('appointments', function (Blueprint $table) {
-        $table->dropColumn('department'); 
         $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
     });
 }

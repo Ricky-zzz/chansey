@@ -40,12 +40,11 @@ class ClinicalLogController extends Controller
             DB::beginTransaction();
 
             $vitalsData = [
-                'bp_systolic' => $request->bp_systolic,
-                'bp_diastolic' => $request->bp_diastolic,
+                'bp' => $request->bp,
                 'temp' => $request->temp,
-                'hr' => $request->heart_rate,
-                'rr' => $request->respiratory_rate,
-                'o2' => $request->o2_sat,
+                'hr' => $request->hr,
+                'pr' => $request->pr,
+                'o2' => $request->o2,
             ];
 
             $logData = array_filter($vitalsData, fn($value) => !is_null($value) && $value !== '');

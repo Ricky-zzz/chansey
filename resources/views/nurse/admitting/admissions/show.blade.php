@@ -106,23 +106,23 @@
                     <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
                         <div class="p-2 bg-slate-50 rounded-lg">
                             <div class="text-xs text-slate-500">Temp</div>
-                            <div class="font-bold text-lg">{{ $admission->temp ?? '--' }}°C</div>
+                            <div class="font-bold text-lg">{{ $admission->initial_vitals['temp'] ?? '--' }}°C</div>
                         </div>
                         <div class="p-2 bg-slate-50 rounded-lg">
                             <div class="text-xs text-slate-500">BP</div>
-                            <div class="font-bold text-lg">{{ $admission->bp_systolic }}/{{ $admission->bp_diastolic }}</div>
+                            <div class="font-bold text-lg">{{ $admission->initial_vitals['bp'] ?? '--' }}</div>
                         </div>
                         <div class="p-2 bg-slate-50 rounded-lg">
-                            <div class="text-xs text-slate-500">Pulse</div>
-                            <div class="font-bold text-lg">{{ $admission->pulse_rate ?? '--' }}</div>
+                            <div class="text-xs text-slate-500">HR</div>
+                            <div class="font-bold text-lg">{{ $admission->initial_vitals['hr'] ?? '--' }}</div>
                         </div>
                         <div class="p-2 bg-slate-50 rounded-lg">
-                            <div class="text-xs text-slate-500">Resp</div>
-                            <div class="font-bold text-lg">{{ $admission->respiratory_rate ?? '--' }}</div>
+                            <div class="text-xs text-slate-500">PR</div>
+                            <div class="font-bold text-lg">{{ $admission->initial_vitals['pr'] ?? '--' }}</div>
                         </div>
                         <div class="p-2 bg-slate-50 rounded-lg">
                             <div class="text-xs text-slate-500">O2 Sat</div>
-                            <div class="font-bold text-lg text-primary">{{ $admission->o2_sat ?? '--' }}%</div>
+                            <div class="font-bold text-lg text-primary">{{ $admission->initial_vitals['o2'] ?? '--' }}%</div>
                         </div>
                     </div>
                 </div>

@@ -4,14 +4,26 @@ use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Public\AppointmentRequestController;
+use App\Http\Controllers\Public\DoctorController;
 
 
 // Landing Page
 Route::get('/', [AppointmentRequestController::class, 'create'])->name('welcome');
 
-// Public Action
-Route::post('/appointment/request', [AppointmentRequestController::class, 'store'])
-    ->name('public.appointment.store');
+// Public Booking Flow
+Route::prefix('book')->name('public.')->group(function () {
+    // Step 1: View doctors in a department
+    Route::get('/department/{id}/doctors', [DoctorController::class, 'index'])->name('doctors.index');
+    
+    // Step 2: View available slots for a doctor
+    Route::get('/doctor/{id}', [DoctorController::class, 'book'])->name('doctors.book');
+    
+    // Step 3: Submit booking
+    Route::post('/appointment', [AppointmentRequestController::class, 'store'])->name('appointment.store');
+    
+    // Step 4: Booking success page
+    Route::get('/success/{id}', [AppointmentRequestController::class, 'success'])->name('booking.success');
+});
 
 // AUTH
 Route::get('/dashboard', function () {

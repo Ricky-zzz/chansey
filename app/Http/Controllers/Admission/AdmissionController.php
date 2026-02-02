@@ -118,13 +118,16 @@ class AdmissionController extends Controller
                 'chief_complaint' => $data['chief_complaint'],
                 'initial_diagnosis' => $data['initial_diagnosis'] ?? null,
 
-                // Vitals
-                'temp' => $data['temp'] ?? null,
-                'bp_systolic' => $data['bp_systolic'] ?? null,
-                'bp_diastolic' => $data['bp_diastolic'] ?? null,
-                'pulse_rate' => $data['pulse_rate'] ?? null,
-                'respiratory_rate' => $data['respiratory_rate'] ?? null,
-                'o2_sat' => $data['o2_sat'] ?? null,
+                // Vitals - stored as JSON
+                'initial_vitals' => [
+                    'bp' => $data['bp'] ?? null,
+                    'temp' => $data['temp'] ?? null,
+                    'hr' => $data['hr'] ?? null,
+                    'pr' => $data['pr'] ?? null,
+                    'o2' => $data['o2'] ?? null,
+                    'height' => $data['height'] ?? null,
+                    'weight' => $data['weight'] ?? null,
+                ],
 
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
@@ -188,12 +191,15 @@ class AdmissionController extends Controller
                 'mode_of_arrival' => $data['mode_of_arrival'],
                 'chief_complaint' => $data['chief_complaint'] ?? null,
                 'initial_diagnosis' => $data['initial_diagnosis'] ?? null,
-                'temp' => $data['temp'] ?? null,
-                'bp_systolic' => $data['bp_systolic'] ?? null,
-                'bp_diastolic' => $data['bp_diastolic'] ?? null,
-                'pulse_rate' => $data['pulse_rate'] ?? null,
-                'respiratory_rate' => $data['respiratory_rate'] ?? null,
-                'o2_sat' => $data['o2_sat'] ?? null,
+                'initial_vitals' => [
+                    'bp' => $data['bp'] ?? null,
+                    'temp' => $data['temp'] ?? null,
+                    'hr' => $data['hr'] ?? null,
+                    'pr' => $data['pr'] ?? null,
+                    'o2' => $data['o2'] ?? null,
+                    'height' => $data['height'] ?? null,
+                    'weight' => $data['weight'] ?? null,
+                ],
                 'known_allergies' => $data['known_allergies'] ?? [],
             ]);
 

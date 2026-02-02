@@ -77,17 +77,17 @@ class WardController extends Controller
         $clinicalLogs = $clinicalLogsQuery->paginate(10);
 
         $vitals = null;
-        if ($latestLog && isset($latestLog->data['bp_systolic'])) {
+        if ($latestLog && isset($latestLog->data['bp'])) {
             $vitals = $latestLog->data;
         } else {
-            $vitals = [
-                'bp_systolic' => $admission->bp_systolic,
-                'bp_diastolic' => $admission->bp_diastolic,
-                'temp' => $admission->temp,
-                'hr' => $admission->pulse_rate,
-                'o2' => $admission->o2_sat,
-                'recorded_at' => $admission->admission_date,
+            $vitals = $admission->initial_vitals ?? [
+                'bp'   => null,
+                'temp' => null,
+                'hr'   => null,
+                'pr'   => null,
+                'o2'   => null,
             ];
+            $vitals['recorded_at'] = $admission->admission_date;
         }
 
         $supplies = InventoryItem::where('quantity', '>', 0)->get();

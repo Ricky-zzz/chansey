@@ -212,13 +212,13 @@
                         <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Current Vitals</h3>
                         @if($vitals)
                         <div class="grid grid-cols-2 gap-2 text-sm">
-                            <div><span class="text-gray-500">BP:</span> <span class="font-mono font-bold">{{ $vitals['bp_systolic'] ?? '--' }}/{{ $vitals['bp_diastolic'] ?? '--' }}</span></div>
+                            <div><span class="text-gray-500">BP:</span> <span class="font-mono font-bold">{{ $vitals['bp'] ?? '--' }}</span></div>
                             <div><span class="text-gray-500">Temp:</span> <span class="font-mono font-bold">{{ $vitals['temp'] ?? '--' }}°C</span></div>
                             <div><span class="text-gray-500">HR:</span> <span class="font-mono font-bold">{{ $vitals['hr'] ?? '--' }}</span></div>
                             <div><span class="text-gray-500">O2:</span> <span class="font-mono font-bold text-primary">{{ $vitals['o2'] ?? '--' }}%</span></div>
                         </div>
                         <div class="text-[10px] text-gray-400 mt-2 text-right">
-                            @if($latestLog && isset($latestLog->data['bp_systolic']))
+                            @if($latestLog && isset($latestLog->data['bp']))
                             {{ $latestLog->created_at->diffForHumans() }}
                             @else
                             Admission Vitals ({{ $admission->admission_date->format('M d H:i') }})
@@ -286,28 +286,24 @@
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="form-control">
-                            <label class="label text-xs">BP Systolic</label>
-                            <input type="number" name="bp_systolic" class="input input-sm input-bordered">
-                        </div>
-                        <div class="form-control">
-                            <label class="label text-xs">BP Diastolic</label>
-                            <input type="number" name="bp_diastolic" class="input input-sm input-bordered">
+                            <label class="label text-xs">BP (e.g. 120/80)</label>
+                            <input type="text" name="bp" class="input input-sm input-bordered">
                         </div>
                         <div class="form-control">
                             <label class="label text-xs">Temp (°C)</label>
                             <input type="number" step="0.1" name="temp" class="input input-sm input-bordered">
                         </div>
                         <div class="form-control">
-                            <label class="label text-xs">Heart Rate</label>
-                            <input type="number" name="heart_rate" class="input input-sm input-bordered">
+                            <label class="label text-xs">Heart Rate (bpm)</label>
+                            <input type="number" name="hr" class="input input-sm input-bordered">
                         </div>
                         <div class="form-control">
-                            <label class="label text-xs">Resp Rate</label>
-                            <input type="number" name="respiratory_rate" class="input input-sm input-bordered">
+                            <label class="label text-xs">Pulse Rate (bpm)</label>
+                            <input type="number" name="pr" class="input input-sm input-bordered">
                         </div>
                         <div class="form-control">
                             <label class="label text-xs">O2 Sat (%)</label>
-                            <input type="number" name="o2_sat" class="input input-sm input-bordered">
+                            <input type="number" name="o2" class="input input-sm input-bordered">
                         </div>
                     </div>
                 </div>

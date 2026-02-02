@@ -210,7 +210,7 @@
                         <h3 class="card-title text-sm text-gray-800 uppercase font-bold flex justify-between">
                             Current Vitals
                             <span class="text-info">
-                                @if($latestLog && isset($latestLog->data['bp_systolic']))
+                                @if($latestLog && isset($latestLog->data['bp']))
                                 {{ $latestLog->created_at->diffForHumans() }}
                                 @else
                                 Admission ({{ $admission->admission_date->format('M d H:i') }})
@@ -222,7 +222,7 @@
                         <div class="grid grid-cols-2 gap-4 mt-2">
                             <div>
                                 <div class="text-xs text-gray-800">BP</div>
-                                <div class="font-mono text-lg font-bold">{{ $vitals['bp_systolic'] ?? '--' }}/{{ $vitals['bp_diastolic'] ?? '--' }}</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['bp'] ?? '--' }}</div>
                             </div>
                             <div>
                                 <div class="text-xs text-gray-800">Temp</div>

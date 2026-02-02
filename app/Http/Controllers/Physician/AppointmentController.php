@@ -12,25 +12,31 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $physician_id = Auth::user()->physician->id;
+        $physician = Auth::user()->physician;
 
-        $appointments = Appointment::where('physician_id', $physician_id)
-            ->whereDate('scheduled_at', today())
-            ->where('status', '!=', 'Cancelled')
-            ->orderBy('scheduled_at', 'asc')
-            ->get()
-            ->map(function ($app) {
-                $admission = Admission::whereHas('patient', function ($q) use ($app) {
-                    $q->where('first_name', $app->first_name)
-                        ->where('last_name', $app->last_name);
-                })
-                    ->whereDate('created_at', today())
-                    ->latest()
-                    ->first();
+        // Get today's appointment slots for this physician
+        $slots = $physician->appointmentSlots()
+            ->whereDate('date', today())
+            ->orderBy('start_time', 'asc')
+            ->with('appointments')
+            ->get();
 
-                $app->admission_id = $admission ? $admission->id : null;
-                return $app;
-            });
+        // Flatten and organize appointments in queue order
+        $appointments = $slots->flatMap(function ($slot) {
+            return $slot->appointments()->where('status', '!=', 'Cancelled')->get();
+        })
+        ->map(function ($app) {
+            $admission = Admission::whereHas('patient', function ($q) use ($app) {
+                $q->where('first_name', $app->first_name)
+                    ->where('last_name', $app->last_name);
+            })
+                ->whereDate('created_at', today())
+                ->latest()
+                ->first();
+
+            $app->admission_id = $admission ? $admission->id : null;
+            return $app;
+        });
 
         return view('physician.appointments.index', compact('appointments'));
     }

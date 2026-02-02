@@ -24,12 +24,13 @@ class AdmissionRequest extends FormRequest
             'initial_diagnosis' => 'nullable|string',
             
             // Vitals
+            'bp' => ['nullable', 'string', 'regex:/^\d{2,3}\/\d{2,3}$/'],
             'temp' => 'nullable|numeric',
-            'bp_systolic' => 'nullable|integer',
-            'bp_diastolic' => 'nullable|integer',
-            'pulse_rate' => 'nullable|integer',
-            'respiratory_rate' => 'nullable|integer',
-            'o2_sat' => 'nullable|integer',
+            'hr' => 'nullable|integer',
+            'pr' => 'nullable|integer',
+            'o2' => 'nullable|integer',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
             'known_allergies' => 'nullable|array',
 
 

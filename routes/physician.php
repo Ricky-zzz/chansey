@@ -5,6 +5,7 @@ use App\Http\Controllers\Physician\OrderController;
 use App\Http\Controllers\Physician\TreatmentPlanController;
 use App\Http\Controllers\Physician\MyPatientController;
 use App\Http\Controllers\Physician\AppointmentController;
+use App\Http\Controllers\Physician\SlotController;
 use Illuminate\Support\Facades\Route;
 
 //  Physicians
@@ -14,6 +15,13 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
     Route::get('/dashboard', [PhysicianDash::class, 'index'])->name('dashboard');
 
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+
+    // Appointment Slots Management
+    Route::get('/slots', [SlotController::class, 'index'])->name('slots.index');
+    Route::post('/slots', [SlotController::class, 'store'])->name('slots.store');
+    Route::get('/slots/{id}', [SlotController::class, 'show'])->name('slots.show');
+    Route::patch('/slots/{id}/cancel', [SlotController::class, 'cancel'])->name('slots.cancel');
+    Route::delete('/slots/{id}', [SlotController::class, 'destroy'])->name('slots.destroy');
 
     // My Patients - Standard CRUD Resource 
     Route::resource('mypatients', MyPatientController::class)->only(['index', 'show'])->parameter('mypatients', 'id');

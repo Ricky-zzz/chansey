@@ -1,3 +1,5 @@
+# Todo
+
 Here is the recommended **Order of Battle** to maximize efficiency and minimize stress.
 
 I recommend the **"Clean, Build, Add"** strategy.
@@ -26,8 +28,9 @@ I recommend the **"Clean, Build, Add"** strategy.
 *   [X] Remove Step 3 from Blade.
 *   [X] Update `PatientController` to remove billing validation.
 *   [X] Hardcode default billing values in Controller.
-*   [ ] update vitals in admission to use json
-*   [ ] update all controllers that use old vitals in admission 
+*   [x] update vitals in admission to use json
+*   [x] update all controllers that use old vitals in admission 
+*   [] Test all instance
 
 **Task 2 (Afternoon): Appointment Slots**
 *   [ ] Create `appointment_slots` migration & model.
@@ -40,3 +43,6 @@ I recommend the **"Clean, Build, Add"** strategy.
 *   [ ] Create "Head Nurse" Dashboard.
 
 Start with the **Billing Cleanup**. It will make the rest of your development testing much faster!
+
+**Task report**
+*   add admission reports

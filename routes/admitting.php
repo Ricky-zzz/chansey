@@ -36,10 +36,4 @@ Route::middleware(['auth'])->prefix('nurse/admitting')->name('nurse.admitting.')
     // Discharge Admission
     Route::post('/admissions/{id}/discharge', [AdmissionController::class, 'discharge'])
         ->name('discharge');
-
-    Route::post('/appointments/{id}/approve', [AppointmentController::class, 'approve'])
-        ->name('appointments.approve');
-
-    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])
-        ->name('appointments.cancel');
 });

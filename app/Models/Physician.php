@@ -38,9 +38,9 @@ class Physician extends Model
         return $this->hasMany(MedicalOrder::class);
     }
 
-    public function appointments()
+    public function appointmentSlots()
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(AppointmentSlot::class);
     }
 
     public function department()

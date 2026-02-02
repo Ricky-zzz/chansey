@@ -123,27 +123,31 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <label class="floating-label w-full">
                             <span>Temp (°C)</span>
-                            <input type="number" step="0.1" name="temp" value="{{ old('temp', $admission->temp) }}" class="input input-bordered input-md w-full" placeholder="Temperature" />
+                            <input type="number" step="0.1" name="temp" value="{{ old('temp', $admission->initial_vitals['temp'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Temperature" />
                         </label>
                         <label class="floating-label w-full">
-                            <span>BP Systolic</span>
-                            <input type="number" name="bp_systolic" value="{{ old('bp_systolic', $admission->bp_systolic) }}" class="input input-bordered input-md w-full" placeholder="Systolic" />
+                            <span>Blood Pressure (e.g. 120/80)</span>
+                            <input type="text" name="bp" value="{{ old('bp', $admission->initial_vitals['bp'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="e.g. 120/80" />
                         </label>
                         <label class="floating-label w-full">
-                            <span>BP Diastolic</span>
-                            <input type="number" name="bp_diastolic" value="{{ old('bp_diastolic', $admission->bp_diastolic) }}" class="input input-bordered input-md w-full" placeholder="Diastolic" />
+                            <span>Heart Rate (bpm)</span>
+                            <input type="number" name="hr" value="{{ old('hr', $admission->initial_vitals['hr'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Heart Rate" />
                         </label>
                         <label class="floating-label w-full">
-                            <span>Pulse</span>
-                            <input type="number" name="pulse_rate" value="{{ old('pulse_rate', $admission->pulse_rate) }}" class="input input-bordered input-md w-full" placeholder="Pulse Rate" />
+                            <span>Pulse Rate</span>
+                            <input type="number" name="pr" value="{{ old('pr', $admission->initial_vitals['pr'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Pulse Rate" />
                         </label>
                         <label class="floating-label w-full">
-                            <span>Resp Rate</span>
-                            <input type="number" name="respiratory_rate" value="{{ old('respiratory_rate', $admission->respiratory_rate) }}" class="input input-bordered input-md w-full" placeholder="Respiratory Rate" />
+                            <span>O2 Saturation (%)</span>
+                            <input type="number" name="o2" value="{{ old('o2', $admission->initial_vitals['o2'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Oxygen Saturation" />
                         </label>
                         <label class="floating-label w-full">
-                            <span>O2 Sat</span>
-                            <input type="number" name="o2_sat" value="{{ old('o2_sat', $admission->o2_sat) }}" class="input input-bordered input-md w-full" placeholder="Oxygen Saturation" />
+                            <span>Height (cm)</span>
+                            <input type="number" step="0.1" name="height" value="{{ old('height', $admission->initial_vitals['height'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Height in cm" />
+                        </label>
+                        <label class="floating-label w-full">
+                            <span>Weight (kg)</span>
+                            <input type="number" step="0.1" name="weight" value="{{ old('weight', $admission->initial_vitals['weight'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Weight in kg" />
                         </label>
                     </div>
 

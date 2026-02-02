@@ -156,13 +156,16 @@ class PatientController extends Controller
                 'chief_complaint' => $data['chief_complaint'],
                 'initial_diagnosis' => $data['initial_diagnosis'],
 
-                // Vitals
-                'temp' => $data['temp'],
-                'bp_systolic' => $data['bp_systolic'],
-                'bp_diastolic' => $data['bp_diastolic'],
-                'pulse_rate' => $data['pulse_rate'],
-                'respiratory_rate' => $data['respiratory_rate'],
-                'o2_sat' => $data['o2_sat'],
+                // Vitals - stored as JSON
+                'initial_vitals' => [
+                    'bp' => $data['bp'] ?? null,
+                    'temp' => $data['temp'] ?? null,
+                    'hr' => $data['hr'] ?? null,
+                    'pr' => $data['pr'] ?? null,
+                    'o2' => $data['o2'] ?? null,
+                    'height' => $data['height'] ?? null,
+                    'weight' => $data['weight'] ?? null,
+                ],
 
                 // Arrays are handled automatically if validation passed
                 'known_allergies' => $data['known_allergies'] ?? [],

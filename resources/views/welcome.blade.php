@@ -140,88 +140,79 @@
 
     <!-- APPOINTMENT SECTION -->
     <section id="appointment" class="bg-white py-20">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-slate-900 mb-4">Quick Appointment Booking</h2>
-                <p class="text-lg text-slate-600">Fill in your details below and we'll get you scheduled with the right specialist</p>
+                <h2 class="text-4xl font-bold text-slate-900 mb-4">Book an Appointment</h2>
+                <p class="text-lg text-slate-600">Select a department to find available doctors and schedule your visit</p>
             </div>
 
-            <div class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-
-                    <form action="{{ route('public.appointment.store') }}" method="POST" class="space-y-4">
-                        @csrf
-
-                        <!-- Name Row -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-semibold">First Name</span>
-                                </label>
-                                <input type="text" name="first_name" placeholder="John" class="input input-bordered" required />
-                            </div>
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-semibold">Last Name</span>
-                                </label>
-                                <input type="text" name="last_name" placeholder="Doe" class="input input-bordered" required />
-                            </div>
+            <!-- Department Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach($departments as $dept)
+                <a href="{{ route('public.doctors.index', $dept->id) }}" 
+                   class="card bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-emerald-500 group">
+                    <div class="card-body text-center items-center p-6">
+                        <!-- Icon -->
+                        <div class="w-16 h-16 rounded-full bg-emerald-100 group-hover:bg-emerald-500 flex items-center justify-center text-3xl mb-3 transition-colors duration-300">
+                            <span class="group-hover:scale-110 transition-transform">
+                                @switch($dept->name)
+                                    @case('Cardiology')
+                                        ❤️
+                                        @break
+                                    @case('Pediatrics')
+                                        👶
+                                        @break
+                                    @case('Orthopedics')
+                                        🦴
+                                        @break
+                                    @case('Neurology')
+                                        🧠
+                                        @break
+                                    @case('Dermatology')
+                                        🧴
+                                        @break
+                                    @case('Ophthalmology')
+                                        👁️
+                                        @break
+                                    @case('ENT')
+                                        👂
+                                        @break
+                                    @case('Gynecology')
+                                        🩺
+                                        @break
+                                    @case('General Medicine')
+                                        💊
+                                        @break
+                                    @case('Surgery')
+                                        🏥
+                                        @break
+                                    @default
+                                        🩺
+                                @endswitch
+                            </span>
                         </div>
-
-                        <!-- Contact Row -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-semibold">Mobile Number</span>
-                                </label>
-                                <input type="tel" name="contact_number" placeholder="+1 (555) 000-0000" class="input input-bordered" required />
-                            </div>
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-semibold">Email </span>
-                                </label>
-                                <input type="email" name="email" placeholder="john@example.com" class="input input-bordered required" />
-                            </div>
-                        </div>
-
-                        <!-- Department -->
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Department</span>
-                            </label>
-                            <select name="department_id" class="select select-bordered" required>
-                                <option disabled selected>Select a department</option>
-                                @foreach($departments as $dept)
-                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Purpose -->
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Reason for Visit</span>
-                            </label>
-                            <textarea name="purpose" class="textarea textarea-bordered h-24" placeholder="Please describe your symptoms or reason for the appointment..." required></textarea>
-                        </div>
-
-                        <!-- Preferred Date -->
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Preferred Appointment Date</span>
-                            </label>
-                            <input type="date" name="preferred_date" class="input input-bordered" required />
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary btn-lg w-full mt-6">Submit Appointment Request</button>
-
-                        <p class="text-center text-sm text-slate-500 mt-4">
-                            We'll contact you within 24 hours to confirm your appointment
+                        <h3 class="card-title text-slate-700 text-lg">{{ $dept->name }}</h3>
+                        <p class="text-sm text-gray-500">
+                            {{ $dept->physicians_count }} {{ Str::plural('Specialist', $dept->physicians_count) }}
                         </p>
-                    </form>
-                </div>
+                        <div class="mt-2">
+                            <span class="text-xs text-emerald-600 font-semibold group-hover:underline">
+                                View Doctors →
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
             </div>
+
+            @if($departments->isEmpty())
+            <div class="text-center py-16 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <p class="text-lg">No departments available at the moment.</p>
+            </div>
+            @endif
         </div>
     </section>
 
