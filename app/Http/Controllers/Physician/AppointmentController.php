@@ -23,7 +23,7 @@ class AppointmentController extends Controller
 
         // Flatten and organize appointments in queue order
         $appointments = $slots->flatMap(function ($slot) {
-            return $slot->appointments()->where('status', '!=', 'Cancelled')->get();
+            return $slot->appointments()->where('status', '!=', 'Cancelled')->with('appointmentSlot')->get();
         })
         ->map(function ($app) {
             $admission = Admission::whereHas('patient', function ($q) use ($app) {

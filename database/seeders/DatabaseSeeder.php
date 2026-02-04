@@ -18,6 +18,7 @@ use App\Models\Department;
 use App\Models\Medicine;
 use App\Models\InventoryItem;
 use App\Models\HospitalFee;
+use App\Models\ShiftSchedule;
 
 class DatabaseSeeder extends Seeder
 {
@@ -124,24 +125,6 @@ class DatabaseSeeder extends Seeder
             'is_head_nurse' => true,
         ]);
 
-        // C. Clinical Nurse (North Wing)
-        $clinNurse = User::create([
-            'name' => 'Riovel Dane',
-            'email' => 'riovel.dane@chansey.test',
-            'password' => $password,
-            'user_type' => 'nurse',
-            'badge_id' => 'NUR-RD-001',
-        ]);
-
-        // D. Head Nurse - East Wing (Althea Marie)
-        $headEastNurse = User::create([
-            'name' => 'Althea Marie',
-            'email' => 'althea.marie@chansey.test',
-            'password' => $password,
-            'user_type' => 'nurse',
-            'badge_id' => 'NUR-AM-001',
-        ]);
-
         // ==========================================
         // 5. GENERAL SERVICE
         // ==========================================
@@ -190,79 +173,221 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 7. INFRASTRUCTURE (Functional Departments)
         // ==========================================
-        // 7. INFRASTRUCTURE & Clinical Nurse Link
-        // ==========================================
-        $wings = [
-            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'],
-            ['name' => 'East Wing',  'code' => 'EW', 'floor' => '1st Floor'],
-            ['name' => 'West Wing',  'code' => 'WW', 'floor' => '2nd Floor'],
-            ['name' => 'South Wing', 'code' => 'SW', 'floor' => '2nd Floor'],
+
+        $stationConfigs = [
+            [
+                'name' => 'Emergency Room',
+                'code' => 'ER',
+                'floor' => 'Ground Floor',
+                'room_type' => 'ER',
+                'capacity' => 10,
+                'price' => 1000.00
+            ],
+            [
+                'name' => 'Intensive Care Unit',
+                'code' => 'ICU',
+                'floor' => '2nd Floor',
+                'room_type' => 'ICU',
+                'capacity' => 8,
+                'price' => 5000.00
+            ],
+            [
+                'name' => 'Medical-Surgical Ward',
+                'code' => 'MS-WARD',
+                'floor' => '3rd Floor',
+                'room_type' => 'Ward',
+                'capacity' => 6,
+                'price' => 1500.00
+            ],
+            [
+                'name' => 'OB-GYN Ward',
+                'code' => 'OB',
+                'floor' => '3rd Floor',
+                'room_type' => 'Ward', // Can be Semi-Private if you prefer
+                'capacity' => 4,
+                'price' => 1500.00
+            ],
+            [
+                'name' => 'Private Wing',
+                'code' => 'PVT',
+                'floor' => '4th Floor',
+                'room_type' => 'Private',
+                'capacity' => 1, // Private rooms = 1 bed
+                'price' => 4000.00,
+                'room_count' => 5 // Create 5 separate rooms for this wing
+            ],
         ];
 
-        $firstStationId = null;
+        // Store IDs for Nurse Assignments later
+        $stationIds = [];
 
-        foreach ($wings as $i => $wing) {
+        foreach ($stationConfigs as $config) {
+            // A. Create Station
             $station = Station::create([
-                'station_name' => $wing['name'],
-                'station_code' => $wing['code'],
-                'floor_location' => $wing['floor'],
+                'station_name' => $config['name'],
+                'station_code' => $config['code'],
+                'floor_location' => $config['floor'],
             ]);
 
-            if ($i === 0) $firstStationId = $station->id; // Save North Wing ID
+            $stationIds[$config['code']] = $station->id;
 
-            // Room logic (Same as before)
-            $roomNum = ($i + 1) . "01";
-            $room = Room::create([
-                'station_id' => $station->id,
-                'room_number' => $roomNum,
-                'room_type' => 'Ward',
-                'capacity' => 4,
-                'price_per_night' => 1500.00,
-                'status' => 'Active',
-            ]);
+            // B. Create Rooms
+            // If it's Private Wing, we create multiple single-bed rooms.
+            // If it's a Ward/ER, we create one big room with many beds.
 
-            for ($b = 1; $b <= 4; $b++) {
-                $letter = chr(64 + $b);
-                Bed::create([
-                    'room_id' => $room->id,
-                    'bed_code' => "{$station->station_code}-{$room->room_number}-{$letter}",
-                    'status' => 'Available',
+            $count = $config['room_count'] ?? 1;
+
+            for ($r = 1; $r <= $count; $r++) {
+                $roomNum = $config['code'] . '-' . str_pad($r, 3, '0', STR_PAD_LEFT);
+
+                $room = Room::create([
+                    'station_id' => $station->id,
+                    'room_number' => $roomNum,
+                    'room_type' => $config['room_type'],
+                    'capacity' => $config['capacity'],
+                    'price_per_night' => $config['price'],
+                    'status' => 'Active',
                 ]);
+
+                // C. Create Beds
+                for ($b = 1; $b <= $config['capacity']; $b++) {
+                    $letter = chr(64 + $b); // A, B, C...
+                    Bed::create([
+                        'room_id' => $room->id,
+                        'bed_code' => "{$roomNum}-{$letter}",
+                        'status' => 'Available',
+                    ]);
+                }
             }
         }
-        Station::create([
-            'station_name' => 'Outpatient / Lobby',
+
+        // C. Create the Virtual OPD (No Rooms, No Nurses)
+        $opd = Station::create([
+            'station_name' => 'Outpatient Dept / Lobby',
             'station_code' => 'OPD',
             'floor_location' => 'Ground Floor',
         ]);
-
-        // Link the Clinical Nurse to East Wing (Station 2)
-        Nurse::create([
-            'user_id' => $clinNurse->id,
-            'employee_id' => 'NUR-RD-001',
-            'first_name' => 'Riovel',
-            'last_name' => 'Dane',
-            'license_number' => '21212123',
-            'designation' => 'Clinical',
-            'station_id' => 2,
-            'is_head_nurse' => false,
-        ]);
-
-        // Link the Head Nurse (Althea Marie) to East Wing (Station 2)
-        Nurse::create([
-            'user_id' => $headEastNurse->id,
-            'employee_id' => 'NUR-AM-001',
-            'first_name' => 'Althea',
-            'last_name' => 'Marie',
-            'license_number' => 'RN-1003',
-            'designation' => 'Clinical',
-            'station_id' => 2,
-            'is_head_nurse' => true,
-        ]);
+        $stationIds['OPD'] = $opd->id;
 
         // ==========================================
-        // 8. MEDICINES (Pharmacy Stock)
+        // 7B. CREATE CLINICAL NURSES FOR EACH STATION
+        // ==========================================
+        $stationNurses = [
+            'ER' => [
+                ['first' => 'Riovel', 'last' => 'Dane', 'head' => false],
+                ['first' => 'Althea', 'last' => 'Marie', 'head' => true],
+            ],
+            'ICU' => [
+                ['first' => 'Carlos', 'last' => 'Mendoza', 'head' => false],
+                ['first' => 'Maria', 'last' => 'Santos', 'head' => true],
+            ],
+            'MS-WARD' => [
+                ['first' => 'Angelo', 'last' => 'Cruz', 'head' => false],
+                ['first' => 'Patricia', 'last' => 'Reyes', 'head' => true],
+            ],
+            'OB' => [
+                ['first' => 'Diana', 'last' => 'Flores', 'head' => false],
+                ['first' => 'Carmen', 'last' => 'Garcia', 'head' => true],
+            ],
+            'PVT' => [
+                ['first' => 'Jerome', 'last' => 'Lim', 'head' => false],
+                ['first' => 'Beatrice', 'last' => 'Tan', 'head' => true],
+            ],
+        ];
+
+        $nurseCounter = 100; // For unique IDs
+        foreach ($stationNurses as $stationCode => $nurses) {
+            foreach ($nurses as $nurse) {
+                $nurseCounter++;
+                $badgeId = 'NUR-' . strtoupper(substr($nurse['first'], 0, 1) . substr($nurse['last'], 0, 1)) . '-' . $nurseCounter;
+                $email = strtolower($nurse['first'] . '.' . $nurse['last']) . '@chansey.test';
+
+                $user = User::create([
+                    'name' => $nurse['first'] . ' ' . $nurse['last'],
+                    'email' => $email,
+                    'password' => $password,
+                    'user_type' => 'nurse',
+                    'badge_id' => $badgeId,
+                ]);
+
+                Nurse::create([
+                    'user_id' => $user->id,
+                    'employee_id' => $badgeId,
+                    'first_name' => $nurse['first'],
+                    'last_name' => $nurse['last'],
+                    'license_number' => 'RN-' . $nurseCounter,
+                    'designation' => 'Clinical',
+                    'station_id' => $stationIds[$stationCode],
+                    'is_head_nurse' => $nurse['head'],
+                ]);
+            }
+        }
+
+        // ==========================================
+        // 8. SHIFT SCHEDULES
+        // ==========================================
+        $schedules = [
+            // M-W-F Schedules (36 hours)
+            [
+                'name' => 'M-W-F Morning',
+                'start_time' => '08:00',
+                'end_time' => '16:00',
+                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
+            ],
+            [
+                'name' => 'M-W-F Night',
+                'start_time' => '20:00',
+                'end_time' => '08:00',
+                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
+            ],
+            // T-TH-S Schedules (36 hours)
+            [
+                'name' => 'T-TH-S Morning',
+                'start_time' => '08:00',
+                'end_time' => '16:00',
+                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
+            ],
+            [
+                'name' => 'T-TH-S Night',
+                'start_time' => '20:00',
+                'end_time' => '08:00',
+                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
+            ],
+            // SAT-SUN Schedules (12 hours each)
+            [
+                'name' => 'Weekend Morning',
+                'start_time' => '08:00',
+                'end_time' => '14:00',
+                'days' => ['saturday' => true, 'sunday' => true]
+            ],
+            [
+                'name' => 'Weekend Night',
+                'start_time' => '20:00',
+                'end_time' => '02:00',
+                'days' => ['saturday' => true, 'sunday' => true]
+            ],
+        ];
+
+        foreach ($schedules as $schedule) {
+            $days = $schedule['days'];
+            ShiftSchedule::create([
+                'name' => $schedule['name'],
+                'start_time' => $schedule['start_time'],
+                'end_time' => $schedule['end_time'],
+                'monday' => $days['monday'] ?? false,
+                'tuesday' => $days['tuesday'] ?? false,
+                'wednesday' => $days['wednesday'] ?? false,
+                'thursday' => $days['thursday'] ?? false,
+                'friday' => $days['friday'] ?? false,
+                'saturday' => $days['saturday'] ?? false,
+                'sunday' => $days['sunday'] ?? false,
+            ]);
+        }
+
+        // ==========================================
+        // 9. MEDICINES (Pharmacy Stock)
         // ==========================================
         $meds = [
             ['Biogesic', 'Paracetamol', '500mg', 'Tablet', 5.00],
@@ -285,7 +410,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // ==========================================
-        // 9. INVENTORY ITEMS (Gen Service Stock)
+        // 10. INVENTORY ITEMS (Gen Service Stock)
         // ==========================================
         $items = [
             ['Admission Kit', 'Hygiene', 350.00],
@@ -305,7 +430,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // ==========================================
-        // 10. HOSPITAL FEES (Accountant Menu)
+        // 11. HOSPITAL FEES (Accountant Menu)
         // ==========================================
         $fees = [
             ['Ambulance Service', 2500.00, 'per_use'],

@@ -23,27 +23,27 @@
                 <label class="label">
                     <span class="label-text font-semibold text-black">From Date</span>
                 </label>
-                <input type="date" name="from_date" 
-                       value="{{ $fromDate }}" 
+                <input type="date" name="from_date"
+                       value="{{ $fromDate }}"
                        class="input input-bordered w-full" />
             </div>
-            
+
             <div class="form-control flex-1">
                 <label class="label">
                     <span class="label-text font-semibold text-black">To Date</span>
                 </label>
-                <input type="date" name="to_date" 
-                       value="{{ $toDate }}" 
+                <input type="date" name="to_date"
+                       value="{{ $toDate }}"
                        class="input input-bordered w-full" />
             </div>
-            
+
             <button type="submit" class="btn btn-outline bg-sky-200 gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.5 5.5a7.5 7.5 0 0 0 10.5 10.5Z" />
                 </svg>
                 Filter
             </button>
-            
+
             <a href="{{ route('physician.slots.index') }}" class="btn btn-outline bg-amber-200 gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -83,9 +83,9 @@
                         {{-- CAPACITY with Progress Bar --}}
                         <td>
                             <div class="flex items-center gap-2">
-                                <progress 
-                                    class="progress {{ $slot->appointments_count >= $slot->capacity ? 'progress-error' : 'progress-primary' }} w-24" 
-                                    value="{{ $slot->appointments_count }}" 
+                                <progress
+                                    class="progress {{ $slot->appointments_count >= $slot->capacity ? 'progress-error' : 'progress-primary' }} w-24"
+                                    value="{{ $slot->appointments_count }}"
                                     max="{{ $slot->capacity }}">
                                 </progress>
                                 <span class="text-xs font-bold {{ $slot->appointments_count >= $slot->capacity ? 'text-error' : '' }}">
@@ -117,9 +117,9 @@
                             <div class="flex justify-end gap-2">
                                 {{-- View Patients Button --}}
                                 @if($slot->appointments_count > 0)
-                                    <button 
+                                    <button
                                         data-slot-id="{{ $slot->id }}"
-                                        onclick="openViewModal(this.dataset.slotId)" 
+                                        onclick="openViewModal(this.dataset.slotId)"
                                         class="btn btn-sm btn-outline btn-primary gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -131,7 +131,7 @@
 
                                 {{-- Cancel Button (only for active slots) --}}
                                 @if($slot->status === 'Active' && $slot->date >= today())
-                                    <form action="{{ route('physician.slots.cancel', $slot->id) }}" method="POST" 
+                                    <form action="{{ route('physician.slots.cancel', $slot->id) }}" method="POST"
                                           onsubmit="return confirm('Are you sure you want to cancel this slot? All patients who booked will be notified.')">
                                         @csrf @method('PATCH')
                                         <button type="submit" class="btn btn-sm btn-outline btn-outlone bg-rose-200 gap-1">
@@ -185,18 +185,18 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
-        
+
         <h3 class="font-bold text-xl mb-4">Open New Appointment Slot</h3>
-        
+
         <form action="{{ route('physician.slots.store') }}" method="POST" class="space-y-4">
             @csrf
-            
+
             {{-- Date --}}
             <div class="form-control">
                 <label class="label">
                     <span class="label-text font-semibold">Date</span>
                 </label>
-                <input type="date" name="date" 
+                <input type="date" name="date"
                        min="{{ now()->format('Y-m-d') }}"
                        value="{{ old('date', now()->addDay()->format('Y-m-d')) }}"
                        class="input input-bordered w-full" required>
@@ -204,14 +204,14 @@
                     <span class="text-error text-xs mt-1">{{ $message }}</span>
                 @enderror
             </div>
-            
+
             {{-- Time Range --}}
             <div class="grid grid-cols-2 gap-4">
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text font-semibold">Start Time</span>
                     </label>
-                    <input type="time" name="start_time" 
+                    <input type="time" name="start_time"
                            value="{{ old('start_time', '08:00') }}"
                            class="input input-bordered w-full" required>
                     @error('start_time')
@@ -222,7 +222,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">End Time</span>
                     </label>
-                    <input type="time" name="end_time" 
+                    <input type="time" name="end_time"
                            value="{{ old('end_time', '12:00') }}"
                            class="input input-bordered w-full" required>
                     @error('end_time')
@@ -230,13 +230,13 @@
                     @enderror
                 </div>
             </div>
-            
+
             {{-- Capacity --}}
             <div class="form-control">
                 <label class="label">
                     <span class="label-text font-semibold">Maximum Patients</span>
                 </label>
-                <input type="number" name="capacity" 
+                <input type="number" name="capacity"
                        min="1" max="50"
                        value="{{ old('capacity', 10) }}"
                        class="input input-bordered w-full" required>
@@ -247,7 +247,7 @@
                     <span class="text-error text-xs mt-1">{{ $message }}</span>
                 @enderror
             </div>
-            
+
             <div class="modal-action">
                 <button type="submit" class="btn btn-primary w-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -264,21 +264,21 @@
 </dialog>
 
 {{-- VIEW APPOINTMENTS MODAL --}}
-<div x-data="viewAppointmentsModal()" x-cloak>
+<div x-data="viewAppointmentsModal()" x-cloak @open-view-modal.window="open($event.detail)">
     <dialog id="view_appointments_modal" class="modal" x-ref="modal">
-        <div class="modal-box max-w-2xl">
+        <div class="modal-box max-w-3xl">
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            
+
             <h3 class="font-bold text-xl mb-2">Booked Patients</h3>
             <p class="text-sm text-gray-500 mb-4" x-text="slotInfo"></p>
-            
+
             {{-- Loading State --}}
             <div x-show="loading" class="flex justify-center py-8">
                 <span class="loading loading-spinner loading-lg text-primary"></span>
             </div>
-            
+
             {{-- Appointments List --}}
             <div x-show="!loading && appointments.length > 0">
                 <table class="table table-zebra w-full">
@@ -304,7 +304,7 @@
                                     "<span x-text="app.purpose"></span>"
                                 </td>
                                 <td>
-                                    <span class="badge" 
+                                    <span class="badge"
                                           :class="{
                                               'badge-info': app.status === 'Booked',
                                               'badge-error text-white': app.status === 'Cancelled',
@@ -319,7 +319,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             {{-- Empty State --}}
             <div x-show="!loading && appointments.length === 0" class="text-center py-8 text-gray-400">
                 No appointments found for this slot.
@@ -340,22 +340,22 @@ function viewAppointmentsModal() {
         loading: false,
         appointments: [],
         slotInfo: '',
-        
+
         open(slotId) {
             this.loading = true;
             this.appointments = [];
             this.slotInfo = '';
             this.$refs.modal.showModal();
-            
+
             fetch(`{{ url('physician/slots') }}/${slotId}`)
                 .then(response => response.json())
                 .then(data => {
                     this.loading = false;
                     this.appointments = data.appointments;
-                    
+
                     const slot = data.slot;
-                    const date = new Date(slot.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                    const date = new Date(slot.date).toLocaleDateString('en-US', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                     });
                     this.slotInfo = `${date} • ${this.formatTime(slot.start_time)} - ${this.formatTime(slot.end_time)}`;
                 })
@@ -364,7 +364,7 @@ function viewAppointmentsModal() {
                     console.error('Error:', error);
                 });
         },
-        
+
         formatTime(timeString) {
             const [hours, minutes] = timeString.split(':');
             const date = new Date();
@@ -374,12 +374,9 @@ function viewAppointmentsModal() {
     }
 }
 
-// Global function to call from button onclick
+// Global function using window event dispatch
 window.openViewModal = function(slotId) {
-    const component = document.querySelector('[x-data="viewAppointmentsModal()"]');
-    if (component && component.__x) {
-        component.__x.$data.open(slotId);
-    }
+    window.dispatchEvent(new CustomEvent('open-view-modal', { detail: slotId }));
 }
 </script>
 @endpush

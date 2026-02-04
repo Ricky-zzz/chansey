@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Maintenance\Resources\Rooms;
+
 use Filament\Notifications\Notification;
 use App\Filament\Maintenance\Resources\Rooms\Pages\CreateRoom;
 use App\Filament\Maintenance\Resources\Rooms\Pages\EditRoom;
@@ -51,11 +52,14 @@ class RoomResource extends Resource
 
                         Select::make('room_type')
                             ->options([
+                                'ER' => 'ER Bed / Trauma Bay',
+                                'ICU' => 'ICU (Intensive Care)',
+                                'Ward' => 'General Ward',
+                                'Semi-Private' => 'Semi-Private (2-4 Beds)',
                                 'Private' => 'Private Suite',
-                                'Semi-Private' => 'Semi-Private (2 Bed)',
-                                'Ward' => 'Ward (Multi-Bed)',
-                                'ICU' => 'ICU',
-                                'ER' => 'Emergency Room',
+                                'Isolation' => 'Isolation Room',
+                                'Delivery' => 'Delivery Room (DR)',
+                                'Nursery' => 'NICU / Nursery',
                             ])
                             ->required(),
 

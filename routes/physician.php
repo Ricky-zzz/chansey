@@ -15,6 +15,7 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
     Route::get('/dashboard', [PhysicianDash::class, 'index'])->name('dashboard');
 
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+    Route::patch('/appointments/{id}/complete', [AppointmentController::class, 'complete'])->name('appointments.complete');
 
     // Appointment Slots Management
     Route::get('/slots', [SlotController::class, 'index'])->name('slots.index');
@@ -23,15 +24,15 @@ Route::middleware(['auth'])->prefix('physician')->name('physician.')->group(func
     Route::patch('/slots/{id}/cancel', [SlotController::class, 'cancel'])->name('slots.cancel');
     Route::delete('/slots/{id}', [SlotController::class, 'destroy'])->name('slots.destroy');
 
-    // My Patients - Standard CRUD Resource 
+    // My Patients - Standard CRUD Resource
     Route::resource('mypatients', MyPatientController::class)->only(['index', 'show'])->parameter('mypatients', 'id');
 
-    // Orders - Standard CRUD Resource 
+    // Orders - Standard CRUD Resource
     Route::resource('orders', OrderController::class)->only(['store', 'destroy']);
 
     Route::post('/appointments/{id}/approve', [AppointmentController::class, 'approve'])
         ->name('appointments.approve');
-    
+
     // Custom order action
     Route::patch('/orders/{order}/discontinue', [OrderController::class, 'discontinue'])
         ->name('orders.discontinue');

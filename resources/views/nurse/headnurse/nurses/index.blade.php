@@ -20,8 +20,6 @@
                         <th></th>
                         <th>Badge ID</th>
                         <th>Name</th>
-                        <th>Designation</th>
-                        <th>Head Nurse</th>
                         <th>Station</th>
                         <th>Shift Schedule</th>
                         <th class="text-right">Actions</th>
@@ -52,22 +50,6 @@
                         <td>
                             <div class="font-bold">{{ $nurse->last_name }}, {{ $nurse->first_name }}</div>
                             <div class="text-xs text-gray-400">{{ $nurse->license_number }}</div>
-                        </td>
-
-                        {{-- DESIGNATION --}}
-                        <td>
-                            <span class="badge {{ $nurse->designation === 'Admitting' ? 'badge-warning' : 'badge-success' }} text-white">
-                                {{ $nurse->designation }}
-                            </span>
-                        </td>
-
-                        {{-- HEAD NURSE --}}
-                        <td>
-                            @if($nurse->is_head_nurse)
-                                <span class="badge badge-primary text-white">Head Nurse</span>
-                            @else
-                                <span class="badge badge-ghost">Staff</span>
-                            @endif
                         </td>
 
                         {{-- STATION --}}
@@ -109,7 +91,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-10 text-gray-400 italic">
+                        <td colspan="7" class="text-center py-10 text-gray-400 italic">
                             <div class="flex flex-col items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-300">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
@@ -139,7 +121,7 @@
             <h3 class="font-bold text-xl mb-2">Assign Shift Schedule</h3>
             <p class="text-sm text-gray-500 mb-4">Assigning schedule for: <span class="font-bold text-primary" x-text="selectedNurse.name"></span></p>
 
-            <form :action="'{{ route('nurse.headnurse.nurses.updateSchedule', '') }}/' + selectedNurse.id + '/schedule'" method="POST" class="space-y-4">
+            <form :action="`{{ url('nurse/headnurse/nurses') }}/${selectedNurse.id}/schedule`" method="POST" class="space-y-4">
                 @csrf
                 @method('PUT')
 

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-    
+
     <div class="flex justify-between items-center mb-6">
         <div>
             <h2 class="text-3xl font-black text-slate-800">Daily Consultations</h2>
@@ -27,7 +27,7 @@
                     <tr class="hover">
                         <!-- TIME -->
                         <td class="font-mono font-bold text-primary">
-                            {{ $app->scheduled_at->format('H:i') }}
+                            {{ $app->formatted_start_time ?? 'N/A' }}
                         </td>
 
                         <!-- NAME -->
@@ -45,7 +45,7 @@
                         <td>
                             @if($app->status === 'Completed')
                                 <span class="badge badge-neutral">Done</span>
-                            @elseif($app->admission_id) 
+                            @elseif($app->admission_id)
                                 <!-- If we found a matching admission, they are HERE -->
                                 <span class="badge badge-success text-white animate-pulse">Admitted</span>
                             @else
@@ -55,17 +55,17 @@
 
                         <!-- ACTION -->
                         <td class="text-right">
-                            
+
                             @if($app->status === 'Completed')
                                 <span class="text-xs text-gray-400">Completed</span>
-                            
+
                             @elseif($app->admission_id)
                                 <!-- LINK TO CHART -->
-                                <a href="{{ route('physician.patients.show', $app->admission_id) }}" 
+                                <a href="{{ route('physician.patients.show', $app->admission_id) }}"
                                    class="btn btn-sm btn-outline btn-primary gap-2">
                                     Open Chart
                                 </a>
-                                
+
                             @else
                                 <!-- MARK DONE (For Outpatients without Admission) -->
                                 <form action="{{ route('physician.appointments.complete', $app->id) }}" method="POST">
