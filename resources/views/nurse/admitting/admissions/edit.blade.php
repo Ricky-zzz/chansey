@@ -138,6 +138,10 @@
                             <input type="number" name="pr" value="{{ old('pr', $admission->initial_vitals['pr'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Pulse Rate" />
                         </label>
                         <label class="floating-label w-full">
+                            <span>Respiratory Rate (breaths/min)</span>
+                            <input type="number" name="rr" value="{{ old('rr', $admission->initial_vitals['rr'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Respiratory Rate" />
+                        </label>
+                        <label class="floating-label w-full">
                             <span>O2 Saturation (%)</span>
                             <input type="number" name="o2" value="{{ old('o2', $admission->initial_vitals['o2'] ?? '') }}" class="input input-bordered input-md w-full" placeholder="Oxygen Saturation" />
                         </label>

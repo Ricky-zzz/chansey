@@ -176,9 +176,9 @@
                                 <span>Admission Type</span>
                                 <select name="admission_type" data-step="1" x-model="admissionType" class="select select-bordered w-full @error('admission_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Admission Type</option>
-                                    <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
-                                    <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient</option>
-                                    <option value="Inpatient" {{ old('admission_type') == 'Inpatient' ? 'selected' : '' }}>Inpatient</option>
+                                    <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency Encounter</option>
+                                    <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient Consultation</option>
+                                    <option value="Inpatient" {{ old('admission_type') == 'Inpatient' ? 'selected' : '' }}>Inpatient Admission</option>
                                     <option value="Transfer" {{ old('admission_type') == 'Transfer' ? 'selected' : '' }}>Transfer</option>
                                 </select>
                                 @error('admission_type')
@@ -278,6 +278,11 @@
                         <label class="floating-label w-full">
                             <span>Pulse Rate (bpm)</span>
                             <input type="number" name="pr" class="input input-md w-full" placeholder="Pulse Rate">
+                        </label>
+
+                        <label class="floating-label w-full">
+                            <span>Respiratory Rate (breaths/min)</span>
+                            <input type="number" name="rr" class="input input-md w-full" placeholder="Respiratory Rate">
                         </label>
 
                         <label class="floating-label w-full">

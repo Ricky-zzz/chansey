@@ -10,14 +10,14 @@ use App\Models\Nurse;
 use App\Models\GeneralService;
 use App\Models\Physician;
 use App\Models\Pharmacist; // Make sure this model exists
-use App\Models\Accountant; 
+use App\Models\Accountant;
 use App\Models\Station;
 use App\Models\Room;
 use App\Models\Bed;
-use App\Models\Department; 
-use App\Models\Medicine;   
+use App\Models\Department;
+use App\Models\Medicine;
 use App\Models\InventoryItem;
-use App\Models\HospitalFee; 
+use App\Models\HospitalFee;
 
 class DatabaseSeeder extends Seeder
 {
@@ -86,7 +86,7 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 4. NURSES
         // ==========================================
-        // A. Admitting
+        // A. Admitting Nurse
         $admitNurse = User::create([
             'name' => 'Steph Torres',
             'email' => 'steph.torres@chansey.test',
@@ -102,17 +102,44 @@ class DatabaseSeeder extends Seeder
             'license_number' => 'RN-1001',
             'designation' => 'Admitting',
             'station_id' => null,
-            'shift_start' => '06:00:00',
-            'shift_end' => '14:00:00',
+            'is_head_nurse' => false,
         ]);
 
-        // B. Clinical (North Wing)
+        // B. Head Nurse - Admitting (Janaih Budy)
+        $headAdmitNurse = User::create([
+            'name' => 'Janaih Budy',
+            'email' => 'janaih.budy@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-JB-001',
+        ]);
+        Nurse::create([
+            'user_id' => $headAdmitNurse->id,
+            'employee_id' => 'NUR-JB-001',
+            'first_name' => 'Janaih',
+            'last_name' => 'Budy',
+            'license_number' => 'RN-1002',
+            'designation' => 'Admitting',
+            'station_id' => null,
+            'is_head_nurse' => true,
+        ]);
+
+        // C. Clinical Nurse (North Wing)
         $clinNurse = User::create([
             'name' => 'Riovel Dane',
             'email' => 'riovel.dane@chansey.test',
             'password' => $password,
             'user_type' => 'nurse',
             'badge_id' => 'NUR-RD-001',
+        ]);
+
+        // D. Head Nurse - East Wing (Althea Marie)
+        $headEastNurse = User::create([
+            'name' => 'Althea Marie',
+            'email' => 'althea.marie@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-AM-001',
         ]);
 
         // ==========================================
@@ -152,7 +179,7 @@ class DatabaseSeeder extends Seeder
                 'user_type' => 'physician',
                 'badge_id' => $doc['id'],
             ]);
-            
+
             Physician::create([
                 'user_id' => $u->id,
                 'employee_id' => $doc['id'],
@@ -167,7 +194,7 @@ class DatabaseSeeder extends Seeder
         // 7. INFRASTRUCTURE & Clinical Nurse Link
         // ==========================================
         $wings = [
-            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'], 
+            ['name' => 'North Wing', 'code' => 'NW', 'floor' => '1st Floor'],
             ['name' => 'East Wing',  'code' => 'EW', 'floor' => '1st Floor'],
             ['name' => 'West Wing',  'code' => 'WW', 'floor' => '2nd Floor'],
             ['name' => 'South Wing', 'code' => 'SW', 'floor' => '2nd Floor'],
@@ -185,18 +212,18 @@ class DatabaseSeeder extends Seeder
             if ($i === 0) $firstStationId = $station->id; // Save North Wing ID
 
             // Room logic (Same as before)
-            $roomNum = ($i + 1) . "01"; 
+            $roomNum = ($i + 1) . "01";
             $room = Room::create([
                 'station_id' => $station->id,
                 'room_number' => $roomNum,
                 'room_type' => 'Ward',
                 'capacity' => 4,
-                'price_per_night' => 1500.00, 
+                'price_per_night' => 1500.00,
                 'status' => 'Active',
             ]);
 
             for ($b = 1; $b <= 4; $b++) {
-                $letter = chr(64 + $b); 
+                $letter = chr(64 + $b);
                 Bed::create([
                     'room_id' => $room->id,
                     'bed_code' => "{$station->station_code}-{$room->room_number}-{$letter}",
@@ -204,8 +231,13 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+        Station::create([
+            'station_name' => 'Outpatient / Lobby',
+            'station_code' => 'OPD',
+            'floor_location' => 'Ground Floor',
+        ]);
 
-        // Link the Clinical Nurse to North Wing (Station 1)
+        // Link the Clinical Nurse to East Wing (Station 2)
         Nurse::create([
             'user_id' => $clinNurse->id,
             'employee_id' => 'NUR-RD-001',
@@ -213,9 +245,20 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Dane',
             'license_number' => '21212123',
             'designation' => 'Clinical',
-            'station_id' => 2, // Linked to East Wing (Station 2)
-            'shift_start' => '11:10:00',
-            'shift_end' => '23:10:00',
+            'station_id' => 2,
+            'is_head_nurse' => false,
+        ]);
+
+        // Link the Head Nurse (Althea Marie) to East Wing (Station 2)
+        Nurse::create([
+            'user_id' => $headEastNurse->id,
+            'employee_id' => 'NUR-AM-001',
+            'first_name' => 'Althea',
+            'last_name' => 'Marie',
+            'license_number' => 'RN-1003',
+            'designation' => 'Clinical',
+            'station_id' => 2,
+            'is_head_nurse' => true,
         ]);
 
         // ==========================================

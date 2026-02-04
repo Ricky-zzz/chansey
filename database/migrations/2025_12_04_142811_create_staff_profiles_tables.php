@@ -33,12 +33,13 @@ return new class extends Migration
 
             $table->string('license_number');
 
-            $table->string('designation')->default('Clinical')->index();
+            $table->string('designation')->default('Clinical')->index(); // can be admitting, clinical, etc.
 
             $table->foreignId('station_id')->nullable()->constrained('stations')->nullOnDelete();
 
-            $table->time('shift_start');
-            $table->time('shift_end');
+            $table->foreignId('shift_schedule_id')->nullable()->constrained()->nullOnDelete();
+            $table->boolean('is_head_nurse')->default(false);
+
             $table->timestamps();
 
             $table->index(['last_name', 'first_name']);

@@ -52,4 +52,9 @@ class Physician extends Model
     {
         return "{$this->first_name} {$this->last_name} ({$this->department?->name})";
     }
+
+    public function getInitialsAttribute()
+    {
+        return strtoupper(substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1));
+    }
 }

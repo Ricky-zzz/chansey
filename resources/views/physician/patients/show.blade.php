@@ -219,7 +219,7 @@
                         </h3>
 
                         @if($vitals)
-                        <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                             <div>
                                 <div class="text-xs text-gray-800">BP</div>
                                 <div class="font-mono text-lg font-bold">{{ $vitals['bp'] ?? '--' }}</div>
@@ -231,6 +231,14 @@
                             <div>
                                 <div class="text-xs text-gray-800">HR</div>
                                 <div class="font-mono text-lg font-bold">{{ $vitals['hr'] ?? '--' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800">PR</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['pr'] ?? '--' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-gray-800">RR</div>
+                                <div class="font-mono text-lg font-bold">{{ $vitals['rr'] ?? '--' }}</div>
                             </div>
                             <div>
                                 <div class="text-xs text-gray-800">O2</div>

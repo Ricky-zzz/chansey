@@ -121,6 +121,10 @@
                             <div class="font-bold text-lg">{{ $admission->initial_vitals['pr'] ?? '--' }}</div>
                         </div>
                         <div class="p-2 bg-slate-50 rounded-lg">
+                            <div class="text-xs text-slate-500">RR</div>
+                            <div class="font-bold text-lg">{{ $admission->initial_vitals['rr'] ?? '--' }}</div>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg">
                             <div class="text-xs text-slate-500">O2 Sat</div>
                             <div class="font-bold text-lg text-primary">{{ $admission->initial_vitals['o2'] ?? '--' }}%</div>
                         </div>

@@ -302,6 +302,10 @@
                             <input type="number" name="pr" class="input input-sm input-bordered">
                         </div>
                         <div class="form-control">
+                            <label class="label text-xs">Respiratory Rate</label>
+                            <input type="number" name="rr" class="input input-sm input-bordered">
+                        </div>
+                        <div class="form-control">
                             <label class="label text-xs">O2 Sat (%)</label>
                             <input type="number" name="o2" class="input input-sm input-bordered">
                         </div>

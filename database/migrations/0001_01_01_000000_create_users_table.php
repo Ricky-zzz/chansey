@@ -21,6 +21,7 @@ Schema::create('users', function (Blueprint $table) {
     $table->string('user_type')->default('nurse'); //['admin', 'nurse', 'physician', 'general_service']
     $table->rememberToken();
     $table->timestamps();
+    $table->string('profile_image_path')->nullable();
 });
 
     Schema::create('password_reset_tokens', function (Blueprint $table) {

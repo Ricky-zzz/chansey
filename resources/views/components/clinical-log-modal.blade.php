@@ -98,16 +98,10 @@
                 <div class="space-y-3">
                     <!-- Vitals Section First -->
                     <div class="text-xs font-bold text-gray-500 mb-2">Vital Signs</div>
-                    <template x-if="viewLogData.data.bp_systolic">
+                    <template x-if="viewLogData.data.bp">
                         <div class="flex justify-between text-sm border-b border-base-300 pb-2">
-                            <span class="font-semibold text-slate-600">BP SYSTOLIC</span>
-                            <span class="font-mono text-slate-800" x-text="viewLogData.data.bp_systolic"></span>
-                        </div>
-                    </template>
-                    <template x-if="viewLogData.data.bp_diastolic">
-                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
-                            <span class="font-semibold text-slate-600">BP DIASTOLIC</span>
-                            <span class="font-mono text-slate-800" x-text="viewLogData.data.bp_diastolic"></span>
+                            <span class="font-semibold text-slate-600">BP</span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.bp"></span>
                         </div>
                     </template>
                     <template x-if="viewLogData.data.temp">
@@ -116,22 +110,28 @@
                             <span class="font-mono text-slate-800" x-text="viewLogData.data.temp"></span>
                         </div>
                     </template>
-                    <template x-if="viewLogData.data.hr || viewLogData.data.heart_rate">
+                    <template x-if="viewLogData.data.hr">
                         <div class="flex justify-between text-sm border-b border-base-300 pb-2">
                             <span class="font-semibold text-slate-600">HEART RATE</span>
-                            <span class="font-mono text-slate-800" x-text="viewLogData.data.hr || viewLogData.data.heart_rate"></span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.hr"></span>
                         </div>
                     </template>
-                    <template x-if="viewLogData.data.o2 || viewLogData.data.o2_sat">
+                    <template x-if="viewLogData.data.pr">
                         <div class="flex justify-between text-sm border-b border-base-300 pb-2">
-                            <span class="font-semibold text-slate-600">O2 SAT (%)</span>
-                            <span class="font-mono text-slate-800" x-text="viewLogData.data.o2 || viewLogData.data.o2_sat"></span>
+                            <span class="font-semibold text-slate-600">PULSE RATE</span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.pr"></span>
                         </div>
                     </template>
-                    <template x-if="viewLogData.data.rr || viewLogData.data.respiratory_rate">
+                    <template x-if="viewLogData.data.rr">
                         <div class="flex justify-between text-sm border-b border-base-300 pb-2">
                             <span class="font-semibold text-slate-600">RESP RATE</span>
-                            <span class="font-mono text-slate-800" x-text="viewLogData.data.rr || viewLogData.data.respiratory_rate"></span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.rr"></span>
+                        </div>
+                    </template>
+                    <template x-if="viewLogData.data.o2">
+                        <div class="flex justify-between text-sm border-b border-base-300 pb-2">
+                            <span class="font-semibold text-slate-600">O2 SAT (%)</span>
+                            <span class="font-mono text-slate-800" x-text="viewLogData.data.o2"></span>
                         </div>
                     </template>
 

@@ -60,6 +60,7 @@ class StoreAdmissionRequest extends FormRequest
             'temp' => 'nullable|numeric',
             'hr' => 'nullable|integer',
             'pr' => 'nullable|integer',
+            'rr' => 'nullable|integer',
             'o2' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',

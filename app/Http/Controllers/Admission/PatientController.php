@@ -162,6 +162,7 @@ class PatientController extends Controller
                     'temp' => $data['temp'] ?? null,
                     'hr' => $data['hr'] ?? null,
                     'pr' => $data['pr'] ?? null,
+                    'rr' => $data['rr'] ?? null,
                     'o2' => $data['o2'] ?? null,
                     'height' => $data['height'] ?? null,
                     'weight' => $data['weight'] ?? null,

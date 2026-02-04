@@ -49,9 +49,12 @@ class PatientMovementService
             if ($currentMovement) {
                 $this->endMovement($currentMovement);
 
-                $oldBed = Bed::find($currentMovement->bed_id);
-                if ($oldBed) {
-                    $oldBed->update(['status' => 'Cleaning']);
+                // Only update old bed status if bed_id is not null (outpatients may not have a bed)
+                if ($currentMovement->bed_id) {
+                    $oldBed = Bed::find($currentMovement->bed_id);
+                    if ($oldBed) {
+                        $oldBed->update(['status' => 'Cleaning']);
+                    }
                 }
             }
 
@@ -59,9 +62,11 @@ class PatientMovementService
 
             $newBed->update(['status' => 'Occupied']);
 
+            // Update admission with new bed and station, and set type to Inpatient
             $admission->update([
                 'bed_id' => $newBed->id,
                 'station_id' => $newBed->room->station_id,
+                'admission_type' => 'Inpatient',
             ]);
 
             return PatientMovement::create([

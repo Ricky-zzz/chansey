@@ -44,6 +44,7 @@ class ClinicalLogController extends Controller
                 'temp' => $request->temp,
                 'hr' => $request->hr,
                 'pr' => $request->pr,
+                'rr' => $request->rr,
                 'o2' => $request->o2,
             ];
 

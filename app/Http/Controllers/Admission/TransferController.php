@@ -55,7 +55,7 @@ class TransferController extends Controller
 
             $request->medicalOrder->update(['status' => 'Done']);
 
-            $logdata['from_bed'] = $request->admission->bed->bed_code;
+            $logdata['from_bed'] = $request->admission->bed?->bed_code ?? 'No Room (Outpatient)';
             $logdata['to_bed'] = $request->targetBed->bed_code;
             $logdata['remarks'] = $request->targetBed->remarks;
 

@@ -15,13 +15,19 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 
 <body class="bg-base-100 min-h-screen">
     @if (session('success'))
-    <div class="toast toast-top toast-end z-50" x-data="{ show: true }" x-show="show">
-        <div class="alert alert-success gap-3 shadow-lg" @click.outside="show = false">
+    <div class="toast toast-top toast-end z-50"
+        x-cloak
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        @load="setTimeout(() => show = false, 4000)">
+        <div class="alert alert-success gap-3 shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -38,8 +44,13 @@
     @endif
 
     @if (session('error'))
-    <div class="toast toast-top toast-end z-50" x-data="{ show: true }" x-show="show">
-        <div class="alert alert-error gap-3 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2" @click.outside="show = false">
+    <div class="toast toast-top toast-end z-50"
+        x-cloak
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        @load="setTimeout(() => show = false, 5000)">
+        <div class="alert alert-error gap-3 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -55,8 +66,13 @@
     </div>
     @endif
     <!-- SERVER VALIDATION ERRORS DISPLAY -->
-    @if ($errors->any())
-    <div class="alert alert-error mb-6 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2" x-data="{ show: true }" x-show="show" @click.outside="show = false">
+    @if ($errors->count() > 0)
+    <div class="alert alert-error mb-6 shadow-lg z-50 fixed top-4 left-1/2 transform -translate-x-1/2"
+        x-cloak
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        @load="setTimeout(() => show = false, 6000)">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -98,8 +114,9 @@
         </div>
 
         <!-- SIDEBAR -->
-        <x-admittingsidebar />
+        <x-nursesidebar />
     </div>
+    @stack('scripts')
 </body>
 
 </html>

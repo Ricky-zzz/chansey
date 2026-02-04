@@ -85,6 +85,7 @@ class WardController extends Controller
                 'temp' => null,
                 'hr'   => null,
                 'pr'   => null,
+                'rr'   => null,
                 'o2'   => null,
             ];
             $vitals['recorded_at'] = $admission->admission_date;

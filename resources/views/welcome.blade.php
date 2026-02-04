@@ -29,7 +29,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    <div class="w-10 h-10 bg-linear-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                         C
                     </div>
                     <h1 class="text-2xl font-bold text-slate-800">Chansey Hospital</h1>
@@ -126,7 +126,7 @@
 
             <!-- Right Visual -->
             <div class="hidden lg:block">
-                <div class="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl h-96 flex items-center justify-center shadow-2xl">
+                <div class="bg-linear-to-br from-emerald-400 to-teal-500 rounded-3xl h-96 flex items-center justify-center shadow-2xl">
                     <div class="text-center text-white">
                         <svg class="w-32 h-32 mx-auto mb-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
@@ -149,7 +149,7 @@
             <!-- Department Cards Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($departments as $dept)
-                <a href="{{ route('public.doctors.index', $dept->id) }}" 
+                <a href="{{ route('public.doctors.index', $dept->id) }}"
                    class="card bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-emerald-500 group">
                     <div class="card-body text-center items-center p-6">
                         <!-- Icon -->

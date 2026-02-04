@@ -4,18 +4,18 @@
 <div class="max-w-5xl mx-auto" x-data='{
     step: 1,
     errorMessage: "",
-    
+
     validateAndNext() {
         this.errorMessage = "";
         const form = document.querySelector("form");
         const requiredFields = form.querySelectorAll("[data-step=\"" + this.step + "\"][required]");
-        
+
         let firstInvalidField = null;
-        
+
         requiredFields.forEach(field => {
             const value = field.value?.trim();
             const isEmpty = !value || value === "";
-            
+
             if (isEmpty) {
                 if (!firstInvalidField) {
                     firstInvalidField = field;
@@ -25,7 +25,7 @@
                 field.classList.remove("input-error", "select-error");
             }
         });
-        
+
         if (this.step === 2) {
             const allergiesContainer = document.querySelector("[x-data*=\"allergies\"]");
             if (allergiesContainer && allergiesContainer.__x_data && allergiesContainer.__x_data.allergies.length === 0) {
@@ -33,14 +33,14 @@
                 firstInvalidField = allergiesContainer;
             }
         }
-        
+
         if (firstInvalidField) {
             this.errorMessage = this.errorMessage || "Please fill in all required fields before proceeding.";
             firstInvalidField.scrollIntoView({ behavior: "smooth", block: "center" });
             firstInvalidField.focus();
             return;
         }
-        
+
         this.step++;
     }
 }'">
@@ -48,24 +48,7 @@
     <!-- HEADER & WIZARD STEPS -->
     <div class=" mb-8">
     <h2 class="text-3xl font-bold mb-4">New Patient Admission</h2>
-    
-    <!-- GLOBAL VALIDATION ERRORS ALERT -->
-    @if ($errors->any())
-        <div class="alert alert-error mb-6 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-                <h3 class="font-bold">Validation Error</h3>
-                <ul class="text-sm mt-2">
-                    @foreach ($errors->all() as $error)
-                        <li>• {{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-    @endif
-    
+
     <ul class="steps w-full">
         <li class="step" :class="step >= 1 ? 'step-primary' : ''">Demographics</li>
         <li class="step" :class="step >= 2 ? 'step-primary' : ''">Clinical Admission</li>
@@ -270,7 +253,7 @@
 
                 <!-- 1. ADMISSION INFO -->
                 <fieldset class="mb-8"
-                    x-data="{ 
+                    x-data="{
                                     stations: {{ Js::from($stations) }},
                                     allBeds: {{ Js::from($rawBeds) }},
                                     selectedStation: '',
@@ -326,9 +309,9 @@
                                 <span>Admission Type</span>
                                 <select name="admission_type" data-step="2" x-model="admissionType" class="select select-bordered w-full @error('admission_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Admission Type</option>
-                                    <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
-                                    <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient</option>
-                                    <option value="Inpatient" {{ old('admission_type') == 'Inpatient' ? 'selected' : '' }}>Inpatient</option>
+                                    <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency Encounter</option>
+                                    <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient Consultation</option>
+                                    <option value="Inpatient" {{ old('admission_type') == 'Inpatient' ? 'selected' : '' }}>Inpatient Admission</option>
                                     <option value="Transfer" {{ old('admission_type') == 'Transfer' ? 'selected' : '' }}>Transfer</option>
                                 </select>
                                 @error('admission_type')
@@ -433,6 +416,11 @@
                         </label>
 
                         <label class="floating-label w-full">
+                            <span>Respiratory Rate (breaths/min)</span>
+                            <input type="number" name="rr" class="input input-md w-full" placeholder="Respiratory Rate">
+                        </label>
+
+                        <label class="floating-label w-full">
                             <span>Oxygen Saturation (%)</span>
                             <input type="number" name="o2" class="input input-md w-full" placeholder="Oxygen Saturation">
                         </label>
@@ -451,8 +439,8 @@
 
                 <!-- 4. ALLERGIES -->
                 <fieldset class="mb-2"
-                    x-data="{ 
-                                  allergies: [], 
+                    x-data="{
+                                  allergies: [],
                                   currentInput: '',
                                   addAllergy() {
                                       if (this.currentInput.trim() !== '' && !this.allergies.includes(this.currentInput.trim())) {

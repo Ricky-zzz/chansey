@@ -17,8 +17,8 @@ class Nurse extends Model
         'license_number',
         'designation',
         'station_id',
-        'shift_start',
-        'shift_end',
+        'shift_schedule_id',
+        'is_head_nurse',
     ];
 
     public function user()
@@ -28,6 +28,11 @@ class Nurse extends Model
     public function station()
     {
         return $this->belongsTo(Station::class);
+    }
+
+    public function shiftSchedule()
+    {
+        return $this->belongsTo(ShiftSchedule::class);
     }
 
     public function nursingCarePlans()

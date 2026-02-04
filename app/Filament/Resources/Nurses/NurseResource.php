@@ -19,8 +19,10 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\FileUpload;
 
 class NurseResource extends Resource
 {
@@ -50,6 +52,16 @@ class NurseResource extends Resource
                 Section::make('Nurse Profile')
                     ->description('Clinical details.')
                     ->schema([
+                        FileUpload::make('user.profile_image_path')
+                            ->label('Profile Image')
+                            ->image()
+                            ->avatar()
+                            ->directory('profile-images')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->columnSpanFull(),
+
                         Grid::make(2)->schema([
                             TextInput::make('first_name')
                                 ->required(),
@@ -61,13 +73,19 @@ class NurseResource extends Resource
                             ->label('PRC License Number')
                             ->required(),
 
-                        Select::make('designation')
-                            ->options([
-                                'Clinical' => 'Clinical Nurse',
-                                'Admitting' => 'Admitting Nurse',
-                            ])
-                            ->live() // <--- React immediately
-                            ->required(),
+                        Grid::make(2)->schema([
+                            Select::make('designation')
+                                ->options([
+                                    'Clinical' => 'Clinical Nurse',
+                                    'Admitting' => 'Admitting Nurse',
+                                ])
+                                ->live()
+                                ->required(),
+
+                            Toggle::make('is_head_nurse')
+                                ->label('Head Nurse')
+                                ->inline(false),
+                        ]),
 
                         Select::make('station_id')
                             ->relationship('station', 'station_name')
@@ -76,17 +94,11 @@ class NurseResource extends Resource
                             ->visible(fn($get) => $get('designation') === 'Clinical')
                             ->required(fn($get) => $get('designation') === 'Clinical'),
 
-                        Grid::make(2)->schema([
-                            TimePicker::make('shift_start')
-                                ->label('Shift Start')
-                                ->seconds(false) // Hide seconds (06:00:00 -> 06:00)
-                                ->required(),
-
-                            TimePicker::make('shift_end')
-                                ->label('Shift End')
-                                ->seconds(false)
-                                ->required(),
-                        ]),
+                        Select::make('shift_schedule_id')
+                            ->relationship('shiftSchedule', 'name')
+                            ->label('Shift Schedule')
+                            ->nullable()
+                            ->helperText('Leave empty if shift is unassigned'),
                     ])
             ]);
     }
@@ -95,6 +107,11 @@ class NurseResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('user.profile_image_path')
+                    ->label('')
+                    ->circular()
+                    ->defaultImageUrl(fn(Nurse $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->first_name . ' ' . $record->last_name) . '&color=7F9CF5&background=EBF4FF'),
+
                 TextColumn::make('employee_id')
                     ->label('Badge ID')
                     ->searchable()
@@ -120,17 +137,23 @@ class NurseResource extends Resource
                     })
                     ->sortable(),
 
-                TextColumn::make('station_id')
-                    ->label('Station')
-                    ->formatStateUsing(fn($state, Nurse $record) => $record->station?->station_name ?? 'Admission'),
+                TextColumn::make('is_head_nurse')
+                    ->label('Head Nurse')
+                    ->badge()
+                    ->formatStateUsing(fn(bool $state): string => $state ? 'Head Nurse' : 'Staff')
+                    ->color(fn(bool $state): string => $state ? 'primary' : 'gray')
+                    ->sortable(),
 
-                TextColumn::make('shift_start')
-                    ->label('Shift')
-                    ->formatStateUsing(
-                        fn(Nurse $record) =>
-                        \Carbon\Carbon::parse($record->shift_start)->format('g:i A') . ' - ' .
-                            \Carbon\Carbon::parse($record->shift_end)->format('g:i A')
-                    )
+                TextColumn::make('station.station_name')
+                    ->label('Station')
+                    ->default('Admission')
+                    ->sortable(),
+
+                TextColumn::make('shiftSchedule.name')
+                    ->label('Shift Schedule')
+                    ->default('Unassigned')
+                    ->color(fn(?string $state): string => $state === null ? 'warning' : 'success')
+                    ->badge(),
 
             ])
             ->filters([

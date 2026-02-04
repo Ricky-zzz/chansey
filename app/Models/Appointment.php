@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Appointment extends Model
 {
     protected $fillable = [
-        'first_name', 
-        'last_name', 
-        'email', 
-        'contact_number', 
-        'purpose', 
-        'appointment_slot_id', 
+        'first_name',
+        'last_name',
+        'email',
+        'contact_number',
+        'purpose',
+        'appointment_slot_id',
         'status'
     ];
 
@@ -55,5 +56,34 @@ class Appointment extends Model
     public function getScheduledTimeAttribute()
     {
         return $this->appointmentSlot?->start_time;
+    }
+
+    // Formatted date accessors
+    public function getFormattedDateAttribute()
+    {
+        return $this->appointmentSlot?->date
+            ? Carbon::parse($this->appointmentSlot->date)->format('F d, Y')
+            : null;
+    }
+
+    public function getFormattedDayAttribute()
+    {
+        return $this->appointmentSlot?->date
+            ? Carbon::parse($this->appointmentSlot->date)->format('l')
+            : null;
+    }
+
+    public function getFormattedStartTimeAttribute()
+    {
+        return $this->appointmentSlot?->start_time
+            ? Carbon::parse($this->appointmentSlot->start_time)->format('h:i A')
+            : null;
+    }
+
+    public function getFormattedEndTimeAttribute()
+    {
+        return $this->appointmentSlot?->end_time
+            ? Carbon::parse($this->appointmentSlot->end_time)->format('h:i A')
+            : null;
     }
 }

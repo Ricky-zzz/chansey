@@ -44,8 +44,11 @@
                             <!-- FROM -->
                             <td>
                                 <div class="font-mono font-bold text-lg">
-                                    {{ $req->admission->bed->bed_code }}
+                                    {{ $req->admission->bed?->bed_code ?? 'No Room' }}
                                 </div>
+                                @if(!$req->admission->bed)
+                                    <div class="text-xs text-gray-400">Outpatient</div>
+                                @endif
                             </td>
 
                             <!-- ARROW -->

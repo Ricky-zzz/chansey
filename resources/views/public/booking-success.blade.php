@@ -7,9 +7,40 @@
     <title>Booking Confirmed - Chansey Hospital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
+    <style>
+        @media print {
+            body {
+                background: white;
+            }
+            header, footer {
+                display: none;
+            }
+            main {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .btn {
+                display: none;
+            }
+            .text-center.mt-8 {
+                display: none;
+            }
+            .bg-emerald-500,
+            .bg-slate-50,
+            .bg-blue-50,
+            .bg-amber-50 {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+<body class="bg-linear-to-br from-slate-50 to-blue-50 min-h-screen">
 
     <!-- HEADER -->
     <header class="bg-white shadow-sm">
@@ -27,10 +58,10 @@
 
     <!-- SUCCESS CONTENT -->
     <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        
+
         <!-- Success Animation -->
         <div class="text-center mb-8">
-            <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+            <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
@@ -42,7 +73,7 @@
         <!-- Appointment Details Card -->
         <div class="card bg-white shadow-xl">
             <div class="card-body">
-                
+
                 <!-- Reference Number -->
                 <div class="text-center mb-6 pb-6 border-b border-slate-200">
                     <p class="text-sm text-slate-500">Reference Number</p>
@@ -56,7 +87,7 @@
                     <div class="avatar placeholder">
                         <div class="bg-emerald-500 text-white rounded-full w-14 h-14 flex items-center justify-center">
                             <span class="text-xl font-bold">
-                                {{ strtoupper(substr($appointment->appointmentSlot->physician->first_name, 0, 1) . substr($appointment->appointmentSlot->physician->last_name, 0, 1)) }}
+                                {{ $appointment->appointmentSlot->physician->initials }}
                             </span>
                         </div>
                     </div>
@@ -73,19 +104,19 @@
                     <div class="bg-slate-50 rounded-lg p-4">
                         <p class="text-xs text-slate-500 uppercase tracking-wide mb-1">Date</p>
                         <p class="font-bold text-slate-800">
-                            {{ \Carbon\Carbon::parse($appointment->appointmentSlot->date)->format('F d, Y') }}
+                            {{ $appointment->formatted_date }}
                         </p>
                         <p class="text-sm text-slate-500">
-                            {{ \Carbon\Carbon::parse($appointment->appointmentSlot->date)->format('l') }}
+                            {{ $appointment->formatted_day }}
                         </p>
                     </div>
                     <div class="bg-slate-50 rounded-lg p-4">
                         <p class="text-xs text-slate-500 uppercase tracking-wide mb-1">Time</p>
                         <p class="font-bold text-slate-800 font-mono">
-                            {{ \Carbon\Carbon::parse($appointment->appointmentSlot->start_time)->format('h:i A') }}
+                            {{ $appointment->formatted_start_time }}
                         </p>
                         <p class="text-sm text-slate-500">
-                            to {{ \Carbon\Carbon::parse($appointment->appointmentSlot->end_time)->format('h:i A') }}
+                            to {{ $appointment->formatted_end_time }}
                         </p>
                     </div>
                 </div>
@@ -118,7 +149,7 @@
                 <!-- Reminders -->
                 <div class="alert bg-amber-50 border-amber-200 mb-6">
                     <div>
-                        <p class="font-semibold text-amber-800 mb-2">📌 Important Reminders</p>
+                        <p class="font-semibold text-amber-800 mb-2"> Important Reminders</p>
                         <ul class="text-sm text-amber-700 list-disc list-inside space-y-1">
                             <li>Please arrive 15 minutes before your scheduled time</li>
                             <li>Bring a valid ID and any relevant medical records</li>
