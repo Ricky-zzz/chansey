@@ -90,8 +90,8 @@
             <!-- Loop Orders -->
             @forelse($activeOrders as $order)
             <div class="card bg-white border border-l-4 shadow-sm hover:shadow-md transition-shadow
-                            {{ $order->type === 'Medication' ? 'border-l-emerald-500' : 
-                              ($order->type === 'Monitoring' ? 'border-l-sky-500' : 
+                            {{ $order->type === 'Medication' ? 'border-l-emerald-500' :
+                              ($order->type === 'Monitoring' ? 'border-l-sky-500' :
                               ($order->type === 'Laboratory' ? 'border-l-amber-500' :
                               ($order->type === 'Transfer' ? 'border-l-rose-500' : 'border-l-lime-500'))) }}">
                 <div class="card-body p-4">
@@ -99,12 +99,17 @@
                     <!-- Top Row: Type & Freq -->
                     <div class="flex justify-between items-start mb-2">
                         <span class="px-3 py-1 rounded-full text-sm font-bold
-                                {{ $order->type === 'Medication' ? 'bg-emerald-600 text-white' : 
-                                  ($order->type === 'Monitoring' ? 'bg-sky-600 text-white' : 
+                                {{ $order->type === 'Medication' ? 'bg-emerald-600 text-white' :
+                                  ($order->type === 'Monitoring' ? 'bg-sky-600 text-white' :
                                   ($order->type === 'Laboratory' ? 'bg-amber-600 text-white' :
                                   ($order->type === 'Transfer' ? 'bg-rose-600 text-white' : 'bg-lime-600 text-white'))) }}">
                             {{ $order->type }}
                         </span>
+                        @if($order->type === 'Medication')
+                        <span class="px-2 py-1 rounded-full text-xs font-bold {{ $order->dispensed ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                            {{ $order->dispensed ? '✓ Dispensed' : '⏳ Awaiting Pharmacy' }}
+                        </span>
+                        @endif
                         <span class="text-xs font-bold text-slate-500">{{ $order->frequency }}</span>
                     </div>
 
@@ -150,12 +155,21 @@
 
                         <!-- 2. MEDICATION: Administer -->
                         @elseif($order->type === 'Medication')
+                        @if($order->dispensed)
                         <button
                             @click="openLogModal(@js($order->id), 'Medication', @js($order->medicine->brand_name ?? $order->medicine->generic_name ?? ''), @js($order->quantity ?? 1))"
                             class="btn btn-sm btn-{{ $status['color'] }} {{ $status['disabled'] ? 'text-gray-700' : 'text-white' }} w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
                             {{ $status['disabled'] ? 'disabled' : '' }}>
                             {{ $status['label'] }}
                         </button>
+                        @else
+                        <button
+                            class="btn btn-sm btn-warning text-white w-full"
+                            disabled
+                            title="Waiting for pharmacy to dispense">
+                            ⏳ Awaiting Dispense
+                        </button>
+                        @endif
 
                         <!-- 3. UTILITY: Execute Directly -->
                         @elseif($order->type === 'Utility')

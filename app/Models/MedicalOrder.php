@@ -18,12 +18,17 @@ class MedicalOrder extends Model
         'quantity',
         'frequency',
         'status',
+        'dispensed',
+        'dispensed_by_user_id',
+        'dispensed_at',
         'fulfilled_by_user_id',
         'fulfilled_at',
     ];
 
     protected $casts = [
         'fulfilled_at' => 'datetime',
+        'dispensed' => 'boolean',
+        'dispensed_at' => 'datetime',
     ];
 
     // --- RELATIONSHIPS ---
@@ -46,6 +51,11 @@ class MedicalOrder extends Model
     public function fulfilledBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'fulfilled_by_user_id');
+    }
+
+    public function dispensedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'dispensed_by_user_id');
     }
 
     public function transferRequests(): HasMany
@@ -82,7 +92,7 @@ class MedicalOrder extends Model
     {
         return match ($this->frequency) {
             'Every 1 Hour'  => 1,
-            'Every 2 Hours' => 2, 
+            'Every 2 Hours' => 2,
             'Every 4 Hours' => 4,
             'Every 6 Hours' => 6,
             'Every 8 Hours' => 8,
@@ -98,7 +108,7 @@ class MedicalOrder extends Model
         // 1. EXCEPTIONS (PRN and Once)
         if ($this->frequency === 'PRN') {
             return [
-                'color' => 'success', 
+                'color' => 'success',
                 'label' => 'Available (PRN)',
                 'disabled' => false,
                 'is_due' => false
@@ -128,7 +138,7 @@ class MedicalOrder extends Model
         // 3. RECURRING LOGIC (Only runs if logs EXIST)
         // Anchor time is the LAST LOG
         $lastAction = $this->latestLog->created_at;
-        
+
         $nextDue = $lastAction->copy()->addHours($this->interval_in_hours);
         $now = now();
 
@@ -136,11 +146,11 @@ class MedicalOrder extends Model
         if ($now->greaterThanOrEqualTo($nextDue)) {
             $overdueBy = $now->diffForHumans($nextDue, ['syntax' => Carbon::DIFF_ABSOLUTE]);
             return [
-                'color' => 'error', 
+                'color' => 'error',
                 'label' => "DUE NOW (Late by $overdueBy)",
                 'disabled' => false,
                 'is_due' => true,
-                'animate' => true 
+                'animate' => true
             ];
         }
 
@@ -148,7 +158,7 @@ class MedicalOrder extends Model
 
         if ($minutesRemaining <= 30) {
             return [
-                'color' => 'warning', 
+                'color' => 'warning',
                 'label' => "Due in {$minutesRemaining}m",
                 'disabled' => false,
                 'is_due' => true
@@ -160,7 +170,7 @@ class MedicalOrder extends Model
             return [
                 'color' => 'neutral',
                 'label' => "Due in {$hoursRemaining}h",
-                'disabled' => true, 
+                'disabled' => true,
                 'is_due' => false
             ];
         }
@@ -170,7 +180,7 @@ class MedicalOrder extends Model
         return [
             'color' => 'neutral',
             'label' => "Due in {$daysRemaining}d",
-            'disabled' => true, 
+            'disabled' => true,
             'is_due' => false
         ];
     }

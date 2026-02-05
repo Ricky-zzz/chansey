@@ -55,7 +55,7 @@ class ClinicalLogController extends Controller
             if ($type === 'Medication' && $order) {
                 $logData['medicine'] = $order->medicine->brand_name ?? 'Unknown';
                 $logData['dosage'] = $order->quantity;
-                $logData['remarks'] = $request->note; 
+                $logData['remarks'] = $request->note;
             }
 
             ClinicalLog::create([
@@ -68,12 +68,12 @@ class ClinicalLogController extends Controller
 
             if ($order) {
                 if ($order->type === 'Medication') {
-                    if ($order->medicine->stock_on_hand < $order->quantity) {
-                        throw new \Exception("Not enough stock for {$order->medicine->name}!");
+                    // Validate medicine is dispensed by pharmacy first
+                    if (!$order->dispensed) {
+                        throw new \Exception("Medicine not yet dispensed by pharmacy! Contact pharmacy.");
                     }
 
-                    $order->medicine->decrement('stock_on_hand', $order->quantity);
-
+                    // Stock already decremented at dispense time - just bill the item
                     $this->billableItemService->create(
                         $order->admission_id,
                         $order->medicine->brand_name,
@@ -81,6 +81,11 @@ class ClinicalLogController extends Controller
                         $order->quantity,
                         'medical'
                     );
+
+                    // Reset dispensed for recurring meds (nurse administered = ready for next dose)
+                    if ($order->frequency !== 'Once') {
+                        $order->update(['dispensed' => false]);
+                    }
                 }
 
                 if ($order->frequency === 'Once' || $order->type === 'Utility') {
