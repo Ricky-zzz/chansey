@@ -19,26 +19,21 @@ class DTRController extends Controller
         return view('dtr.kiosk');
     }
 
-    /**
-     * Process Time In / Time Out from Kiosk
-     */
+
     public function store(Request $request)
     {
-        // Validate input
         $validated = $request->validate([
             'badge_id' => 'required|string',
             'password' => 'required|string',
             'action' => 'required|in:time_in,time_out'
         ]);
 
-        // Find user by badge_id
         $user = User::where('badge_id', $validated['badge_id'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             return back()->with('error', 'Invalid badge ID or password.');
         }
 
-        // Check if user is a nurse with a valid schedule
         $nurse = $user->nurse;
 
         if (!$nurse) {
@@ -49,16 +44,13 @@ class DTRController extends Controller
             return back()->with('error', 'You have no assigned schedule. Contact Head Nurse.');
         }
 
-        // Check for hanging sessions
         $hangingDtr = DailyTimeRecord::where('user_id', $user->id)
             ->whereNull('time_out')
             ->first();
 
-        // ACTION: TIME IN
         if ($validated['action'] === 'time_in') {
 
             if ($hangingDtr) {
-                // Mark previous session as incomplete (they forgot to logout)
                 $hangingDtr->update([
                     'status' => 'Incomplete',
                     'time_out' => $hangingDtr->time_in,
@@ -66,7 +58,6 @@ class DTRController extends Controller
                 ]);
             }
 
-            // Create new session
             DailyTimeRecord::create([
                 'user_id' => $user->id,
                 'time_in' => now(),
@@ -76,16 +67,14 @@ class DTRController extends Controller
             return back()->with('success', 'Time In Recorded: ' . now()->format('h:i A'));
         }
 
-        // ACTION: TIME OUT
         if ($validated['action'] === 'time_out') {
             if (!$hangingDtr) {
                 return back()->with('error', 'No active shift found. Please Time In first.');
             }
 
-            // Calculate Hours
             $start = Carbon::parse($hangingDtr->time_in);
             $end = now();
-            $hours = $start->diffInMinutes($end) / 60; // Hours with decimals
+            $hours = $start->diffInMinutes($end) / 60;
 
             $hangingDtr->update([
                 'time_out' => $end,
@@ -99,34 +88,34 @@ class DTRController extends Controller
         return back()->with('error', 'Invalid action.');
     }
 
-    /**
-     * Show My DTR Calendar (Authenticated)
-     */
-    public function myDtr()
+    public function myDtr(Request $request)
     {
         $user = Auth::user();
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
 
-        // Get all DTR records for current month
+        // Get month and year from request, default to current
+        $currentMonth = $request->query('month', now()->month);
+        $currentYear = $request->query('year', now()->year);
+
+        // Validate month and year
+        $currentMonth = max(1, min(12, (int)$currentMonth));
+        $currentYear = max(now()->year - 2, min(now()->year, (int)$currentYear));
+
         $records = DailyTimeRecord::where('user_id', $user->id)
             ->whereYear('time_in', $currentYear)
             ->whereMonth('time_in', $currentMonth)
             ->orderBy('time_in')
             ->get();
 
-        // Create array indexed by date for easy lookup
         $dtrMap = [];
         foreach ($records as $record) {
             $date = Carbon::parse($record->time_in)->format('Y-m-d');
             $dtrMap[$date] = $record;
         }
 
-        // Get calendar days
         $firstDay = Carbon::createFromDate($currentYear, $currentMonth, 1);
         $lastDay = $firstDay->copy()->endOfMonth();
         $daysInMonth = $lastDay->day;
-        $startingDayOfWeek = $firstDay->dayOfWeek; // 0 = Sunday, 6 = Saturday
+        $startingDayOfWeek = $firstDay->dayOfWeek;
 
         return view('dtr.my-dtr', [
             'dtrMap' => $dtrMap,

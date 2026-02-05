@@ -1,7 +1,7 @@
 @extends('layouts.physician')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="max-w-7xl mx-auto bg-white rounded-lg p-6 shadow-xl border border-slate-200">
 
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -44,12 +44,12 @@
                         <!-- STATUS -->
                         <td>
                             @if($app->status === 'Completed')
-                                <span class="badge badge-neutral">Done</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-gray-600 bg-gray-100 border border-gray-200">Done</span>
                             @elseif($app->admission_id)
                                 <!-- If we found a matching admission, they are HERE -->
-                                <span class="badge badge-success text-white animate-pulse">Admitted</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600 border border-emerald-600 animate-pulse">Active Consultation</span>
                             @else
-                                <span class="badge badge-ghost">Waiting / Approved</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-gray-600 bg-gray-50 border border-orange-200">Waiting</span>
                             @endif
                         </td>
 
@@ -61,8 +61,9 @@
 
                             @elseif($app->admission_id)
                                 <!-- LINK TO CHART -->
-                                <a href="{{ route('physician.patients.show', $app->admission_id) }}"
-                                   class="btn btn-sm btn-outline btn-primary gap-2">
+                                <a href="{{ route('physician.mypatients.show', $app->admission_id) }}"
+                                   class="px-3 py-1.5 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors inline-flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                     Open Chart
                                 </a>
 
@@ -70,7 +71,8 @@
                                 <!-- MARK DONE (For Outpatients without Admission) -->
                                 <form action="{{ route('physician.appointments.complete', $app->id) }}" method="POST">
                                     @csrf @method('PATCH')
-                                    <button class="btn btn-sm btn-ghost text-success">
+                                    <button class="px-3 py-1.5 text-sm bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors inline-flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                         Mark Done
                                     </button>
                                 </form>

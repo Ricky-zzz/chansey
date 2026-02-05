@@ -79,21 +79,21 @@
             <tbody>
                 @forelse($recentAdmissions as $admission)
                 <tr class="hover">
-                    <td class="font-mono text-xs font-bold">{{ $admission->patient->patient_unique_id }}</td>
+                    <td class="font-mono  text-blue-500 font-bold">{{ $admission->patient->patient_unique_id }}</td>
 
                     <td>
-                        <div class="font-bold">{{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}</div>
+                        <div class="font-bold">{{ $admission->patient->getFullNameAttribute() }}</div>
                     </td>
                     <td>
                         @php
                         $badgeClass = match($admission->admission_type) {
-                        'Emergency' => 'badge-error',
-                        'Inpatient' => 'badge-primary',
-                        'Outpatient' => 'badge-info',
-                        default => 'badge-ghost'
+                        'Emergency' => 'bg-red-600 text-white',
+                        'Inpatient' => 'bg-blue-600 text-white',
+                        'Outpatient' => 'bg-cyan-600 text-white',
+                        default => 'bg-gray-200 text-gray-800'
                         };
                         @endphp
-                            <div class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $badgeClass }}">{{ $admission->admission_type }}</div>
+                            <div class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-bold {{ $badgeClass }}">{{ $admission->admission_type }}</div>
                     </td>
 
                     <td>
@@ -102,7 +102,11 @@
                         @elseif($admission->status === 'Cleared')
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-yellow-800 bg-yellow-50 border border-yellow-200">Ready to Go</span>
                         @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600">Admitted</span>
+                                @if($admission->admission_type === 'Outpatient')
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600">Active Consultation</span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600">Admitted</span>
+                                @endif
                         @endif
                     </td>
 

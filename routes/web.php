@@ -41,6 +41,9 @@ Route::get('/dashboard', DashboardController::class)
 // DTR My Records (Authenticated)
 Route::middleware(['auth'])->group(function () {
     Route::get('/my-dtr', [DTRController::class, 'myDtr'])->name('dtr.my-dtr');
+    Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Include role-based routes

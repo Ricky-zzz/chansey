@@ -1,7 +1,7 @@
 @extends('layouts.physician')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto bg-white rounded-lg p-6 shadow-xl border border-slate-200">
     {{-- Header --}}
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -71,13 +71,13 @@
                     <tr class="hover">
                         {{-- DATE --}}
                         <td>
-                            <div class="font-bold">{{ \Carbon\Carbon::parse($slot->date)->format('M d, Y') }}</div>
-                            <div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($slot->date)->format('l') }}</div>
+                            <div class="font-bold">{{ $slot->formatted_date }}</div>
+                            <div class="text-xs text-gray-400">{{ $slot->formatted_day }}</div>
                         </td>
 
                         {{-- TIME --}}
                         <td class="font-mono text-primary font-bold">
-                            {{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }}
+                            {{ $slot->formatted_start_time }} - {{ $slot->formatted_end_time }}
                         </td>
 
                         {{-- CAPACITY with Progress Bar --}}
@@ -104,11 +104,11 @@
                         {{-- STATUS --}}
                         <td>
                             @if($slot->status === 'Cancelled')
-                                <span class="badge badge-error text-white">Cancelled</span>
-                            @elseif($slot->date < today())
-                                <span class="badge badge-ghost">Past</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-rose-600 border border-rose-600">Cancelled</span>
+                            @elseif(\Carbon\Carbon::parse($slot->date)->toDateString() < today()->toDateString())
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-gray-600 bg-gray-100 border border-gray-200">Past</span>
                             @else
-                                <span class="badge badge-success text-white">Active</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold text-white bg-emerald-600 border border-emerald-600">Active</span>
                             @endif
                         </td>
 

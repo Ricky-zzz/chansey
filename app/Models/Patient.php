@@ -61,9 +61,14 @@ class Patient extends Model
         $middleInitial = $this->middle_name ? ' ' . strtoupper($this->middle_name[0]) . '.' : '';
         return trim("{$this->last_name}, {$this->first_name}".$middleInitial);
     }
-    
+
     public function getAgeAttribute(): int
     {
         return $this->date_of_birth->diffInYears();
+    }
+
+    public function getFormattedDateOfBirthAttribute(): string
+    {
+        return $this->date_of_birth->format('F d, Y');
     }
 }

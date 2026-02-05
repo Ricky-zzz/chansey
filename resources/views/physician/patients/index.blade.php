@@ -3,13 +3,13 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+    <div class="bg-white rounded-lg p-6 shadow-xl border border-slate-200">
 
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
                 <h2 class="text-3xl font-bold text-slate-800">My Patient List</h2>
-                <div class="badge badge-primary badge-outline mt-1">Active Rounds</div>
+                <p class="text-sm text-gray-500">List of all Active Patients</p>
             </div>
 
             <!-- SEARCH -->
@@ -30,7 +30,7 @@
                         <th>Patient</th>
                         <th>Type</th>
                         <th>Case Details</th>
-                        <th>Admission Date</th>
+                        <th>Encounter Date</th>
                         <th class="text-right">Chart</th>
                     </tr>
                 </thead>
@@ -43,13 +43,13 @@
                                 {{ $admission->station->station_name ?? 'Floating' }}
                             </div>
                             <div class="badge badge-neutral font-mono text-xs">
-                                {{ $admission->bed->bed_code ?? 'Outpatient' }}
+                                {{ $admission->bed->bed_code ?? 'none' }}
                             </div>
                         </td>
 
                         <!-- Patient -->
                         <td>
-                            <div class="font-bold text-md text-primary">
+                            <div class="font-bold text-sm text-blue-500">
                                 {{ $admission->patient->getFullNameAttribute() }}
                             </div>
                             <div class="text-xs text-gray-500">
@@ -88,7 +88,7 @@
 
                         <!-- Action -->
                         <td class="text-right">
-                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn btn-sm btn-primary gap-2">
+                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn btn-sm text-white btn-primary gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 Open Chart
                             </a>

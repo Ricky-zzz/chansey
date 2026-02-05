@@ -47,9 +47,9 @@
         <!-- PRIMARY ACTIONS -->
         <div class="flex flex-col gap-2 items-end">
             <h2 class="text-xs font-bold text-gray-400 uppercase">Actions</h2>
-            <div class="join">
+            <div class="flex flex-row gap-2 items-center">
                 <!-- Order Modal Trigger -->
-                <button onclick="order_modal.showModal()" class="btn btn-primary text-white btn-sm join-item gap-2">
+                <button onclick="order_modal.showModal()" class="bg-blue-600 hover:bg-blue-700 text-white btn-sm gap-2 border-2 border-blue-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -58,9 +58,9 @@
 
                 <!-- Treatment Plan Button -->
                 @if($admission->treatmentPlan)
-                <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="btn btn-neutral btn-sm join-item text-white">Manage Plan</a>
+                <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white btn-sm border-2 border-emerald-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">Manage Plan</a>
                 @else
-                <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="btn btn-neutral btn-sm join-item text-white">Create Plan</a>
+                <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white btn-sm border-2 border-emerald-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">Create Plan</a>
                 @endif
             </div>
         </div>
@@ -209,11 +209,11 @@
                     <div class="card-body">
                         <h3 class="card-title text-sm text-gray-800 uppercase font-bold flex justify-between">
                             Current Vitals
-                            <span class="text-info">
+                            <span class="text-blue-600">
                                 @if($latestLog && isset($latestLog->data['bp']))
                                 {{ $latestLog->created_at->diffForHumans() }}
                                 @else
-                                Admission ({{ $admission->admission_date->format('M d H:i') }})
+                                  From Admission
                                 @endif
                             </span>
                         </h3>

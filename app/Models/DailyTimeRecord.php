@@ -24,4 +24,20 @@ class DailyTimeRecord extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Format the date portion of time_in (M d, Y format)
+     */
+    public function getFormattedDateAttribute()
+    {
+        return $this->time_in->format('M d, Y');
+    }
+
+    /**
+     * Format the full date and time of time_in (M d, Y H:i format)
+     */
+    public function getFormattedDateTimeAttribute()
+    {
+        return $this->time_in->format('M d, Y H:i');
+    }
 }
