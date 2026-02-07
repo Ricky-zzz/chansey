@@ -34,6 +34,8 @@ class Patient extends Model
         'date_of_birth' => 'datetime',
     ];
 
+    protected $appends = ['formatted_date_of_birth'];
+
     // --- RELATIONSHIPS ---
 
     public function admissions(): HasMany
@@ -67,8 +69,11 @@ class Patient extends Model
         return $this->date_of_birth->diffInYears();
     }
 
-    public function getFormattedDateOfBirthAttribute(): string
+    /**
+     * Format date of birth (M d, Y)
+     */
+    public function getFormattedDateOfBirthAttribute()
     {
-        return $this->date_of_birth->format('F d, Y');
+        return $this->date_of_birth ? $this->date_of_birth->format('M d, Y') : 'N/A';
     }
 }

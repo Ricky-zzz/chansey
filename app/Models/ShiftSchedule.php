@@ -34,7 +34,7 @@ class ShiftSchedule extends Model
         'sunday' => 'boolean',
     ];
 
-    protected $appends = ['total_hours_per_week', 'days_short'];
+    protected $appends = ['total_hours_per_week', 'days_short', 'formatted_start_time', 'formatted_end_time', 'formatted_time_range'];
 
     /**
      * Get total hours per week based on checked days
@@ -43,7 +43,7 @@ class ShiftSchedule extends Model
     {
         $start = \Carbon\Carbon::parse($this->start_time);
         $end = \Carbon\Carbon::parse($this->end_time);
-        
+
         // Handle overnight shifts
         if ($end->lt($start)) {
             $hoursPerDay = 24 - $start->diffInMinutes($end) / 60;
@@ -79,6 +79,34 @@ class ShiftSchedule extends Model
         if ($this->sunday) $days[] = 'SU';
 
         return implode(', ', $days) ?: 'None';
+    }
+
+    /**
+     * Get formatted start time (H:i format)
+     */
+    public function getFormattedStartTimeAttribute(): string
+    {
+        return $this->start_time instanceof \DateTime
+            ? $this->start_time->format('H:i')
+            : \Carbon\Carbon::parse($this->start_time)->format('H:i');
+    }
+
+    /**
+     * Get formatted end time (H:i format)
+     */
+    public function getFormattedEndTimeAttribute(): string
+    {
+        return $this->end_time instanceof \DateTime
+            ? $this->end_time->format('H:i')
+            : \Carbon\Carbon::parse($this->end_time)->format('H:i');
+    }
+
+    /**
+     * Get formatted time range (e.g., "08:00 - 16:00")
+     */
+    public function getFormattedTimeRangeAttribute(): string
+    {
+        return $this->formatted_start_time . ' - ' . $this->formatted_end_time;
     }
 
     public function nurses()

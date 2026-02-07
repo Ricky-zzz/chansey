@@ -20,6 +20,8 @@ class DailyTimeRecord extends Model
         'total_hours' => 'decimal:2'
     ];
 
+    protected $appends = ['formatted_date', 'formatted_date_time', 'formatted_time_in', 'formatted_time_out', 'formatted_hours', 'formatted_day'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -39,5 +41,37 @@ class DailyTimeRecord extends Model
     public function getFormattedDateTimeAttribute()
     {
         return $this->time_in->format('M d, Y H:i');
+    }
+
+    /**
+     * Format time_in as time only (h:i A format - 12 hour)
+     */
+    public function getFormattedTimeInAttribute()
+    {
+        return $this->time_in->format('H:i');
+    }
+
+    /**
+     * Format time_out as time only (h:i A format - 12 hour)
+     */
+    public function getFormattedTimeOutAttribute()
+    {
+        return $this->time_out ? $this->time_out->format('H:i') : '—';
+    }
+
+    /**
+     * Format total hours with 2 decimals and 'h' suffix
+     */
+    public function getFormattedHoursAttribute()
+    {
+        return $this->total_hours ? number_format($this->total_hours, 2) . 'h' : '—';
+    }
+
+    /**
+     * Get day of week (l format - Monday, Tuesday, etc.)
+     */
+    public function getFormattedDayAttribute()
+    {
+        return $this->time_in->format('l');
     }
 }

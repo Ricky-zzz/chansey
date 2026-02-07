@@ -14,13 +14,13 @@ class DashboardController extends Controller
 
         // My Active Patients
         $query = Admission::query()
-            ->with(['patient', 'bed.room.station']) 
+            ->with(['patient', 'bed.room.station'])
             ->where('admissions.status', 'Admitted')
             ->where('admissions.attending_physician_id', $physician->id);
 
         // Stats
         $myTotalPatients = (clone $query)->count();
-        
+
         $newReferrals = (clone $query)
             ->where('created_at', '>=', now()->subHours(24))
             ->count();
@@ -30,15 +30,14 @@ class DashboardController extends Controller
             ->where('admission_type', 'Emergency')
             ->count();
 
-        // Main List
+        // Main List - Paginated (10 per page)
         $myPatients = $query
             ->leftJoin('beds', 'admissions.bed_id', '=', 'beds.id')
             ->leftJoin('rooms', 'beds.room_id', '=', 'rooms.id')
             ->leftJoin('stations', 'rooms.station_id', '=', 'stations.id')
-            ->orderByRaw('COALESCE(stations.station_name, "") ASC')
-            ->orderByRaw('COALESCE(rooms.room_number, "") ASC')    
+            ->orderBy('admissions.admission_date', 'DESC')
             ->select('admissions.*')
-            ->get();
+            ->paginate(8);
 
         return view('physician.dashboard', compact(
             'physician',

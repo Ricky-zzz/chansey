@@ -18,5 +18,18 @@ export default {
         },
     },
 
-    plugins: [forms],
+    corePlugins: {
+        // Keep DaisyUI working
+    },
+
+    plugins: [
+        forms,
+        function({ addUtilities }) {
+            addUtilities({
+                '.badge-count': {
+                    '@apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-cyan-100 text-cyan-700': {},
+                },
+            })
+        },
+    ],
 };

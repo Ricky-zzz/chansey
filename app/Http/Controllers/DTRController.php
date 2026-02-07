@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyTimeRecord;
+use App\Models\Nurse;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,10 +78,27 @@ class DTRController extends Controller
             $end = now();
             $hours = $start->diffInMinutes($end) / 60;
 
+            // Determine if late based on shift schedule
+            $shiftSchedule = $nurse->shiftSchedule;
+            $status = 'Present';
+
+            if ($shiftSchedule) {
+                $scheduledStartTime = Carbon::parse($shiftSchedule->start_time);
+                $actualStartTime = Carbon::parse($hangingDtr->time_in);
+
+                // Compare only the time portion (ignore date)
+                $actualTimeOfDay = $actualStartTime->format('H:i');
+                $scheduledTimeOfDay = $scheduledStartTime->format('H:i');
+
+                if ($actualTimeOfDay > $scheduledTimeOfDay) {
+                    $status = 'Late';
+                }
+            }
+
             $hangingDtr->update([
                 'time_out' => $end,
                 'total_hours' => round($hours, 2),
-                'status' => 'Present'
+                'status' => $status
             ]);
 
             return back()->with('success', 'Time Out Recorded. Total Hours: ' . round($hours, 2));
@@ -91,12 +110,11 @@ class DTRController extends Controller
     public function myDtr(Request $request)
     {
         $user = Auth::user();
+        $nurse = $user->nurse;
 
-        // Get month and year from request, default to current
         $currentMonth = $request->query('month', now()->month);
         $currentYear = $request->query('year', now()->year);
 
-        // Validate month and year
         $currentMonth = max(1, min(12, (int)$currentMonth));
         $currentYear = max(now()->year - 2, min(now()->year, (int)$currentYear));
 
@@ -117,13 +135,225 @@ class DTRController extends Controller
         $daysInMonth = $lastDay->day;
         $startingDayOfWeek = $firstDay->dayOfWeek;
 
+        // Get nurse's shift schedule
+        $shiftSchedule = $nurse ? $nurse->shiftSchedule : null;
+
+        // Get scheduled days for display
+        $scheduledDays = [];
+        if ($shiftSchedule) {
+            $dayMap = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            foreach ($dayMap as $day) {
+                if ($shiftSchedule->{$day}) {
+                    $scheduledDays[] = ucfirst($day);
+                }
+            }
+        }
+
         return view('dtr.my-dtr', [
             'dtrMap' => $dtrMap,
             'daysInMonth' => $daysInMonth,
             'startingDayOfWeek' => $startingDayOfWeek,
             'currentMonth' => $currentMonth,
             'currentYear' => $currentYear,
-            'monthName' => $firstDay->format('F Y')
+            'monthName' => $firstDay->format('F Y'),
+            'shiftSchedule' => $shiftSchedule,
+            'scheduledDays' => $scheduledDays
         ]);
+    }
+
+    /**
+     * Generate DTR report PDF for the authenticated nurse
+     */
+    public function myDtrReport(Request $request)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $user = Auth::user();
+        $nurse = $user->nurse;
+
+        if (!$nurse) {
+            return back()->with('error', 'Only nurses can generate DTR reports.');
+        }
+
+        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+
+        return $this->generateDtrPdf($nurse, $dateFrom, $dateTo);
+    }
+
+    /**
+     * Generate DTR report PDF for a specific nurse (Head Nurse)
+     */
+    public function nurseDtrReport(Request $request, Nurse $nurse)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+
+        return $this->generateDtrPdf($nurse, $dateFrom, $dateTo);
+    }
+
+    /**
+     * Generate batch DTR report PDF for all nurses under head nurse
+     */
+    public function batchDtrReport(Request $request)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $me = Auth::user()->nurse;
+        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+
+        if ($me->designation === 'Clinical') {
+            $nurses = Nurse::with(['user', 'station', 'shiftSchedule'])
+                ->where('station_id', $me->station_id)
+                ->where('id', '!=', $me->id)
+                ->orderBy('last_name')
+                ->get();
+        } else {
+            $nurses = Nurse::with(['user', 'shiftSchedule'])
+                ->where('designation', 'Admitting')
+                ->where('id', '!=', $me->id)
+                ->orderBy('last_name')
+                ->get();
+        }
+
+        return $this->buildBatchPdf($nurses, $dateFrom, $dateTo);
+    }
+
+    /**
+     * Generate DTR report PDF for a specific nurse (Admin)
+     */
+    public function adminNurseDtrReport(Request $request, Nurse $nurse)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+
+        return $this->generateDtrPdf($nurse, $dateFrom, $dateTo);
+    }
+
+    /**
+     * Generate batch DTR report PDF for all nurses (Admin - no filtering)
+     */
+    public function adminBatchDtrReport(Request $request)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+        $dateTo = Carbon::parse($request->date_to)->endOfDay();
+
+        // Get all nurses (no filtering)
+        $nurses = Nurse::with(['user', 'station', 'shiftSchedule'])
+            ->orderBy('last_name')
+            ->get();
+
+        return $this->buildBatchPdf($nurses, $dateFrom, $dateTo);
+    }
+
+    /**
+     * Build batch DTR PDF for given nurses and date range
+     */
+    private function buildBatchPdf($nurses, $dateFrom, $dateTo)
+    {
+        // Build data for each nurse
+        $allReports = [];
+        foreach ($nurses as $nurse) {
+            $records = DailyTimeRecord::where('user_id', $nurse->user_id)
+                ->whereBetween('time_in', [$dateFrom, $dateTo])
+                ->orderBy('time_in')
+                ->get();
+
+            $allReports[] = [
+                'nurse' => $nurse,
+                'shiftSchedule' => $nurse->shiftSchedule,
+                'records' => $records,
+                'summary' => $this->buildSummary($records, $nurse->shiftSchedule, $dateFrom, $dateTo),
+            ];
+        }
+
+        // Format dates for view
+        $dateFromFormatted = $dateFrom->format('F d, Y');
+        $dateToFormatted = $dateTo->format('F d, Y');
+        $dateFromFormattedShort = $dateFrom->format('M d, Y');
+        $dateToFormattedShort = $dateTo->format('M d, Y');
+
+        $pdf = Pdf::loadView('dtr.dtr-batch-report', compact('allReports', 'dateFromFormatted', 'dateToFormatted', 'dateFromFormattedShort', 'dateToFormattedShort'));
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->stream('dtr-batch-report-' . $dateFrom->format('Ymd') . '-' . $dateTo->format('Ymd') . '.pdf');
+    }
+
+    /**
+     * Generate a single nurse DTR PDF
+     */
+    private function generateDtrPdf(Nurse $nurse, Carbon $dateFrom, Carbon $dateTo)
+    {
+        $records = DailyTimeRecord::where('user_id', $nurse->user_id)
+            ->whereBetween('time_in', [$dateFrom, $dateTo])
+            ->orderBy('time_in')
+            ->get();
+
+        $shiftSchedule = $nurse->shiftSchedule;
+        $summary = $this->buildSummary($records, $shiftSchedule, $dateFrom, $dateTo);
+
+        // Format dates for view
+        $dateFromFormatted = $dateFrom->format('M d, Y');
+        $dateToFormatted = $dateTo->format('M d, Y');
+
+        $pdf = Pdf::loadView('dtr.dtr-report', compact('nurse', 'records', 'shiftSchedule', 'summary', 'dateFromFormatted', 'dateToFormatted'));
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->stream('dtr-report-' . $nurse->employee_id . '-' . $dateFrom->format('Ymd') . '.pdf');
+    }
+
+    /**
+     * Build summary statistics for DTR records
+     */
+    private function buildSummary($records, $shiftSchedule, Carbon $dateFrom, Carbon $dateTo)
+    {
+        $totalRecords = $records->count();
+        $totalHours = $records->sum('total_hours');
+        $presentDays = $records->where('status', 'Present')->count();
+        $lateDays = $records->where('status', 'Late')->count();
+        $incompleteDays = $records->where('status', 'Incomplete')->count();
+
+        // Calculate expected hours based on shift schedule and date range
+        $expectedHours = 0;
+        if ($shiftSchedule) {
+            $dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            $current = $dateFrom->copy();
+            while ($current->lte($dateTo)) {
+                $dayName = $dayMap[$current->dayOfWeek];
+                if ($shiftSchedule->{$dayName}) {
+                    $start = Carbon::parse($shiftSchedule->start_time);
+                    $end = Carbon::parse($shiftSchedule->end_time);
+                    $expectedHours += $end->gt($start)
+                        ? $start->diffInMinutes($end) / 60
+                        : (1440 - $start->diffInMinutes($end)) / 60;
+                }
+                $current->addDay();
+            }
+        }
+
+        $overtime = max(0, $totalHours - $expectedHours);
+        $deficit = max(0, $expectedHours - $totalHours);
+
+        return compact('totalRecords', 'totalHours', 'presentDays', 'lateDays', 'incompleteDays', 'expectedHours', 'overtime', 'deficit');
     }
 }

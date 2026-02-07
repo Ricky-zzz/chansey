@@ -9,6 +9,10 @@
             <h2 class="text-3xl font-black text-slate-800">{{ $title }}</h2>
             <p class="text-sm text-gray-500">Manage shift schedules for nurses under your supervision</p>
         </div>
+        <button @click="openBatchDtrModal()" class="btn btn-sm bg-slate-700 hover:bg-slate-800 text-white gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Batch DTR Report
+        </button>
     </div>
 
     {{-- Table --}}
@@ -75,18 +79,29 @@
 
                         {{-- ACTIONS --}}
                         <td class="text-right">
-                            <button
-                                @click="openScheduleModal({
-                                    id: {{ $nurse->id }},
-                                    name: '{{ $nurse->first_name }} {{ $nurse->last_name }}',
-                                    current_schedule_id: {{ $nurse->shift_schedule_id ?? 'null' }}
-                                })"
-                                class="btn btn-sm btn-outline btn-primary gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                Assign Schedule
-                            </button>
+                            <div class="flex gap-1 justify-end">
+                                <button
+                                    @click="openDtrModal({
+                                        id: {{ $nurse->id }},
+                                        name: '{{ $nurse->first_name }} {{ $nurse->last_name }}'
+                                    })"
+                                    class="btn btn-sm btn-outline btn-neutral gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                    DTR
+                                </button>
+                                <button
+                                    @click="openScheduleModal({
+                                        id: {{ $nurse->id }},
+                                        name: '{{ $nurse->first_name }} {{ $nurse->last_name }}',
+                                        current_schedule_id: {{ $nurse->shift_schedule_id ?? 'null' }}
+                                    })"
+                                    class="btn btn-sm btn-outline btn-primary gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    Schedule
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -176,6 +191,76 @@
         </form>
     </dialog>
 
+    {{-- SINGLE NURSE DTR REPORT MODAL --}}
+    <dialog id="dtr_nurse_modal" class="modal" x-ref="dtrModal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+
+            <h3 class="font-bold text-xl mb-2">DTR Report</h3>
+            <p class="text-sm text-gray-500 mb-4">Generate DTR report for: <span class="font-bold text-primary" x-text="selectedDtrNurse.name"></span></p>
+
+            <form :action="`{{ url('nurse/headnurse/nurses') }}/${selectedDtrNurse.id}/dtr-report`" method="POST" target="_blank" class="space-y-4">
+                @csrf
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-semibold">Date From</span></label>
+                        <input type="date" name="date_from" required class="input input-bordered w-full" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-semibold">Date To</span></label>
+                        <input type="date" name="date_to" required class="input input-bordered w-full" />
+                    </div>
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" @click="$refs.dtrModal.close()" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Generate PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+
+    {{-- BATCH DTR REPORT MODAL --}}
+    <dialog id="dtr_batch_modal" class="modal" x-ref="batchDtrModal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+
+            <h3 class="font-bold text-xl mb-2">Batch DTR Report</h3>
+            <p class="text-sm text-gray-500 mb-4">Generate DTR reports for <strong>all nurses</strong> under your supervision in one PDF.</p>
+
+            <form action="{{ route('nurse.headnurse.nurses.batchDtrReport') }}" method="POST" target="_blank" class="space-y-4">
+                @csrf
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-semibold">Date From</span></label>
+                        <input type="date" name="date_from" required class="input input-bordered w-full" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text font-semibold">Date To</span></label>
+                        <input type="date" name="date_to" required class="input input-bordered w-full" />
+                    </div>
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" @click="$refs.batchDtrModal.close()" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Generate Batch PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+
 </div>
 
 @push('scripts')
@@ -188,6 +273,10 @@
                 name: '',
                 current_schedule_id: null
             },
+            selectedDtrNurse: {
+                id: null,
+                name: ''
+            },
             schedules: window.schedulesData,
 
             openScheduleModal(nurse) {
@@ -197,6 +286,18 @@
                     current_schedule_id: nurse.current_schedule_id
                 };
                 this.$refs.scheduleModal.showModal();
+            },
+
+            openDtrModal(nurse) {
+                this.selectedDtrNurse = {
+                    id: nurse.id,
+                    name: nurse.name
+                };
+                this.$refs.dtrModal.showModal();
+            },
+
+            openBatchDtrModal() {
+                this.$refs.batchDtrModal.showModal();
             },
 
             getScheduleDetails(scheduleId) {

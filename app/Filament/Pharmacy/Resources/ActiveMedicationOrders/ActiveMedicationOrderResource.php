@@ -33,10 +33,9 @@ class ActiveMedicationOrderResource extends Resource
     {
         return $table
             ->query(
-                fn($query) => $query
+                MedicalOrder::query()
                     ->where('type', 'Medication')
-                    ->where(fn($q) => $q->where('status', 'Active')
-                        ->orWhere('status', 'Pending'))
+                    ->whereIn('status', ['Active', 'Pending'])
                     ->with(['admission.patient', 'admission.bed', 'medicine', 'dispensedBy'])
                     ->orderBy('created_at', 'desc')
             )
@@ -128,7 +127,6 @@ class ActiveMedicationOrderResource extends Resource
                 ->body("{$order->medicine->generic_name} dispensed for {$order->admission->patient->first_name}")
                 ->success()
                 ->send();
-
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Error')

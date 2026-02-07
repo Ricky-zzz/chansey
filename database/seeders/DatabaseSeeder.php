@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 0. CREATE DEPARTMENTS (Prerequisite)
         // ==========================================
-        $deptNames = ['Cardiology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Surgery', 'OB-GYN'];
+        $deptNames = ['Cardiology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Surgery', 'OB-GYN','ENT'];
         $depts = [];
         foreach ($deptNames as $name) {
             $depts[$name] = Department::create(['name' => $name])->id;
@@ -183,7 +183,8 @@ class DatabaseSeeder extends Seeder
                 'floor' => 'Ground Floor',
                 'room_type' => 'ER',
                 'capacity' => 10,
-                'price' => 1000.00
+                'price' => 1000.00,
+                'room_count' => 5
             ],
             [
                 'name' => 'Intensive Care Unit',
@@ -199,7 +200,8 @@ class DatabaseSeeder extends Seeder
                 'floor' => '3rd Floor',
                 'room_type' => 'Ward',
                 'capacity' => 6,
-                'price' => 1500.00
+                'price' => 1500.00,
+                'room_count' => 5
             ],
             [
                 'name' => 'OB-GYN Ward',
@@ -448,5 +450,7 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
+
+        $this->call(PatientAdmissionSeeder::class);
     }
 }

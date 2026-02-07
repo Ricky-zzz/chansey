@@ -62,6 +62,14 @@
                 @else
                 <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white btn-sm border-2 border-emerald-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">Create Plan</a>
                 @endif
+
+                <!-- Print Report Button -->
+                <a href="{{ route('patient.print-report', $admission->id) }}" target="_blank" class="bg-slate-600 hover:bg-slate-700 text-white btn-sm border-2 border-slate-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Report
+                </a>
             </div>
         </div>
     </div>
@@ -385,9 +393,7 @@
 
                 <!-- MODAL ACTIONS -->
                 <div class="modal-action pt-2">
-                    <form method="dialog">
-                        <button class="btn btn-outline btn-error">Cancel</button>
-                    </form>
+                    <button type="button" onclick="order_modal.close()" class="btn btn-outline btn-error">Cancel</button>
                     <button type="submit" class="btn btn-primary">Submit Order</button>
                 </div>
             </form>

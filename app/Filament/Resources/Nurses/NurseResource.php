@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -163,6 +164,48 @@ class NurseResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    \Filament\Actions\Action::make('dtrReport')
+                        ->label('DTR Report')
+                        ->icon('heroicon-o-document-text')
+                        ->form([
+                \Filament\Actions\Action::make('batchDtrReport')
+                    ->label('Batch DTR Report')
+                    ->icon('heroicon-o-document-chart-bar')
+                    ->form([
+                        Grid::make(2)->schema([
+                            DatePicker::make('date_from')
+                                ->label('Date From')
+                                ->required(),
+                            DatePicker::make('date_to')
+                                ->label('Date To')
+                                ->required(),
+                        ]),
+                    ])
+                    ->modalSubmitActionLabel('Generate Batch PDF')
+                    ->action(function (array $data) {
+                        return redirect()->away(
+                            route('admin.nurses.batchDtrReport', $data)
+                        );
+                    }),
+                            Grid::make(2)->schema([
+                                DatePicker::make('date_from')
+                                    ->label('Date From')
+                                    ->required(),
+                                DatePicker::make('date_to')
+                                    ->label('Date To')
+                                    ->required(),
+                            ]),
+                        ])
+                        ->modalSubmitActionLabel('Generate PDF')
+                        ->action(function (Nurse $record, array $data) {
+                            return redirect()->away(
+                                route('admin.nurses.dtrReport', [
+                                    'nurse' => $record->id,
+                                    'date_from' => $data['date_from'],
+                                    'date_to' => $data['date_to'],
+                                ])
+                            );
+                        }),
                     DeleteAction::make(),
                 ]),
             ])

@@ -77,7 +77,6 @@
     <!-- 3. PATIENT LIST (Rounds View) -->
     <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
         <span>Rounds List</span>
-        <span class="badge badge-neutral text-xs font-normal">Sorted by Location</span>
     </h2>
 
     <div class="card bg-base-100 shadow-xl border border-base-200">
@@ -85,7 +84,7 @@
             <table class="table table-lg">
                 <thead class="bg-neutral text-neutral-content font-bold uppercase text-xs">
                     <tr>
-                        <th>Location</th> <!-- Key difference for doctors -->
+                        <th>Location</th>
                         <th>Patient Name</th>
                         <th>Type</th>
                         <th>Case Details</th>
@@ -165,6 +164,17 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <!-- Pagination -->
+        <div class="card-body pt-4 border-t border-base-200">
+            <div class="flex items-center justify-between gap-4">
+                <div class="text-sm text-gray-500">
+                    Showing <span class="font-semibold">{{ $myPatients->firstItem() ?? 0 }}</span> to <span class="font-semibold">{{ $myPatients->lastItem() ?? 0 }}</span> of <span class="font-semibold">{{ $myPatients->total() }}</span> patients
+                </div>
+                <div>
+                    {{ $myPatients->links() }}
+                </div>
+            </div>
         </div>
     </div>
 

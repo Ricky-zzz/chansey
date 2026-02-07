@@ -44,6 +44,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Patient Reports
+    Route::get('/patient/{id}/print-report', [\App\Http\Controllers\PatientReportController::class, 'printReport'])->name('patient.print-report');
+    Route::get('/admission/{admission}/report', [\App\Http\Controllers\PatientReportController::class, 'admissionReport'])->name('admission.report');
+
+    // DTR Reports (own DTR)
+    Route::post('/my-dtr/report', [DTRController::class, 'myDtrReport'])->name('dtr.my-dtr-report');
+
+    // Admin DTR Reports
+    Route::post('/admin/nurses/{nurse}/dtr-report', [DTRController::class, 'adminNurseDtrReport'])->name('admin.nurses.dtrReport');
+    Route::post('/admin/nurses/batch-dtr-report', [DTRController::class, 'adminBatchDtrReport'])->name('admin.nurses.batchDtrReport');
 });
 
 // Include role-based routes

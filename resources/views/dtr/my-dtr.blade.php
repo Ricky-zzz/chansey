@@ -4,10 +4,61 @@
 <div class="py-4">
     <div class="container max-w-4xl mx-auto px-4">
         <!-- Header Card -->
-        <div class="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">My Attendance</h1>
-            <p class="text-sm text-gray-600">View your daily time records and attendance history</p>
+        <div class="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-1">My Attendance</h1>
+                <p class="text-sm text-gray-600">View your daily time records and attendance history</p>
+            </div>
+            <button onclick="dtr_report_modal.showModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-semibold hover:bg-slate-800 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Print DTR Report
+            </button>
         </div>
+
+        <!-- Assigned Schedule Card -->
+        @if ($shiftSchedule)
+            <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm p-4 border border-blue-300">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">Your Assigned Schedule</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg p-3 border border-blue-200">
+                        <div class="text-xs font-bold text-gray-600 uppercase tracking-wide">Shift Name</div>
+                        <div class="text-lg font-bold text-blue-600 mt-1">{{ $shiftSchedule->name }}</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-3 border border-blue-200">
+                        <div class="text-xs font-bold text-gray-600 uppercase tracking-wide">Time In</div>
+                        <div class="text-lg font-bold text-green-600 mt-1 font-mono">{{ $shiftSchedule->formatted_start_time }}</div>
+                    </div>
+                    <div class="bg-white rounded-lg p-3 border border-blue-200">
+                        <div class="text-xs font-bold text-gray-600 uppercase tracking-wide">Time Out</div>
+                        <div class="text-lg font-bold text-red-600 mt-1 font-mono">{{ $shiftSchedule->formatted_end_time }}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Scheduled Days</div>
+                    <div class="flex flex-wrap gap-2">
+                        @php
+                            $dayMap = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                            $dayShortMap = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        @endphp
+                        @foreach ($dayMap as $index => $day)
+                            @if ($shiftSchedule->{$day})
+                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-green-100 border border-green-300">
+                                    <span class="font-bold text-sm text-green-800">{{ $dayShortMap[$index] }}</span>
+                                </div>
+                            @else
+                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-300">
+                                    <span class="font-bold text-sm text-gray-600">{{ $dayShortMap[$index] }}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="mb-6 bg-yellow-50 rounded-lg shadow-sm p-4 border border-yellow-300">
+                <p class="text-sm text-yellow-800 font-medium">No shift schedule assigned. Please contact your Head Nurse.</p>
+            </div>
+        @endif
 
         <!-- Month Navigation Card -->
         <div class="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
@@ -110,12 +161,12 @@
                         <div class="text-xs text-gray-700 space-y-0.5">
                             <div>
                                 <span class="font-semibold text-xs text-gray-600">In:</span>
-                                <span class="text-blue-600 font-mono font-bold text-xs">{{ $record->time_in->format('H:i') }}</span>
+                                <span class="text-blue-600 font-mono font-bold text-xs">{{ $record->formatted_time_in }}</span>
                             </div>
                             @if ($record->time_out)
                                 <div>
                                     <span class="font-semibold text-xs text-gray-600">Out:</span>
-                                    <span class="text-blue-600 font-mono font-bold text-xs">{{ $record->time_out->format('H:i') }}</span>
+                                    <span class="text-blue-600 font-mono font-bold text-xs">{{ $record->formatted_time_out }}</span>
                                 </div>
                                 <div>
                                     <span class="font-semibold text-xs text-gray-600">Hrs:</span>
@@ -134,7 +185,7 @@
                         <div class="absolute hidden group-hover:block bottom-full right-0 mb-2 bg-gray-900 text-white text-xs rounded-lg p-3 whitespace-nowrap z-10 border border-gray-700 shadow-lg">
                             {{ $record->formatted_date_time }}
                             @if ($record->time_out)
-                                — {{ $record->time_out->format('H:i') }}
+                                — {{ $record->formatted_time_out }}
                             @endif
                         </div>
                     @endif
@@ -196,10 +247,10 @@
                         @foreach ($dtrMap as $date => $record)
                             <tr class="hover:bg-gray-50 transition-colors duration-150">
                                 <td class="px-4 py-2 text-xs text-gray-800 font-medium">{{ $record->formatted_date }}</td>
-                                <td class="px-4 py-2 text-xs text-gray-800 font-mono font-bold ">{{ $record->time_in->format('H:i') }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-800 font-mono font-bold ">{{ $record->formatted_time_in }}</td>
                                 <td class="px-4 py-2 text-xs text-gray-800 font-mono font-bold ">
                                     @if ($record->time_out)
-                                        {{ $record->time_out->format('H:i') }}
+                                        {{ $record->formatted_time_out }}
                                     @else
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">Pending</span>
                                     @endif
@@ -228,4 +279,39 @@
         </div>
     @endif
 </div>
+
+<!-- DTR Report Modal -->
+<dialog id="dtr_report_modal" class="modal">
+    <div class="modal-box">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+
+        <h3 class="font-bold text-xl mb-2">Generate DTR Report</h3>
+        <p class="text-sm text-gray-500 mb-4">Select date range for your DTR report. This will generate a PDF for payroll.</p>
+
+        <form action="{{ route('dtr.my-dtr-report') }}" method="POST" target="_blank" class="space-y-4">
+            @csrf
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label"><span class="label-text font-semibold">Date From</span></label>
+                    <input type="date" name="date_from" required class="input input-bordered w-full" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text font-semibold">Date To</span></label>
+                    <input type="date" name="date_to" required class="input input-bordered w-full" />
+                </div>
+            </div>
+
+            <div class="modal-action">
+                <button type="button" onclick="dtr_report_modal.close()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Generate PDF
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
 @endsection

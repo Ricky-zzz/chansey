@@ -19,70 +19,69 @@
 
     {{-- Table --}}
     <div class="card bg-white shadow-sm border border-slate-200">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead class="bg-slate-800 text-white uppercase text-xs">
+        <div class="w-full overflow-hidden">
+            <table class="table table-zebra w-full table-compact table-xs">
+                <thead class="bg-slate-800 text-white uppercase">
                     <tr>
-                        <th>Name</th>
-                        <th>Time</th>
-                        <th>Days</th>
-                        <th>Hours/Week</th>
-                        <th>Assigned Nurses</th>
-                        <th class="text-right">Actions</th>
+                        <th class="w-36">Name</th>
+                        <th class="w-32">Time</th>
+                        <th class="w-40">Days</th>
+                        <th class="w-24">Hours</th>
+                        <th class="w-16">Assigned</th>
+                        <th class="w-20 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($schedules as $schedule)
                     <tr class="hover">
                         {{-- NAME --}}
-                        <td>
-                            <div class="font-bold text-lg">{{ $schedule->name }}</div>
+                        <td class="font-semibold text-sm">
+                            {{ $schedule->name }}
                         </td>
 
                         {{-- TIME --}}
-                        <td class="font-mono text-primary font-bold">
-                            {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - 
-                            {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
+                        <td class="font-mono font-bold text-xs whitespace-nowrap">
+                            {{ $schedule->formatted_time_range }}
                         </td>
 
                         {{-- DAYS --}}
                         <td>
-                            <div class="flex gap-1 flex-wrap">
-                                <span class="badge {{ $schedule->monday ? 'badge-primary text-white' : 'badge-ghost' }}">M</span>
-                                <span class="badge {{ $schedule->tuesday ? 'badge-primary text-white' : 'badge-ghost' }}">T</span>
-                                <span class="badge {{ $schedule->wednesday ? 'badge-primary text-white' : 'badge-ghost' }}">W</span>
-                                <span class="badge {{ $schedule->thursday ? 'badge-primary text-white' : 'badge-ghost' }}">TH</span>
-                                <span class="badge {{ $schedule->friday ? 'badge-primary text-white' : 'badge-ghost' }}">F</span>
-                                <span class="badge {{ $schedule->saturday ? 'badge-primary text-white' : 'badge-ghost' }}">SA</span>
-                                <span class="badge {{ $schedule->sunday ? 'badge-primary text-white' : 'badge-ghost' }}">SU</span>
+                            <div class="flex gap-0.5 flex-wrap">
+                                <span class="badge badge-xs {{ $schedule->monday ? 'badge-primary text-white' : 'badge-ghost' }}">M</span>
+                                <span class="badge badge-xs {{ $schedule->tuesday ? 'badge-primary text-white' : 'badge-ghost' }}">T</span>
+                                <span class="badge badge-xs {{ $schedule->wednesday ? 'badge-primary text-white' : 'badge-ghost' }}">W</span>
+                                <span class="badge badge-xs {{ $schedule->thursday ? 'badge-primary text-white' : 'badge-ghost' }}">Th</span>
+                                <span class="badge badge-xs {{ $schedule->friday ? 'badge-primary text-white' : 'badge-ghost' }}">F</span>
+                                <span class="badge badge-xs {{ $schedule->saturday ? 'badge-primary text-white' : 'badge-ghost' }}">Sa</span>
+                                <span class="badge badge-xs {{ $schedule->sunday ? 'badge-primary text-white' : 'badge-ghost' }}">Su</span>
                             </div>
                         </td>
 
                         {{-- HOURS/WEEK --}}
-                        <td>
-                            <span class="font-bold text-lg">{{ $schedule->total_hours_per_week }}</span>
-                            <span class="text-gray-400 text-sm">hrs</span>
+                        <td class="text-xs">
+                            <span class="font-bold">{{ $schedule->total_hours_per_week }}</span>
+                            <span class="text-gray-400">hrs</span>
                         </td>
 
                         {{-- ASSIGNED NURSES --}}
                         <td>
                             @if($schedule->nurses_count > 0)
-                                <span class="badge badge-info text-white">{{ $schedule->nurses_count }} nurse(s)</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-200 text-black">{{ $schedule->nurses_count }} nurse(s)</span>
                             @else
-                                <span class="badge badge-ghost">None</span>
+                                <span class="text-gray-400">—</span>
                             @endif
                         </td>
 
                         {{-- ACTIONS --}}
                         <td class="text-right">
-                            <div class="flex justify-end gap-2">
+                            <div class="flex justify-end gap-0.5">
                                 {{-- Edit Button --}}
-                                <button 
+                                <button
                                     @click="openEditModal({
                                         id: {{ $schedule->id }},
                                         name: '{{ addslashes($schedule->name) }}',
-                                        start_time: '{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}',
-                                        end_time: '{{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}',
+                                        start_time: '{{ $schedule->formatted_start_time }}',
+                                        end_time: '{{ $schedule->formatted_end_time }}',
                                         monday: {{ $schedule->monday ? 'true' : 'false' }},
                                         tuesday: {{ $schedule->tuesday ? 'true' : 'false' }},
                                         wednesday: {{ $schedule->wednesday ? 'true' : 'false' }},
@@ -91,28 +90,27 @@
                                         saturday: {{ $schedule->saturday ? 'true' : 'false' }},
                                         sunday: {{ $schedule->sunday ? 'true' : 'false' }}
                                     })"
-                                    class="btn btn-sm btn-outline btn-primary gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    class="btn btn-circle btn-outline btn-xs btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                     </svg>
-                                    Edit
                                 </button>
 
                                 {{-- Delete Button --}}
                                 @if($schedule->nurses_count === 0)
                                 <form action="{{ route('nurse.headnurse.shifts.destroy', $schedule->id) }}" method="POST"
-                                      onsubmit="return confirm('Delete this shift schedule permanently?')">
+                                      onsubmit="return confirm('Delete this shift schedule?')" style="display:inline;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline text-rose-600 hover:bg-red-100 border-rose-500 gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <button type="submit" class="btn btn-circle btn-outline btn-xs text-rose-600 hover:bg-red-100 border-rose-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                         </svg>
                                     </button>
                                 </form>
                                 @else
                                 <div class="tooltip" data-tip="Cannot delete - nurses assigned">
-                                    <button class="btn btn-sm btn-outline btn-disabled gap-1" disabled>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <button class="btn btn-circle btn-outline btn-xs btn-disabled">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                         </svg>
                                     </button>
@@ -152,12 +150,12 @@
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            
+
             <h3 class="font-bold text-xl mb-4">Create Shift Schedule</h3>
-            
+
             <form action="{{ route('nurse.headnurse.shifts.store') }}" method="POST" class="space-y-4">
                 @csrf
-                
+
                 {{-- Name --}}
                 <div class="form-control">
                     <label class="label">
@@ -170,7 +168,7 @@
                         <span class="text-error text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
-                
+
                 {{-- Time Range --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div class="form-control">
@@ -239,7 +237,7 @@
                         <div class="text-2xl font-bold text-primary" x-text="calculateTotalHours() + ' hours'"></div>
                     </div>
                 </div>
-                
+
                 <div class="modal-action">
                     <button type="submit" class="btn btn-primary w-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -261,13 +259,11 @@
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            
+
             <h3 class="font-bold text-xl mb-4">Edit Shift Schedule</h3>
-            
-            <form :action="'{{ route('nurse.headnurse.shifts.update', '') }}/' + editForm.id" method="POST" class="space-y-4">
-                @csrf
-                @method('PUT')
-                
+
+            <form :action="`{{ route('nurse.headnurse.shifts.update', 'ID') }}`.replace('ID', editForm.id)" method="POST" class="space-y-4">
+
                 {{-- Name --}}
                 <div class="form-control">
                     <label class="label">
@@ -276,7 +272,7 @@
                     <input type="text" name="name" x-model="editForm.name"
                            class="input input-bordered w-full" required>
                 </div>
-                
+
                 {{-- Time Range --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div class="form-control">
@@ -342,7 +338,7 @@
                         <div class="text-2xl font-bold text-primary" x-text="calculateEditTotalHours() + ' hours'"></div>
                     </div>
                 </div>
-                
+
                 <div class="modal-action">
                     <button type="submit" class="btn btn-primary w-full">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -427,17 +423,17 @@ function shiftScheduleManager() {
 
             const [startH, startM] = formData.start_time.split(':').map(Number);
             const [endH, endM] = formData.end_time.split(':').map(Number);
-            
+
             let startMinutes = startH * 60 + startM;
             let endMinutes = endH * 60 + endM;
-            
+
             // Handle overnight shifts
             if (endMinutes <= startMinutes) {
                 endMinutes += 24 * 60;
             }
-            
+
             const hoursPerDay = (endMinutes - startMinutes) / 60;
-            
+
             const daysCount = [
                 formData.monday,
                 formData.tuesday,
@@ -447,7 +443,7 @@ function shiftScheduleManager() {
                 formData.saturday,
                 formData.sunday
             ].filter(Boolean).length;
-            
+
             return Math.round(hoursPerDay * daysCount * 10) / 10;
         }
     }

@@ -36,6 +36,8 @@ class Admission extends Model
         'initial_vitals' => 'array',
     ];
 
+    protected $appends = ['formatted_admission_date', 'formatted_discharge_date', 'formatted_created_at', 'formatted_updated_at'];
+
     // --- RELATIONSHIPS ---
 
     public function patient(): BelongsTo
@@ -76,6 +78,40 @@ class Admission extends Model
     public function treatmentPlan(): HasOne
     {
         return $this->hasOne(TreatmentPlan::class);
+    }
+
+    // --- FORMATTED ATTRIBUTES ---
+
+    /**
+     * Format admission date (M d, Y H:i)
+     */
+    public function getFormattedAdmissionDateAttribute()
+    {
+        return $this->admission_date->format('M d, Y H:i');
+    }
+
+    /**
+     * Format discharge date (M d, Y H:i)
+     */
+    public function getFormattedDischargeDateAttribute()
+    {
+        return $this->discharge_date ? $this->discharge_date->format('M d, Y H:i') : 'N/A';
+    }
+
+    /**
+     * Format created_at timestamp (M d, Y H:i A)
+     */
+    public function getFormattedCreatedAtAttribute()
+    {
+        return $this->created_at->format('M d, Y H:i A');
+    }
+
+    /**
+     * Format updated_at timestamp (M d, Y H:i A)
+     */
+    public function getFormattedUpdatedAtAttribute()
+    {
+        return $this->updated_at->format('M d, Y H:i A');
     }
 
     public function medicalOrders(): HasMany
@@ -119,7 +155,7 @@ class Admission extends Model
     {
         return Str::limit($this->chief_complaint, $limit, '...');
     }
-    
+
     // BMI Calculation
     public function getBmiAttribute()
     {
@@ -129,7 +165,7 @@ class Admission extends Model
             return 'N/A';
         }
 
-        $h_meters = $vitals['height'] / 100; 
+        $h_meters = $vitals['height'] / 100;
         $w_kg = $vitals['weight'];
 
         if ($h_meters <= 0) return 'N/A';

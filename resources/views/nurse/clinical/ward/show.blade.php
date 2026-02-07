@@ -107,7 +107,7 @@
                         </span>
                         @if($order->type === 'Medication')
                         <span class="px-2 py-1 rounded-full text-xs font-bold {{ $order->dispensed ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                            {{ $order->dispensed ? '✓ Dispensed' : '⏳ Awaiting Pharmacy' }}
+                            {{ $order->dispensed ? '✓ Dispensed' : ' Awaiting Pharmacy' }}
                         </span>
                         @endif
                         <span class="text-xs font-bold text-slate-500">{{ $order->frequency }}</span>
@@ -167,7 +167,7 @@
                             class="btn btn-sm btn-warning text-white w-full"
                             disabled
                             title="Waiting for pharmacy to dispense">
-                            ⏳ Awaiting Dispense
+                             Awaiting Dispense
                         </button>
                         @endif
 

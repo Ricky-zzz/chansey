@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DTRController;
 use App\Http\Controllers\HeadNurse\ShiftScheduleController;
 use App\Http\Controllers\HeadNurse\NurseController;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,10 @@ Route::middleware(['auth', 'headnurse'])->prefix('nurse/headnurse')->name('nurse
     // My Nurses
     Route::get('/nurses', [NurseController::class, 'index'])->name('nurses.index');
     Route::put('/nurses/{nurse}/schedule', [NurseController::class, 'updateSchedule'])->name('nurses.updateSchedule');
+
+    // DTR Reports
+    Route::post('/nurses/{nurse}/dtr-report', [DTRController::class, 'nurseDtrReport'])->name('nurses.dtrReport');
+    Route::post('/nurses/batch-dtr-report', [DTRController::class, 'batchDtrReport'])->name('nurses.batchDtrReport');
 
     // Shift Schedules CRUD
     Route::get('/shifts', [ShiftScheduleController::class, 'index'])->name('shifts.index');
