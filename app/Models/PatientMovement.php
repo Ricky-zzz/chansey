@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class PatientMovement extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'admission_id',
+        'room_id',
+        'bed_id',
+        'room_price',
+        'started_at',
+        'ended_at',
+    ];
 
     protected $casts = [
         'started_at' => 'datetime',

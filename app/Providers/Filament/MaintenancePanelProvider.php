@@ -25,9 +25,9 @@ class MaintenancePanelProvider extends PanelProvider
             ->id('maintenance')
             ->path('maintenance')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
             ])
-            ->brandLogo(fn () => view('filament.brand')) 
+            ->brandLogo(fn () => view('filament.brand'))
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->discoverResources(in: app_path('Filament/Maintenance/Resources'), for: 'App\Filament\Maintenance\Resources')
             ->discoverPages(in: app_path('Filament/Maintenance/Pages'), for: 'App\Filament\Maintenance\Pages')

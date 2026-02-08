@@ -10,6 +10,7 @@ use App\Models\Bed;
 use App\Models\Station;
 use App\Models\Physician;
 use App\Models\User;
+use App\Models\PatientMovement;
 use Illuminate\Support\Facades\Hash;
 
 class PatientAdmissionSeeder extends Seeder
@@ -149,6 +150,16 @@ class PatientAdmissionSeeder extends Seeder
 
                 // Mark bed as occupied
                 $bed->update(['status' => 'Occupied']);
+
+                // Create patient movement to track room expenses
+                PatientMovement::create([
+                    'admission_id' => $admission->id,
+                    'room_id' => $bed->room_id,
+                    'bed_id' => $bed->id,
+                    'room_price' => $bed->room->price ?? 0,
+                    'started_at' => $admission->admission_date,
+                    'ended_at' => null,
+                ]);
 
                 // Create billing info
                 AdmissionBillingInfo::create([

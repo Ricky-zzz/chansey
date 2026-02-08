@@ -6,20 +6,20 @@
     <title>Time Clock - Chansey Hospital</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-br from-white to-emerald-50 min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-md">
         <!-- Header -->
         <div class="text-center mb-12">
             <div class="flex justify-center mb-6">
                 <div class="avatar">
-                    <div class="w-20 rounded-full ring ring-primary ring-offset-slate-900 ring-offset-2">
+                    <div class="w-20 rounded-full ring ring-emerald-500 ring-offset-white ring-offset-2">
                         <img src="{{ asset('images/chansey.jpg') }}" alt="Chansey Logo" />
                     </div>
                 </div>
             </div>
-            <h1 class="text-4xl font-black text-white mb-2">Chansey</h1>
-            <p class="text-lg text-slate-300">Time Clock System</p>
+            <h1 class="text-4xl font-black text-emerald-600 mb-2">Chansey</h1>
+            <p class="text-lg text-slate-600">Time Clock System</p>
         </div>
 
         <!-- Messages -->
@@ -48,9 +48,9 @@
         @endif
 
         <!-- Form Card -->
-        <div class="card bg-slate-800 shadow-2xl border border-slate-700">
+        <div class="card bg-white shadow-2xl border border-emerald-200">
             <div class="card-body">
-                <h2 class="card-title text-white text-2xl mb-6">Clock In / Out</h2>
+                <h2 class="card-title text-slate-900 text-2xl mb-6">Clock In / Out</h2>
 
                 <form method="POST" action="{{ route('dtr.store') }}" class="space-y-6">
                     @csrf
@@ -58,19 +58,19 @@
                     <!-- Badge ID -->
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text text-slate-300 font-semibold">Badge ID</span>
+                            <span class="label-text text-slate-700 font-semibold">Badge ID</span>
                         </label>
                         <input
                             type="text"
                             name="badge_id"
                             placeholder="e.g., NUR-001"
-                            class="input input-bordered input-lg bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                            class="input input-bordered input-lg bg-emerald-50 border-emerald-300 text-slate-900 placeholder-slate-500 focus:border-emerald-500 focus:ring focus:ring-emerald-500 focus:ring-opacity-50"
                             required
                             autofocus
                         />
                         @error('badge_id')
                             <label class="label">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
+                                <span class="label-text-alt text-red-600">{{ $message }}</span>
                             </label>
                         @enderror
                     </div>
@@ -78,18 +78,18 @@
                     <!-- Password -->
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text text-slate-300 font-semibold">Password</span>
+                            <span class="label-text text-slate-700 font-semibold">Password</span>
                         </label>
                         <input
                             type="password"
                             name="password"
                             placeholder="••••••••"
-                            class="input input-bordered input-lg bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                            class="input input-bordered input-lg bg-emerald-50 border-emerald-300 text-slate-900 placeholder-slate-500 focus:border-emerald-500 focus:ring focus:ring-emerald-500 focus:ring-opacity-50"
                             required
                         />
                         @error('password')
                             <label class="label">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
+                                <span class="label-text-alt text-red-600">{{ $message }}</span>
                             </label>
                         @enderror
                     </div>
@@ -102,7 +102,7 @@
                                 type="submit"
                                 name="action"
                                 value="time_in"
-                                class="btn btn-success btn-lg flex-1 text-white font-bold text-lg gap-2 hover:btn-success"
+                                class="btn btn-success btn-lg flex-1 text-white font-bold text-lg gap-2 hover:bg-emerald-700 bg-emerald-600"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0Z" />
@@ -115,7 +115,7 @@
                                 type="submit"
                                 name="action"
                                 value="time_out"
-                                class="btn btn-error btn-lg flex-1 text-white font-bold text-lg gap-2 hover:btn-error"
+                                class="btn btn-error btn-lg flex-1 text-white font-bold text-lg gap-2 hover:bg-red-700 bg-red-600"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
@@ -129,11 +129,11 @@
                 <!-- Footer Info -->
                 <div class="divider my-6"></div>
                 <div class="text-center">
-                    <p class="text-slate-400 text-sm mb-3">
-                        <span class="font-bold text-slate-300">Current Time:</span>
-                        <span id="clock" class="font-mono text-lg text-primary font-bold"></span>
+                    <p class="text-slate-600 text-sm mb-3">
+                        <span class="font-bold text-slate-700">Current Time:</span>
+                        <span id="clock" class="font-mono text-lg text-emerald-600 font-bold"></span>
                     </p>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs text-slate-600">
                         If you need assistance, contact the Head Nurse
                     </p>
                 </div>

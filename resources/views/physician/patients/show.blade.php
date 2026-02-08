@@ -75,7 +75,7 @@
     </div>
 
     <!-- 2. TOP GRID: LATEST STATUS & PLAN SUMMARY -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" x-data="{ orderView: 'active' }">
+    <div class="grid grid-cols-1  lg:grid-cols-3 gap-6 h-[calc(100vh-300px)] overflow-hidden" x-data="{ orderView: 'active' }">
 
         <!-- LEFT COLUMN: ORDERS (ACTIVE OR HISTORY) (SCROLLABLE) -->
         <div class="lg:col-span-1">
@@ -88,7 +88,7 @@
                 <span class="badge badge-ghost" x-text="orderView === 'active' ? {{ $admission->medicalOrders->count() }} : {{ $orderHistory->count() }}"></span>
             </div>
 
-            <div class="space-y-4 overflow-y-auto max-h-96 m-1">
+            <div class="space-y-4 overflow-y-auto flex-1 m-1">
                 <!-- ACTIVE ORDERS -->
                 <template x-if="orderView === 'active'">
                     <div>
@@ -207,7 +207,7 @@
         </div>
 
         <!-- RIGHT COLUMN: CLINICAL STATUS -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-6 h-full overflow-y-auto">
 
             <!-- A. LATEST CLINICAL STATUS & PLAN -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

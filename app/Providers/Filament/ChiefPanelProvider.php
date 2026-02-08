@@ -29,9 +29,9 @@ class ChiefPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
             ])
-            ->brandLogo(fn () => view('filament.brand'))
-        ->viteTheme('resources/css/filament/admin/theme.css')
-        ->sidebarFullyCollapsibleOnDesktop()
+            ->brandLogo(fn() => view('filament.brand'))
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->sidebarFullyCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Chief/Resources'), for: 'App\Filament\Chief\Resources')
             ->discoverPages(in: app_path('Filament/Chief/Pages'), for: 'App\Filament\Chief\Pages')
             ->pages([

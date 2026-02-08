@@ -14,7 +14,7 @@ class TreatmentPlanController extends Controller
     public function edit($admission_id)
     {
         $admission = Admission::with('patient')->findOrFail($admission_id);
-        
+
         // Find existing plan OR create a blank instance (in memory only)
         $plan = TreatmentPlan::firstOrNew(['admission_id' => $admission_id]);
 
@@ -49,7 +49,7 @@ class TreatmentPlanController extends Controller
             ] // Data to update/insert
         );
 
-        return redirect()->route('physician.patients.show', $admission_id)
+        return redirect()->route('physician.mypatients.show', $admission_id)
             ->with('success', 'Treatment Plan updated successfully.');
     }
 }
