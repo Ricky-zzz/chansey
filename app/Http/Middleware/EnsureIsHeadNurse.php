@@ -15,7 +15,7 @@ class EnsureIsHeadNurse
     {
         $user = $request->user();
 
-        if (!$user || !$user->nurse || !$user->nurse->is_head_nurse) {
+        if (!$user || !$user->nurse || !in_array($user->nurse->role_level, ['Head', 'Supervisor', 'Chief'])) {
             abort(403, 'Access denied. Head nurse privileges required.');
         }
 

@@ -19,25 +19,25 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class PharmacyPanelProvider extends PanelProvider
+class ChiefPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('pharmacy')
-            ->path('pharmacy')
+            ->id('chief')
+            ->path('chief')
             ->colors([
                 'primary' => Color::Emerald,
             ])
             ->brandLogo(fn () => view('filament.brand'))
-            ->viteTheme('resources/css/filament/admin/theme.css')
-            ->sidebarFullyCollapsibleOnDesktop()
-            ->discoverResources(in: app_path('Filament/Pharmacy/Resources'), for: 'App\Filament\Pharmacy\Resources')
-            ->discoverPages(in: app_path('Filament/Pharmacy/Pages'), for: 'App\Filament\Pharmacy\Pages')
+        ->viteTheme('resources/css/filament/admin/theme.css')
+        ->sidebarFullyCollapsibleOnDesktop()
+            ->discoverResources(in: app_path('Filament/Chief/Resources'), for: 'App\Filament\Chief\Resources')
+            ->discoverPages(in: app_path('Filament/Chief/Pages'), for: 'App\Filament\Chief\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Pharmacy/Widgets'), for: 'App\Filament\Pharmacy\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Chief/Widgets'), for: 'App\Filament\Chief\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,

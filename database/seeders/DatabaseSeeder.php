@@ -11,6 +11,7 @@ use App\Models\GeneralService;
 use App\Models\Physician;
 use App\Models\Pharmacist; // Make sure this model exists
 use App\Models\Accountant;
+use App\Models\Unit;
 use App\Models\Station;
 use App\Models\Room;
 use App\Models\Bed;
@@ -19,6 +20,7 @@ use App\Models\Medicine;
 use App\Models\InventoryItem;
 use App\Models\HospitalFee;
 use App\Models\ShiftSchedule;
+use App\Models\NurseType;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,6 +35,26 @@ class DatabaseSeeder extends Seeder
         $depts = [];
         foreach ($deptNames as $name) {
             $depts[$name] = Department::create(['name' => $name])->id;
+        }
+
+        // ==========================================
+        // 0B. CREATE NURSE TYPES
+        // ==========================================
+        $nurseTypeNames = [
+            'Ward Nurse' => 'General ward care and patient monitoring',
+            'Administrative' => 'Nursing administration and management duties',
+            'Admission' => 'Patient admission processing and intake',
+            'Dialysis' => 'Hemodialysis and peritoneal dialysis care',
+            'Bedside' => 'Direct bedside patient care',
+            'ER Nurse' => 'Emergency room trauma and triage',
+            'ICU Nurse' => 'Intensive care unit specialized monitoring',
+            'OB Nurse' => 'Obstetrics and gynecology nursing care',
+            'OR Nurse' => 'Operating room and surgical assistance',
+            'Pediatric Nurse' => 'Pediatric and neonatal care',
+        ];
+        $nurseTypes = [];
+        foreach ($nurseTypeNames as $ntName => $ntDesc) {
+            $nurseTypes[$ntName] = NurseType::create(['name' => $ntName, 'description' => $ntDesc])->id;
         }
 
         // ==========================================
@@ -85,7 +107,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ==========================================
-        // 4. NURSES
+        // 4. NURSES (Admitting — assigned to Admission station later)
         // ==========================================
         // A. Admitting Nurse
         $admitNurse = User::create([
@@ -95,15 +117,16 @@ class DatabaseSeeder extends Seeder
             'user_type' => 'nurse',
             'badge_id' => 'NUR-ST-001',
         ]);
-        Nurse::create([
+        $admitNurseRecord = Nurse::create([
             'user_id' => $admitNurse->id,
             'employee_id' => 'NUR-ST-001',
             'first_name' => 'Steph',
             'last_name' => 'Torres',
             'license_number' => 'RN-1001',
             'designation' => 'Admitting',
-            'station_id' => null,
-            'is_head_nurse' => false,
+            'role_level' => 'Staff',
+            'nurse_type_id' => $nurseTypes['Admission'],
+            'date_hired' => now(),
         ]);
 
         // B. Head Nurse - Admitting (Janaih Budy)
@@ -114,15 +137,16 @@ class DatabaseSeeder extends Seeder
             'user_type' => 'nurse',
             'badge_id' => 'NUR-JB-001',
         ]);
-        Nurse::create([
+        $headAdmitNurseRecord = Nurse::create([
             'user_id' => $headAdmitNurse->id,
             'employee_id' => 'NUR-JB-001',
             'first_name' => 'Janaih',
             'last_name' => 'Budy',
             'license_number' => 'RN-1002',
             'designation' => 'Admitting',
-            'station_id' => null,
-            'is_head_nurse' => true,
+            'role_level' => 'Head',
+            'nurse_type_id' => $nurseTypes['Administrative'],
+            'date_hired' => now(),
         ]);
 
         // ==========================================
@@ -176,6 +200,16 @@ class DatabaseSeeder extends Seeder
         // 7. INFRASTRUCTURE (Functional Departments)
         // ==========================================
 
+        // A. Create Units (Buildings)
+        $unitA = Unit::create([
+            'name' => 'Building A',
+            'description' => 'Main Hospital Building',
+        ]);
+        $unitB = Unit::create([
+            'name' => 'Building B',
+            'description' => 'Annex Building',
+        ]);
+
         $stationConfigs = [
             [
                 'name' => 'Emergency Room',
@@ -184,7 +218,8 @@ class DatabaseSeeder extends Seeder
                 'room_type' => 'ER',
                 'capacity' => 10,
                 'price' => 1000.00,
-                'room_count' => 5
+                'room_count' => 5,
+                'unit_id' => $unitA->id,
             ],
             [
                 'name' => 'Intensive Care Unit',
@@ -192,7 +227,8 @@ class DatabaseSeeder extends Seeder
                 'floor' => '2nd Floor',
                 'room_type' => 'ICU',
                 'capacity' => 8,
-                'price' => 5000.00
+                'price' => 5000.00,
+                'unit_id' => $unitA->id,
             ],
             [
                 'name' => 'Medical-Surgical Ward',
@@ -201,24 +237,27 @@ class DatabaseSeeder extends Seeder
                 'room_type' => 'Ward',
                 'capacity' => 6,
                 'price' => 1500.00,
-                'room_count' => 5
+                'room_count' => 5,
+                'unit_id' => $unitA->id,
             ],
             [
                 'name' => 'OB-GYN Ward',
                 'code' => 'OB',
                 'floor' => '3rd Floor',
-                'room_type' => 'Ward', // Can be Semi-Private if you prefer
+                'room_type' => 'Ward',
                 'capacity' => 4,
-                'price' => 1500.00
+                'price' => 1500.00,
+                'unit_id' => $unitB->id,
             ],
             [
                 'name' => 'Private Wing',
                 'code' => 'PVT',
                 'floor' => '4th Floor',
                 'room_type' => 'Private',
-                'capacity' => 1, // Private rooms = 1 bed
+                'capacity' => 1,
                 'price' => 4000.00,
-                'room_count' => 5 // Create 5 separate rooms for this wing
+                'room_count' => 5,
+                'unit_id' => $unitB->id,
             ],
         ];
 
@@ -228,6 +267,7 @@ class DatabaseSeeder extends Seeder
         foreach ($stationConfigs as $config) {
             // A. Create Station
             $station = Station::create([
+                'unit_id' => $config['unit_id'],
                 'station_name' => $config['name'],
                 'station_code' => $config['code'],
                 'floor_location' => $config['floor'],
@@ -267,35 +307,49 @@ class DatabaseSeeder extends Seeder
 
         // C. Create the Virtual OPD (No Rooms, No Nurses)
         $opd = Station::create([
+            'unit_id' => $unitA->id,
             'station_name' => 'Outpatient Dept / Lobby',
             'station_code' => 'OPD',
             'floor_location' => 'Ground Floor',
         ]);
         $stationIds['OPD'] = $opd->id;
 
+        // D. Create Ghost Station: Admission (for all Admitting nurses)
+        $admissionStation = Station::create([
+            'unit_id' => $unitA->id,
+            'station_name' => 'Admission',
+            'station_code' => 'ADM',
+            'floor_location' => 'Ground Floor',
+        ]);
+        $stationIds['ADM'] = $admissionStation->id;
+
+        // Assign admitting nurses to the Admission station
+        $admitNurseRecord->update(['station_id' => $admissionStation->id]);
+        $headAdmitNurseRecord->update(['station_id' => $admissionStation->id]);
+
         // ==========================================
         // 7B. CREATE CLINICAL NURSES FOR EACH STATION
         // ==========================================
         $stationNurses = [
             'ER' => [
-                ['first' => 'Riovel', 'last' => 'Dane', 'head' => false],
-                ['first' => 'Althea', 'last' => 'Marie', 'head' => true],
+                ['first' => 'Riovel', 'last' => 'Dane', 'role_level' => 'Staff'],
+                ['first' => 'Althea', 'last' => 'Marie', 'role_level' => 'Head'],
             ],
             'ICU' => [
-                ['first' => 'Carlos', 'last' => 'Mendoza', 'head' => false],
-                ['first' => 'Maria', 'last' => 'Santos', 'head' => true],
+                ['first' => 'Carlos', 'last' => 'Mendoza', 'role_level' => 'Staff'],
+                ['first' => 'Maria', 'last' => 'Santos', 'role_level' => 'Head'],
             ],
             'MS-WARD' => [
-                ['first' => 'Angelo', 'last' => 'Cruz', 'head' => false],
-                ['first' => 'Patricia', 'last' => 'Reyes', 'head' => true],
+                ['first' => 'Angelo', 'last' => 'Cruz', 'role_level' => 'Staff'],
+                ['first' => 'Patricia', 'last' => 'Reyes', 'role_level' => 'Head'],
             ],
             'OB' => [
-                ['first' => 'Diana', 'last' => 'Flores', 'head' => false],
-                ['first' => 'Carmen', 'last' => 'Garcia', 'head' => true],
+                ['first' => 'Diana', 'last' => 'Flores', 'role_level' => 'Staff'],
+                ['first' => 'Carmen', 'last' => 'Garcia', 'role_level' => 'Head'],
             ],
             'PVT' => [
-                ['first' => 'Jerome', 'last' => 'Lim', 'head' => false],
-                ['first' => 'Beatrice', 'last' => 'Tan', 'head' => true],
+                ['first' => 'Jerome', 'last' => 'Lim', 'role_level' => 'Staff'],
+                ['first' => 'Beatrice', 'last' => 'Tan', 'role_level' => 'Head'],
             ],
         ];
 
@@ -321,11 +375,82 @@ class DatabaseSeeder extends Seeder
                     'last_name' => $nurse['last'],
                     'license_number' => 'RN-' . $nurseCounter,
                     'designation' => 'Clinical',
+                    'role_level' => $nurse['role_level'],
+                    'nurse_type_id' => $nurse['role_level'] === 'Head' ? $nurseTypes['Administrative'] : $nurseTypes['Ward Nurse'],
+                    'date_hired' => now(),
                     'station_id' => $stationIds[$stationCode],
-                    'is_head_nurse' => $nurse['head'],
                 ]);
             }
         }
+
+        // ==========================================
+        // 7C. CHIEF NURSE
+        // ==========================================
+        $chiefUser = User::create([
+            'name' => 'Elena Villanueva',
+            'email' => 'elena.villanueva@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-EV-001',
+        ]);
+        Nurse::create([
+            'user_id' => $chiefUser->id,
+            'employee_id' => 'NUR-EV-001',
+            'first_name' => 'Elena',
+            'last_name' => 'Villanueva',
+            'license_number' => 'RN-9001',
+            'designation' => 'Clinical',
+            'role_level' => 'Chief',
+            'nurse_type_id' => $nurseTypes['Administrative'],
+            'date_hired' => now(),
+        ]);
+
+        // ==========================================
+        // 7D. SUPERVISOR NURSES (one per Unit/Building)
+        // ==========================================
+        // Supervisor for Building A
+        $supAUser = User::create([
+            'name' => 'Rosa Navarro',
+            'email' => 'rosa.navarro@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-RN-001',
+        ]);
+        Nurse::create([
+            'user_id' => $supAUser->id,
+            'employee_id' => 'NUR-RN-001',
+            'first_name' => 'Rosa',
+            'last_name' => 'Navarro',
+            'license_number' => 'RN-9002',
+            'designation' => 'Clinical',
+            'role_level' => 'Supervisor',
+            'nurse_type_id' => $nurseTypes['Administrative'],
+            'date_hired' => now(),
+            'station_id' => null,
+            'unit_id' => $unitA->id,
+        ]);
+
+        // Supervisor for Building B
+        $supBUser = User::create([
+            'name' => 'Lorna Aquino',
+            'email' => 'lorna.aquino@chansey.test',
+            'password' => $password,
+            'user_type' => 'nurse',
+            'badge_id' => 'NUR-LA-001',
+        ]);
+        Nurse::create([
+            'user_id' => $supBUser->id,
+            'employee_id' => 'NUR-LA-001',
+            'first_name' => 'Lorna',
+            'last_name' => 'Aquino',
+            'license_number' => 'RN-9003',
+            'designation' => 'Clinical',
+            'role_level' => 'Supervisor',
+            'nurse_type_id' => $nurseTypes['Administrative'],
+            'date_hired' => now(),
+            'station_id' => null,
+            'unit_id' => $unitB->id,
+        ]);
 
         // ==========================================
         // 8. SHIFT SCHEDULES

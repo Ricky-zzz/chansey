@@ -48,7 +48,8 @@ class User extends Authenticatable implements FilamentUser
         });
     }
 
-    public function DTR(){
+    public function DTR()
+    {
         return $this->hasMany(DailyTimeRecord::class);
     }
 
@@ -130,6 +131,10 @@ class User extends Authenticatable implements FilamentUser
 
         if ($panel->getId() === 'pharmacy') {
             return in_array($this->user_type, ['pharmacist', 'admin']);
+        }
+
+        if ($panel->getId() === 'chief') {
+            return $this->user_type === 'nurse' && $this->nurse->role_level === 'Chief';
         }
 
         return false;

@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Station extends Model
 {
     protected $fillable = [
+        'unit_id',
         'station_name',
         'station_code',
         'floor_location',
     ];
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 
     public function rooms()
     {

@@ -40,7 +40,7 @@
             </li>
 
             <!-- HEAD NURSE SECTION -->
-            @if(Auth::user()->nurse->is_head_nurse)
+            @if(in_array(Auth::user()->nurse->role_level, ['Head', 'Supervisor', 'Chief']))
             <li class="menu-title">
                 <span class="font-bold text-xs uppercase tracking-wider text-primary">Head Nurse</span>
             </li>
@@ -194,8 +194,8 @@
                     <div class="text-xs text-gray-400 truncate">
                         {{ Auth::user()->nurse->designation ?? 'Nurse' }} ({{ Auth::user()->badge_id }})
                     </div>
-                    @if(Auth::user()->nurse->is_head_nurse)
-                    <div class="text-xs text-primary font-bold">Head Nurse</div>
+                    @if(in_array(Auth::user()->nurse->role_level, ['Head', 'Supervisor', 'Chief']))
+                    <div class="text-xs text-primary font-bold">{{ Auth::user()->nurse->role_level }} Nurse</div>
                     @endif
                 </div>
             </div>

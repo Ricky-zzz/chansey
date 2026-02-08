@@ -14,11 +14,25 @@ class Nurse extends Model
         'employee_id',
         'first_name',
         'last_name',
+        'address',
+        'contact_number',
+        'birthdate',
         'license_number',
+        'status',
+        'date_hired',
+        'educational_background',
+        'role_level',
         'designation',
+        'nurse_type_id',
         'station_id',
+        'unit_id',
         'shift_schedule_id',
-        'is_head_nurse',
+    ];
+
+    protected $casts = [
+        'educational_background' => 'array',
+        'date_hired' => 'date',
+        'birthdate' => 'date',
     ];
 
     public function user()
@@ -28,6 +42,16 @@ class Nurse extends Model
     public function station()
     {
         return $this->belongsTo(Station::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function nurseType()
+    {
+        return $this->belongsTo(NurseType::class);
     }
 
     public function shiftSchedule()

@@ -28,6 +28,10 @@ class DashboardController extends Controller
             return redirect('/login')->with('error', 'Nurse profile not found.');
         }
 
+        if ($user->nurse->role_level === 'Chief') {
+            return redirect('/chief');
+        }
+
         return $user->nurse->designation === 'Admitting'
             ? redirect()->route('nurse.admitting.dashboard')
             : redirect()->route('nurse.clinical.dashboard');

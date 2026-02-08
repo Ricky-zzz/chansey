@@ -14,22 +14,25 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Get;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\FileUpload;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 
 class NurseResource extends Resource
 {
     protected static ?string $model = Nurse::class;
 
-    // Use the standard string for the icon
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-plus';
 
     protected static ?string $recordTitleAttribute = 'last_name';
@@ -38,79 +41,299 @@ class NurseResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Login Details')
-                    ->description('This creates the user account for the system.')
+                // ─── Personal Information ───
+                Section::make('Personal Information')
+                    ->description('Basic identification and contact details.')
+                    ->schema([
+                        FileUpload::make('user.profile_image_path')
+                            ->label('Profile Photo')
+                            ->image()
+                            ->avatar()
+                            ->disk('public')
+                            ->directory('profile-images')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(5120)
+                            ->helperText('Accepted formats: JPG, PNG, WebP (Max 5MB)')
+                            ->columnSpanFull(),
+
+                        TextInput::make('first_name')
+                            ->label('First Name')
+                            ->required()
+                            ->columnSpanFull(),
+
+                        TextInput::make('last_name')
+                            ->label('Last Name')
+                            ->required()
+                            ->columnSpanFull(),
+
+                        TextInput::make('contact_number')
+                            ->label('Contact Number')
+                            ->tel()
+                            ->columnSpanFull(),
+
+                        DatePicker::make('birthdate')
+                            ->label('Date of Birth')
+                            ->maxDate(now())
+                            ->columnSpanFull(),
+
+                        DatePicker::make('date_hired')
+                            ->label('Date Hired')
+                            ->default(now())
+                            ->columnSpanFull(),
+
+                        TextInput::make('address')
+                            ->label('Address')
+                            ->columnSpanFull(),
+                    ]),
+
+                // ─── Professional Details ───
+                Section::make('Professional Details')
+                    ->description('Licensure, role classification, and nurse type.')
+                    ->schema([
+                        TextInput::make('license_number')
+                            ->label('PRC License Number')
+                            ->required()
+                            ->columnSpanFull(),
+
+                        Select::make('nurse_type_id')
+                            ->relationship('nurseType', 'name')
+                            ->label('Nurse Type / Specialization')
+                            ->preload()
+                            ->searchable()
+                            ->nullable()
+                            ->columnSpanFull(),
+
+                        Select::make('designation')
+                            ->label('Designation')
+                            ->options([
+                                'Clinical' => 'Clinical',
+                                'Admitting' => 'Admitting',
+                            ])
+                            ->live()
+                            ->required()
+                            ->columnSpanFull(),
+
+                        Select::make('role_level')
+                            ->label('Role Level')
+                            ->options([
+                                'Staff' => 'Staff',
+                                'Charge' => 'Charge',
+                                'Head' => 'Head',
+                                'Supervisor' => 'Supervisor',
+                                'Chief' => 'Chief',
+                            ])
+                            ->default('Staff')
+                            ->live()
+                            ->required()
+                            ->columnSpanFull(),
+
+                        Select::make('station_id')
+                            ->relationship('station', 'station_name')
+                            ->label('Station Assignment')
+                            ->preload()
+                            ->searchable()
+                            ->visible(fn(Get $get): bool => $get('role_level') === 'Head')
+                            ->required(fn(Get $get): bool => $get('role_level') === 'Head')
+                            ->columnSpanFull(),
+
+                        Select::make('unit_id')
+                            ->relationship('unit', 'name')
+                            ->label('Unit / Building Assignment')
+                            ->preload()
+                            ->searchable()
+                            ->visible(fn(Get $get): bool => $get('role_level') === 'Supervisor')
+                            ->required(fn(Get $get): bool => $get('role_level') === 'Supervisor')
+                            ->columnSpanFull(),
+
+                        Select::make('status')
+                            ->label('Employment Status')
+                            ->options([
+                                'Active' => 'Active',
+                                'Inactive' => 'Inactive',
+                            ])
+                            ->default('Active')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+
+                // ─── Account Credentials ───
+                Section::make('Account Credentials')
+                    ->description('System login credentials for this nurse.')
                     ->hidden(fn(string $operation): bool => $operation === 'view')
                     ->schema([
                         TextInput::make('password')
                             ->password()
                             ->required(fn(string $operation): bool => $operation === 'create')
-                            ->label(fn(string $operation): string => $operation === 'create' ? 'Initial Password' : 'New Password (Leave blank to keep current)')
+                            ->label(fn(string $operation): string => $operation === 'create'
+                                ? 'Initial Password'
+                                : 'New Password (leave blank to keep current)')
                             ->formatStateUsing(fn() => null)
-                            ->dehydrated(fn($state) => filled($state)),
+                            ->dehydrated(fn($state) => filled($state))
+                            ->columnSpanFull(),
                     ]),
 
-                Section::make('Nurse Profile')
-                    ->description('Clinical details.')
+                // ─── Educational Background ───
+                Section::make('Educational Background')
+                    ->description('Academic qualifications and credentials.')
+                    ->collapsible()
                     ->schema([
-                        FileUpload::make('user.profile_image_path')
-                            ->label('Profile Image')
-                            ->image()
-                            ->avatar()
-                            ->directory('profile-images')
-                            ->visibility('public')
-                            ->imageEditor()
-                            ->circleCropper()
+                        Repeater::make('educational_background')
+                            ->label('')
+                            ->schema([
+                                TextInput::make('level')
+                                    ->label('Degree Level')
+                                    ->placeholder('e.g., Bachelor of Nursing, Master of Science')
+                                    ->required()
+                                    ->columnSpanFull(),
+
+                                TextInput::make('school')
+                                    ->label('School / University')
+                                    ->required()
+                                    ->columnSpanFull(),
+
+                                Select::make('year')
+                                    ->label('Year Achieved')
+                                    ->options(
+                                        collect(range(now()->year, 1970))
+                                            ->mapWithKeys(fn($y) => [$y => (string) $y])
+                                            ->toArray()
+                                    )
+                                    ->searchable()
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ])
+                            ->addActionLabel('Add Education')
+                            ->reorderable(false)
+                            ->defaultItems(0)
                             ->columnSpanFull(),
+                    ]),
+            ]);
+    }
 
-                        Grid::make(2)->schema([
-                            TextInput::make('first_name')
-                                ->required(),
-                            TextInput::make('last_name')
-                                ->required(),
-                        ]),
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                // ─── Personal Information ───
+                Section::make('Personal Information')
+                    ->schema([
+                        ImageEntry::make('user.profile_image_path')
+                            ->label('Profile Photo')
+                            ->circular()
+                            ->disk('public')
+                            ->size(100)
+                            ->defaultImageUrl(fn(Nurse $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->first_name . ' ' . $record->last_name) . '&color=7F9CF5&background=EBF4FF'),
 
-                        TextInput::make('license_number')
-                            ->label('PRC License Number')
-                            ->required(),
+                        TextEntry::make('employee_id')
+                            ->label('Badge ID'),
 
-                        Grid::make(2)->schema([
-                            Select::make('designation')
-                                ->options([
-                                    'Clinical' => 'Clinical Nurse',
-                                    'Admitting' => 'Admitting Nurse',
-                                ])
-                                ->live()
-                                ->required(),
+                        TextEntry::make('first_name')
+                            ->label('First Name'),
 
-                            Toggle::make('is_head_nurse')
-                                ->label('Head Nurse')
-                                ->inline(false),
-                        ]),
+                        TextEntry::make('last_name')
+                            ->label('Last Name'),
 
-                        Select::make('station_id')
-                            ->relationship('station', 'station_name')
-                            ->label('Station Assignment')
-                            ->nullable()
-                            ->visible(fn($get) => $get('designation') === 'Clinical')
-                            ->required(fn($get) => $get('designation') === 'Clinical'),
+                        TextEntry::make('contact_number')
+                            ->label('Contact Number')
+                            ->default('—'),
 
-                        Select::make('shift_schedule_id')
-                            ->relationship('shiftSchedule', 'name')
-                            ->label('Shift Schedule')
-                            ->nullable()
-                            ->helperText('Leave empty if shift is unassigned'),
+                        TextEntry::make('birthdate')
+                            ->label('Date of Birth')
+                            ->date()
+                            ->default('—'),
+
+                        TextEntry::make('date_hired')
+                            ->label('Date Hired')
+                            ->date()
+                            ->default('—'),
+
+                        TextEntry::make('address')
+                            ->label('Address')
+                            ->default('—')
+                            ->columnSpanFull(),
                     ])
+                    ->columns(2),
+
+                // ─── Professional Details ───
+                Section::make('Professional Details')
+                    ->schema([
+                        TextEntry::make('license_number')
+                            ->label('PRC License Number'),
+
+                        TextEntry::make('nurseType.name')
+                            ->label('Nurse Type / Specialization')
+                            ->default('—'),
+
+                        TextEntry::make('designation')
+                            ->label('Designation')
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'Admitting' => 'warning',
+                                'Clinical' => 'success',
+                                default => 'gray',
+                            }),
+
+                        TextEntry::make('role_level')
+                            ->label('Role Level')
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'Chief' => 'danger',
+                                'Supervisor' => 'warning',
+                                'Head' => 'primary',
+                                'Charge' => 'info',
+                                default => 'gray',
+                            }),
+
+                        TextEntry::make('station.station_name')
+                            ->label('Station Assignment')
+                            ->default('—'),
+
+                        TextEntry::make('unit.name')
+                            ->label('Unit / Building')
+                            ->default('—'),
+
+                        TextEntry::make('status')
+                            ->label('Employment Status')
+                            ->badge()
+                            ->color(fn(string $state): string => $state === 'Active' ? 'success' : 'gray'),
+                    ])
+                    ->columns(2),
+
+                // ─── Educational Background ───
+                Section::make('Educational Background')
+                    ->schema([
+                        RepeatableEntry::make('educational_background')
+                            ->label('')
+                            ->schema([
+                                TextEntry::make('level')
+                                    ->label('Degree Level'),
+
+                                TextEntry::make('school')
+                                    ->label('School / University'),
+
+                                TextEntry::make('year')
+                                    ->label('Year Achieved'),
+                            ])
+                            ->columns(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('id', 'desc')
             ->columns([
                 ImageColumn::make('user.profile_image_path')
                     ->label('')
                     ->circular()
+                    ->disk('public')
+                    ->checkFileExistence(false)
                     ->defaultImageUrl(fn(Nurse $record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->first_name . ' ' . $record->last_name) . '&color=7F9CF5&background=EBF4FF'),
 
                 TextColumn::make('employee_id')
@@ -119,7 +342,6 @@ class NurseResource extends Resource
                     ->sortable()
                     ->weight('bold'),
 
-                // 2. Name
                 TextColumn::make('last_name')
                     ->label('Last Name')
                     ->searchable()
@@ -138,27 +360,72 @@ class NurseResource extends Resource
                     })
                     ->sortable(),
 
-                TextColumn::make('is_head_nurse')
-                    ->label('Head Nurse')
+                TextColumn::make('role_level')
+                    ->label('Role Level')
                     ->badge()
-                    ->formatStateUsing(fn(bool $state): string => $state ? 'Head Nurse' : 'Staff')
-                    ->color(fn(bool $state): string => $state ? 'primary' : 'gray')
+                    ->color(fn(string $state): string => match ($state) {
+                        'Chief' => 'danger',
+                        'Supervisor' => 'warning',
+                        'Head' => 'primary',
+                        'Charge' => 'info',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
+                TextColumn::make('nurseType.name')
+                    ->label('Nurse Type')
+                    ->default('—')
                     ->sortable(),
 
                 TextColumn::make('station.station_name')
                     ->label('Station')
-                    ->default('Admission')
+                    ->default('—')
                     ->sortable(),
 
-                TextColumn::make('shiftSchedule.name')
-                    ->label('Shift Schedule')
-                    ->default('Unassigned')
-                    ->color(fn(?string $state): string => $state === null ? 'warning' : 'success')
-                    ->badge(),
+                TextColumn::make('unit.name')
+                    ->label('Unit')
+                    ->default('—')
+                    ->sortable(),
 
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => $state === 'Active' ? 'success' : 'gray')
+                    ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('designation')
+                    ->options([
+                        'Clinical' => 'Clinical',
+                        'Admitting' => 'Admitting',
+                    ]),
+
+                SelectFilter::make('role_level')
+                    ->label('Role Level')
+                    ->options([
+                        'Staff' => 'Staff',
+                        'Charge' => 'Charge',
+                        'Head' => 'Head',
+                        'Supervisor' => 'Supervisor',
+                        'Chief' => 'Chief',
+                    ]),
+
+                SelectFilter::make('nurse_type_id')
+                    ->label('Nurse Type')
+                    ->relationship('nurseType', 'name')
+                    ->preload()
+                    ->searchable(),
+
+                SelectFilter::make('station_id')
+                    ->label('Station')
+                    ->relationship('station', 'station_name')
+                    ->preload()
+                    ->searchable(),
+
+                SelectFilter::make('unit_id')
+                    ->label('Unit')
+                    ->relationship('unit', 'name')
+                    ->preload()
+                    ->searchable(),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -168,25 +435,6 @@ class NurseResource extends Resource
                         ->label('DTR Report')
                         ->icon('heroicon-o-document-text')
                         ->form([
-                \Filament\Actions\Action::make('batchDtrReport')
-                    ->label('Batch DTR Report')
-                    ->icon('heroicon-o-document-chart-bar')
-                    ->form([
-                        Grid::make(2)->schema([
-                            DatePicker::make('date_from')
-                                ->label('Date From')
-                                ->required(),
-                            DatePicker::make('date_to')
-                                ->label('Date To')
-                                ->required(),
-                        ]),
-                    ])
-                    ->modalSubmitActionLabel('Generate Batch PDF')
-                    ->action(function (array $data) {
-                        return redirect()->away(
-                            route('admin.nurses.batchDtrReport', $data)
-                        );
-                    }),
                             Grid::make(2)->schema([
                                 DatePicker::make('date_from')
                                     ->label('Date From')
@@ -210,6 +458,25 @@ class NurseResource extends Resource
                 ]),
             ])
             ->toolbarActions([
+                \Filament\Actions\Action::make('batchDtrReport')
+                    ->label('Batch DTR Report')
+                    ->icon('heroicon-o-document-chart-bar')
+                    ->form([
+                        Grid::make(2)->schema([
+                            DatePicker::make('date_from')
+                                ->label('Date From')
+                                ->required(),
+                            DatePicker::make('date_to')
+                                ->label('Date To')
+                                ->required(),
+                        ]),
+                    ])
+                    ->modalSubmitActionLabel('Generate Batch PDF')
+                    ->action(function (array $data) {
+                        return redirect()->away(
+                            route('admin.nurses.batchDtrReport', $data)
+                        );
+                    }),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
@@ -228,6 +495,7 @@ class NurseResource extends Resource
         return [
             'index' => Pages\ListNurses::route('/'),
             'create' => Pages\CreateNurse::route('/create'),
+            'view' => Pages\ViewNurse::route('/{record}'),
             'edit' => Pages\EditNurse::route('/{record}/edit'),
         ];
     }

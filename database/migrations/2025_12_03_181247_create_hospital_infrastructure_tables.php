@@ -8,33 +8,42 @@ return new class extends Migration
 {
     public function up(): void
     {
+
+        Schema::create('units', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // e.g. "East Wing Building", "Main Complex"
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
         Schema::create('stations', function (Blueprint $table) {
             $table->id();
 
-            $table->string('station_name')->unique(); 
-            
-            $table->string('station_code')->nullable()->unique(); 
-            
-            $table->string('floor_location')->nullable(); 
+            $table->foreignId('unit_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->string('station_name')->unique();
+
+            $table->string('station_code')->nullable()->unique();
+
+            $table->string('floor_location')->nullable();
 
             $table->timestamps();
         });
 
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('station_id')->constrained('stations')->cascadeOnDelete();
 
-            $table->string('room_number'); 
-            
-            $table->string('room_type')->index(); 
-            
-            $table->integer('capacity')->default(1);
-            $table->decimal('price_per_night', 10, 2)->default(0.00); 
+            $table->string('room_number');
 
-            $table->string('status')->default('Active')->index(); 
+            $table->string('room_type')->index();
+
+            $table->integer('capacity')->default(1);
+            $table->decimal('price_per_night', 10, 2)->default(0.00);
+
+            $table->string('status')->default('Active')->index();
             $table->timestamps();
-            
+
             $table->unique('room_number');
         });
 
@@ -55,6 +64,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('beds');
         Schema::dropIfExists('rooms');
-        Schema::dropIfExists('stations'); 
+        Schema::dropIfExists('stations');
+        Schema::dropIfExists('units');
     }
 };

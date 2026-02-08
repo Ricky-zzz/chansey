@@ -12,6 +12,16 @@ class EditNurse extends EditRecord
 {
     protected static string $resource = NurseResource::class;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Load the user's profile image into the nested form field
+        $data['user'] = [
+            'profile_image_path' => $this->record->user?->profile_image_path,
+        ];
+
+        return $data;
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $userUpdates = [];
@@ -24,11 +34,17 @@ class EditNurse extends EditRecord
             $userUpdates['name'] = $data['first_name'] . ' ' . $data['last_name'];
         }
 
+        // Handle nested user.profile_image_path
+        if (isset($data['user']['profile_image_path'])) {
+            $userUpdates['profile_image_path'] = $data['user']['profile_image_path'];
+        }
+
         if (! empty($userUpdates)) {
             $record->user->update($userUpdates);
         }
 
-        unset($data['password']); 
+        unset($data['password']);
+        unset($data['user']);
 
         $record->update($data);
 

@@ -17,12 +17,14 @@ class CreateNurse extends CreateRecord
     {
         $badgeId = BadgeGenerator::generate('nurse', $data['first_name'], $data['last_name']);
 
-        // Extract password before creating nurse
+        // Extract password and profile image before creating nurse
         $password = $data['password'] ?? null;
-        
+        $profileImagePath = $data['user']['profile_image_path'] ?? null;
+
         // Remove password and any user-related fields from data to avoid duplication
         unset($data['password']);
         unset($data['user_id']);
+        unset($data['user']);
 
         // Create the user first
         $user = User::create([
@@ -31,6 +33,7 @@ class CreateNurse extends CreateRecord
             'email' => strtolower($badgeId) . '@chansey.local',
             'password' => Hash::make($password),
             'user_type' => 'nurse',
+            'profile_image_path' => $profileImagePath,
         ]);
 
         // Add user_id and employee_id to the cleaned data

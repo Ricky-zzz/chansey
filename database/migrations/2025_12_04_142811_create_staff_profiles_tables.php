@@ -20,28 +20,60 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Nurses Table
+        // Nurse Types Table (must come before nurses)
+        Schema::create('nurse_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('nurses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index();
-            $table->foreign('user_id', 'nurses_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
 
+            // 1. User Account Link
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('employee_id')->unique();
 
+            // 2. Personal Information (Bio-Data)
             $table->string('first_name');
             $table->string('last_name')->index();
+            $table->text('address')->nullable();
+            $table->string('contact_number')->nullable();
+            $table->date('birthdate')->nullable();
 
+            // 3. Professional Details
             $table->string('license_number');
+            $table->string('status')->default('Active'); // Active / Inactive
+            $table->date('date_hired')->nullable();
 
-            $table->string('designation')->default('Clinical')->index(); // can be admitting, clinical, etc.
+            // Education (JSON for Grid Table)
+            // Structure: [{ level: 'BS', school: 'UST', year: '2023' }]
+            $table->json('educational_background')->nullable();
 
+            // 4. Role Hierarchy & Assignment
+            // Role Level: 'Staff', 'Charge', 'Head', 'Supervisor', 'Chief'
+            $table->string('role_level')->default('Staff')->index();
+
+            // Designation: 'Admitting' vs 'Clinical' (For Dashboard Redirect)
+            $table->string('designation')->default('Clinical')->index();
+
+            // Job Description: Link to "ER Nurse", "Dialysis", etc.
+            $table->foreignId('nurse_type_id')->nullable()->constrained()->nullOnDelete();
+
+            // 5. Location Assignments
+            // Standard Nurses belong to a Station
             $table->foreignId('station_id')->nullable()->constrained('stations')->nullOnDelete();
 
+            // Supervisors belong to a Unit (Building)
+            $table->foreignId('unit_id')->nullable()->constrained('units')->nullOnDelete();
+
+            // 6. Scheduling
             $table->foreignId('shift_schedule_id')->nullable()->constrained()->nullOnDelete();
-            $table->boolean('is_head_nurse')->default(false);
 
             $table->timestamps();
 
+            // Optimization
             $table->index(['last_name', 'first_name']);
         });
 
@@ -92,6 +124,7 @@ return new class extends Migration
         Schema::dropIfExists('general_services');
         Schema::dropIfExists('physicians');
         Schema::dropIfExists('nurses');
+        Schema::dropIfExists('nurse_types');
         Schema::dropIfExists('admins');
     }
 };
