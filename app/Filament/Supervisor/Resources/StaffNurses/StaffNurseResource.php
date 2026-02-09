@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Chief\Resources\StaffNurses;
+namespace App\Filament\Supervisor\Resources\StaffNurses;
 
-use App\Filament\Chief\Resources\StaffNurses\Pages\CreateStaffNurse;
-use App\Filament\Chief\Resources\StaffNurses\Pages\EditStaffNurse;
-use App\Filament\Chief\Resources\StaffNurses\Pages\ListStaffNurses;
-use App\Filament\Chief\Resources\StaffNurses\Schemas\StaffNurseForm;
-use App\Filament\Chief\Resources\StaffNurses\Tables\StaffNursesTable;
+use App\Filament\Supervisor\Resources\StaffNurses\Pages\CreateStaffNurse;
+use App\Filament\Supervisor\Resources\StaffNurses\Pages\EditStaffNurse;
+use App\Filament\Supervisor\Resources\StaffNurses\Pages\ListStaffNurses;
+use App\Filament\Supervisor\Resources\StaffNurses\Schemas\StaffNurseForm;
+use App\Filament\Supervisor\Resources\StaffNurses\Tables\StaffNursesTable;
 use App\Models\Nurse;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class StaffNurseResource extends Resource
@@ -56,6 +57,12 @@ class StaffNurseResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role_level', 'Staff');
+        $myUnitId = Auth::user()->nurse->unit_id;
+
+        return parent::getEloquentQuery()
+            ->whereIn('role_level', ['Staff', 'Charge'])
+            ->whereHas('station', function ($query) use ($myUnitId) {
+                $query->where('unit_id', $myUnitId);
+            });
     }
 }

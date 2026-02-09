@@ -14,12 +14,17 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class HeadNurseResource extends Resource
 {
     protected static ?string $model = Nurse::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Nurses';
+
+    protected static ?string $navigationLabel = 'Head Nurses';
 
     protected static ?string $recordTitleAttribute = 'last_name';
 

@@ -119,6 +119,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Billing::class, 'processed_by');
     }
 
+    public function memos()
+    {
+        return $this->hasMany(Memo::class, 'created_by_user_id');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
@@ -136,6 +141,10 @@ class User extends Authenticatable implements FilamentUser
         if ($panel->getId() === 'chief') {
             return $this->user_type === 'nurse' && $this->nurse->role_level === 'Chief';
         }
+
+        if ($panel->getId() === 'supervisor') {
+        return $this->user_type === 'nurse' && $this->nurse->role_level === 'Supervisor';
+    }
 
         return false;
     }

@@ -32,6 +32,10 @@ class DashboardController extends Controller
             return redirect('/chief');
         }
 
+        if ($user->nurse->role_level === 'Supervisor') {
+            return redirect('/supervisor');
+        }
+
         return $user->nurse->designation === 'Admitting'
             ? redirect()->route('nurse.admitting.dashboard')
             : redirect()->route('nurse.clinical.dashboard');
