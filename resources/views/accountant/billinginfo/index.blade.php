@@ -3,18 +3,18 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+    <div class="card-enterprise p-6">
 
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
-                <h2 class="text-3xl font-bold text-slate-800">Billing Information</h2>
+                <h2 class="text-xl font-bold text-slate-800">Billing Information</h2>
             </div>
 
             <!-- SEARCH -->
-            <form action="{{ route('accountant.billinginfo.index') }}" method="GET" class="join w-full md:w-96">
-                <input type="text" name="search" class="input input-bordered join-item w-full" placeholder="Search by admission # or patient name..." value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary join-item">
+            <form action="{{ route('accountant.billinginfo.index') }}" method="GET" class="flex w-full md:w-96">
+                <input type="text" name="search" class="input-enterprise rounded-r-none w-full" placeholder="Search by admission # or patient name..." value="{{ request('search') }}">
+                <button type="submit" class="btn-enterprise-primary rounded-l-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
             </form>
@@ -22,8 +22,8 @@
 
         <!-- TABLE -->
         <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead class="bg-slate-800 text-white">
+            <table class="table-enterprise">
+                <thead>
                     <tr>
                         <th>Patient</th>
                         <th>Admission #</th>
@@ -38,7 +38,7 @@
                     <tr class="hover">
                         <!-- Patient -->
                         <td>
-                            <div class="font-bold text-md text-primary">
+                            <div class="font-bold text-md text-emerald-700">
                                 {{ $billingInfo->admission->patient->getFullNameAttribute() }}
                             </div>
                             <div class="text-xs text-gray-500">
@@ -48,23 +48,23 @@
 
                         <!-- Admission # -->
                         <td>
-                            <div class="badge badge-neutral font-mono text-xs">
+                            <span class="badge-enterprise bg-slate-100 text-slate-600 font-mono text-xs">
                                 {{ $billingInfo->admission->admission_number }}
-                            </div>
+                            </span>
                         </td>
 
                         <!-- Payment Type -->
                         <td>
                             @php
                                 $typeColors = [
-                                    'Cash' => 'badge-success',
-                                    'Insurance' => 'badge-info',
-                                    'HMO' => 'badge-warning',
-                                    'Government' => 'badge-primary',
+                                    'Cash' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                    'Insurance' => 'bg-sky-50 text-sky-700 border-sky-200',
+                                    'HMO' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                    'Government' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
                                 ];
-                                $badgeClass = $typeColors[$billingInfo->payment_type] ?? 'badge-ghost';
+                                $badgeClass = $typeColors[$billingInfo->payment_type] ?? 'bg-slate-50 text-slate-600 border-slate-200';
                             @endphp
-                            <span class="badge {{ $badgeClass }} badge-sm">{{ $billingInfo->payment_type ?? 'Not Set' }}</span>
+                            <span class="badge-enterprise {{ $badgeClass }} text-xs">{{ $billingInfo->payment_type ?? 'Not Set' }}</span>
                         </td>
 
                         <!-- Insurance Provider -->
@@ -83,7 +83,7 @@
 
                         <!-- Action -->
                         <td class="text-right">
-                            <a href="{{ route('accountant.billinginfo.show', $billingInfo->admission->id) }}" class="btn btn-sm btn-primary gap-2">
+                            <a href="{{ route('accountant.billinginfo.show', $billingInfo->admission->id) }}" class="btn-enterprise-primary text-xs inline-flex items-center gap-1.5 py-1.5 px-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 View/Edit
                             </a>

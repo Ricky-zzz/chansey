@@ -3,3 +3,91 @@
   themes: light, dark, emerald, winter;
 }
 
+/* ─── Enterprise Medical Design System ─── */
+@layer components {
+
+    /* Cards */
+    .card-enterprise {
+        @apply bg-white border border-slate-200 shadow-sm rounded-xl;
+    }
+
+    /* Buttons */
+    .btn-enterprise-primary {
+        @apply btn bg-emerald-600 hover:bg-emerald-700 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+    }
+    .btn-enterprise-secondary {
+        @apply btn bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+    }
+    .btn-enterprise-danger {
+        @apply btn bg-red-600 hover:bg-red-700 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+    }
+    .btn-enterprise-warning {
+        @apply btn bg-amber-500 hover:bg-amber-600 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+    }
+    .btn-enterprise-info {
+        @apply btn bg-sky-500 hover:bg-sky-600 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+    }
+
+    /* Inputs */
+    .input-enterprise {
+        @apply input rounded-lg border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white text-sm;
+    }
+    .select-enterprise {
+        @apply select rounded-lg border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white text-sm;
+    }
+    .textarea-enterprise {
+        @apply textarea rounded-lg border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white text-sm;
+    }
+
+    /* Tables */
+    .table-enterprise {
+        @apply table w-full;
+    }
+    .table-enterprise thead {
+        @apply bg-slate-50 border-b border-slate-200;
+    }
+    .table-enterprise thead th {
+        @apply text-slate-500 text-xs font-bold uppercase tracking-wider bg-transparent;
+    }
+    .table-enterprise tbody tr {
+        @apply border-b border-slate-100 hover:bg-slate-50 transition-colors;
+    }
+
+    /* Sidebar */
+    .sidebar-enterprise {
+        @apply bg-white border-r border-slate-200 text-slate-700;
+    }
+    .sidebar-link {
+        @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors;
+    }
+    .sidebar-link-active {
+        @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold bg-emerald-50 text-emerald-700;
+    }
+    .sidebar-section-title {
+        @apply text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-4 pb-1;
+    }
+
+    /* Stat cards */
+    .stat-card {
+        @apply bg-white border border-slate-200 shadow-sm rounded-xl p-5;
+    }
+
+    /* Modal */
+    .modal-enterprise {
+        @apply bg-white rounded-xl border border-slate-200 shadow-lg;
+    }
+
+    /* Badge */
+    .badge-enterprise {
+        @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold;
+    }
+
+    /* Toast notifications */
+    .toast-enterprise-success {
+        @apply bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg shadow-sm;
+    }
+    .toast-enterprise-error {
+        @apply bg-red-50 border border-red-200 text-red-800 rounded-lg shadow-sm;
+    }
+}
+

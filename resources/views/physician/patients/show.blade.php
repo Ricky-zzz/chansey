@@ -3,41 +3,39 @@
 @section('content')
 <div class="max-w-full mx-auto" x-data="clinicalChart()">
     <!-- BREADCRUMB -->
-    <div class="text-sm breadcrumbs mb-3">
-        <ul>
-            <li><a href="{{ route('physician.dashboard') }}" class="link link-hover">Dashboard</a></li>
-            <li><a href="{{ route('physician.mypatients.index') }}" class="link link-hover">My Patients</a></li>
-            <li class="text-slate-700 font-semibold">
-                {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
-            </li>
-        </ul>
+    <div class="flex items-center gap-2 text-sm mb-3">
+        <a href="{{ route('physician.dashboard') }}" class="text-slate-500 hover:text-emerald-600 transition-colors">Dashboard</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <a href="{{ route('physician.mypatients.index') }}" class="text-slate-500 hover:text-emerald-600 transition-colors">My Patients</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <span class="text-slate-700 font-semibold">
+            {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
+        </span>
     </div>
 
     <!-- 1. HEADER: PATIENT CONTEXT -->
-    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 card-enterprise p-6">
         <div class="flex items-center gap-4">
-            <div class="avatar placeholder">
-                <div class="bg-neutral text-neutral-content rounded-full w-16 h-16 flex items-center justify-center">
-                    <span class="text-3xl">{{ substr($admission->patient->first_name, 0, 1) }}</span>
-                </div>
+            <div class="w-14 h-14 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <span class="text-2xl font-bold">{{ substr($admission->patient->first_name, 0, 1) }}</span>
             </div>
             <div>
-                <h1 class="text-2xl font-black text-slate-800">
+                <h1 class="text-2xl font-bold text-slate-800">
                     {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
                 </h1>
                 <div class="flex gap-2 items-center mt-1">
-                    <span class="badge badge-lg badge-primary font-mono">
+                    <span class="badge-enterprise bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
                         {{ $admission->bed ? $admission->bed->bed_code : 'Outpatient' }}
                     </span>
-                    <span class="text-sm text-gray-500">{{ $admission->patient->age }}yo / {{ $admission->patient->sex }}</span>
-                    <span class="text-sm text-gray-500">• Admitted: {{ $admission->admission_date->format('M d') }}</span>
+                    <span class="text-sm text-slate-500">{{ $admission->patient->age }}yo / {{ $admission->patient->sex }}</span>
+                    <span class="text-sm text-slate-500">• Admitted: {{ $admission->admission_date->format('M d') }}</span>
                 </div>
                 <!-- Allergies Alert -->
                 @if(!empty($admission->known_allergies))
                 <div class="mt-2 flex gap-1 items-center">
-                    <span class="text-xs font-bold text-gray-500">Allergies:</span>
+                    <span class="text-xs font-bold text-slate-500">Allergies:</span>
                     @foreach($admission->known_allergies as $allergy)
-                    <span class="badge badge-error text-white badge-xs">{{ $allergy }}</span>
+                    <span class="badge-enterprise bg-red-50 text-red-700 border border-red-200 text-xs">{{ $allergy }}</span>
                     @endforeach
                 </div>
                 @endif
@@ -49,7 +47,7 @@
             <h2 class="text-xs font-bold text-gray-400 uppercase">Actions</h2>
             <div class="flex flex-row gap-2 items-center">
                 <!-- Order Modal Trigger -->
-                <button onclick="order_modal.showModal()" class="bg-blue-600 hover:bg-blue-700 text-white btn-sm gap-2 border-2 border-blue-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">
+                <button onclick="order_modal.showModal()" class="btn-enterprise-info text-sm gap-2 inline-flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -58,13 +56,13 @@
 
                 <!-- Treatment Plan Button -->
                 @if($admission->treatmentPlan)
-                <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white btn-sm border-2 border-emerald-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">Manage Plan</a>
+                <a href="{{ route('physician.treatment-plan.edit', $admission->id) }}" class="btn-enterprise-primary text-sm inline-flex items-center">Manage Plan</a>
                 @else
-                <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white btn-sm border-2 border-emerald-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">Create Plan</a>
+                <a href="{{ route('physician.treatment-plan.create', $admission->id) }}" class="btn-enterprise-primary text-sm inline-flex items-center">Create Plan</a>
                 @endif
 
                 <!-- Print Report Button -->
-                <a href="{{ route('patient.print-report', $admission->id) }}" target="_blank" class="bg-slate-600 hover:bg-slate-700 text-white btn-sm border-2 border-slate-700 hover:scale-105 transition-transform px-3 py-1.5 rounded-lg inline-flex items-center font-medium">
+                <a href="{{ route('patient.print-report', $admission->id) }}" target="_blank" class="btn-enterprise-secondary text-sm inline-flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
@@ -81,11 +79,11 @@
         <div class="lg:col-span-1">
             <div class="flex justify-between items-center mb-4 px-1">
                 <h3 class="font-bold text-slate-700 text-lg" x-text="orderView === 'active' ? 'Active Orders' : 'Order History'"></h3>
-                <div class="join border border-slate-300 rounded-lg">
-                    <button @click="orderView = 'active'" :class="orderView === 'active' ? 'btn-active' : ''" class="btn btn-xs join-item">Active</button>
-                    <button @click="orderView = 'history'" :class="orderView === 'history' ? 'btn-active' : ''" class="btn btn-xs join-item">History</button>
+                <div class="flex border border-slate-200 rounded-lg overflow-hidden">
+                    <button @click="orderView = 'active'" :class="orderView === 'active' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'" class="px-3 py-1 text-xs font-medium transition-colors">Active</button>
+                    <button @click="orderView = 'history'" :class="orderView === 'history' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'" class="px-3 py-1 text-xs font-medium transition-colors">History</button>
                 </div>
-                <span class="badge badge-ghost" x-text="orderView === 'active' ? {{ $admission->medicalOrders->count() }} : {{ $orderHistory->count() }}"></span>
+                <span class="badge-enterprise bg-slate-100 text-slate-600 text-xs" x-text="orderView === 'active' ? {{ $admission->medicalOrders->count() }} : {{ $orderHistory->count() }}"></span>
             </div>
 
             <div class="space-y-4 overflow-y-auto flex-1 m-1">
@@ -93,10 +91,10 @@
                 <template x-if="orderView === 'active'">
                     <div>
                         @forelse($admission->medicalOrders as $order)
-                        <div class="card mb-1.5 bg-base-100 shadow border border-l-4
+                        <div class="card-enterprise mb-1.5 border-l-4
                             {{ $order->type === 'Medication' ? 'border-l-emerald-500' :
                               ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
-                            <div class="card-body p-3">
+                            <div class="p-3">
                                 <div class="flex justify-between items-start mb-1">
                                     <div class="flex gap-2 items-center">
                                         <span class="px-3 py-1 rounded-full text-sm font-bold
@@ -106,7 +104,7 @@
                                   ($order->type === 'Transfer' ? 'bg-rose-600 text-white' : 'bg-lime-600 text-white'))) }}">
                                             {{ $order->type }}
                                         </span>
-                                        <span class="badge badge-sm {{ $order->status === 'Pending' ? 'badge-warning' : 'badge-neutral' }}">
+                                        <span class="badge-enterprise text-xs {{ $order->status === 'Pending' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600' }}">
                                             {{ $order->status }}
                                         </span>
                                     </div>
@@ -128,13 +126,13 @@
                                     <form action="{{ route('physician.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Delete?');" class="w-full">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-error btn-outline w-full">Delete</button>
+                                        <button class="btn-enterprise-danger text-xs w-full">Delete</button>
                                     </form>
                                     @elseif($order->status === 'Pending' || $order->status === 'Active')
                                     <form action="{{ route('physician.orders.discontinue', $order->id) }}" method="POST" class="w-full">
                                         @csrf
                                         @method('PATCH')
-                                        <button class="btn btn-sm btn-error btn-outline w-full">Stop</button>
+                                        <button class="btn-enterprise-danger text-xs w-full">Stop</button>
                                     </form>
                                     @endif
                                 </div>
@@ -150,10 +148,10 @@
                 <template x-if="orderView === 'history'">
                     <div>
                         @forelse($orderHistory as $order)
-                        <div class="card bg-base-100 shadow border border-l-4
+                        <div class="card-enterprise border-l-4
                             {{ $order->type === 'Medication' ? 'border-l-emerald-500' :
                               ($order->type === 'Monitoring' ? 'border-l-blue-500' : 'border-l-slate-300') }}">
-                            <div class="card-body p-3">
+                            <div class="p-3">
                                 <div class="flex justify-between items-start mb-1">
                                     <div class="flex gap-2 items-center">
                                         <span class="px-3 py-1 rounded-full text-sm font-bold
@@ -164,7 +162,7 @@
                                               ($order->type === 'Discharge' ? 'bg-lime-100 text-lime-800' : 'bg-slate-100 text-slate-800')))) }}">
                                             {{ $order->type }}
                                         </span>
-                                        <span class="badge badge-sm {{ $order->status === 'Done' ? 'badge-success' : 'badge-error' }}">
+                                        <span class="badge-enterprise text-xs {{ $order->status === 'Done' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
                                             {{ $order->status }}
                                         </span>
                                     </div>
@@ -188,7 +186,7 @@
                                 @endif
                                 @if($order->type === 'Laboratory' && $order->labResultFile)
                                 <div class="flex gap-2">
-                                    <a href="{{ route('document.view', $order->labResultFile->id) }}" target="_blank" class="btn btn-xs btn-primary text-white flex-1">
+                                    <a href="{{ route('document.view', $order->labResultFile->id) }}" target="_blank" class="btn-enterprise-primary text-xs flex-1 inline-flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                         </svg>
@@ -213,11 +211,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <!-- CARD A: LATEST VITALS  -->
-                <div class="card bg-base-100 shadow-xl border-l-8 border-info">
-                    <div class="card-body">
-                        <h3 class="card-title text-sm text-gray-800 uppercase font-bold flex justify-between">
+                <div class="card-enterprise border-l-4 border-l-sky-400">
+                    <div class="p-5">
+                        <h3 class="text-sm text-slate-800 uppercase font-bold flex justify-between">
                             Current Vitals
-                            <span class="text-blue-600">
+                            <span class="text-sky-600">
                                 @if($latestLog && isset($latestLog->data['bp']))
                                 {{ $latestLog->created_at->diffForHumans() }}
                                 @else
@@ -260,9 +258,9 @@
                 </div>
 
                 <!-- CARD B: TREATMENT PLAN SNAPSHOT -->
-                <div class="card bg-base-100 shadow-xl border-l-8 border-secondary">
-                    <div class="card-body">
-                        <h3 class="card-title text-sm text-gray-800 uppercase font-bold">Active Treatment Plan</h3>
+                <div class="card-enterprise border-l-4 border-l-emerald-400">
+                    <div class="p-5">
+                        <h3 class="text-sm text-slate-800 uppercase font-bold">Active Treatment Plan</h3>
 
                         @if($admission->treatmentPlan)
                         <div class="font-bold text-lg text-slate-800">{{ $admission->treatmentPlan->main_problem }}</div>
@@ -301,11 +299,11 @@
 
     <!-- CREATE ORDER MODAL  -->
     <dialog id="order_modal" class="modal" x-data="{ orderType: 'Medication' }">
-        <div class="modal-box w-11/12 max-w-2xl">
+        <div class="modal-enterprise w-11/12 max-w-2xl">
             <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                <button class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">✕</button>
             </form>
-            <h3 class="font-bold text-xl mb-6">Create Physician Order</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-6">Create Physician Order</h3>
 
             <form action="{{ route('physician.orders.store') }}" method="POST" class="space-y-4">
                 @csrf
@@ -316,7 +314,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Order Type</span>
                     </label>
-                    <select name="type" x-model="orderType" class="select select-bordered w-full">
+                    <select name="type" x-model="orderType" class="select-enterprise w-full">
                         <option value="Medication">Medication</option>
                         <option value="Monitoring">Monitoring / Vitals</option>
                         <option value="Laboratory">Laboratory Request</option>
@@ -331,7 +329,7 @@
                         <label class="label">
                             <span class="label-text font-semibold">Select Medicine</span>
                         </label>
-                        <select name="medicine_id" class="select select-bordered w-full">
+                        <select name="medicine_id" class="select-enterprise w-full">
                             <option value="">-- Choose from Pharmacy --</option>
                             @foreach($medicines as $med)
                             <option value="{{ $med->id }}">{{ $med->generic_name }} {{ $med->brand_name ? "({$med->brand_name})" : '' }} {{ $med->dosage }} - {{ $med->stock_on_hand }} avail</option>
@@ -342,7 +340,7 @@
                         <label class="label">
                             <span class="label-text font-semibold">Quantity</span>
                         </label>
-                        <input type="number" name="quantity" class="input input-bordered w-full" value="1" min="1">
+                        <input type="number" name="quantity" class="input-enterprise w-full" value="1" min="1">
                     </div>
                 </div>
 
@@ -351,7 +349,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Frequency</span>
                     </label>
-                    <select name="frequency" class="select select-bordered w-full">
+                    <select name="frequency" class="select-enterprise w-full">
                         <option value="Once">Stat / Once Only</option>
                         <option value="Every 1 Hour">Every 1 Hour (q1h)</option>
                         <option value="Every 2 Hours">Every 2 Hours (q2h)</option>
@@ -374,7 +372,7 @@
                         'Request Details'
                     "></span>
                     </label>
-                    <textarea name="instruction" class="textarea textarea-bordered w-full h-24"
+                    <textarea name="instruction" class="textarea-enterprise w-full h-24"
                         :placeholder="
                         orderType === 'Medication' ? 'e.g. Give after meals' :
                         orderType === 'Monitoring' ? 'e.g. Check BP and Neuro Vitals' :
@@ -384,17 +382,17 @@
                 </div>
 
                 <!-- 5. DISCHARGE NOTICE -->
-                <div x-show="orderType === 'Discharge'" x-cloak class="alert alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <div x-show="orderType === 'Discharge'" x-cloak class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-emerald-600 shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>This will flag the patient as ready for discharge.</span>
+                    <span class="text-sm">This will flag the patient as ready for discharge.</span>
                 </div>
 
                 <!-- MODAL ACTIONS -->
                 <div class="modal-action pt-2">
-                    <button type="button" onclick="order_modal.close()" class="btn btn-outline btn-error">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Order</button>
+                    <button type="button" onclick="order_modal.close()" class="btn-enterprise-secondary">Cancel</button>
+                    <button type="submit" class="btn-enterprise-primary">Submit Order</button>
                 </div>
             </form>
         </div>

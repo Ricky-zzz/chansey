@@ -1,7 +1,7 @@
 @extends('layouts.accountant')
 
 @section('content')
-<div class="max-w-7xl mx-auto" x-data="{ 
+<div class="max-w-7xl mx-auto" x-data="{
     editMode: false,
     editId: null,
     editName: '',
@@ -9,7 +9,7 @@
     editUnit: '',
     editAction: '',
     editIsActive: false,
-    
+
     openEdit(fee) {
         this.editMode = true;
         this.editId = fee.id;
@@ -31,28 +31,28 @@
     }
 }">
 
-    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
-        
+    <div class="card-enterprise p-6">
+
         <!-- HEADER -->
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-3xl font-bold text-slate-800">Hospital Fees</h2>
-                <p class="text-sm text-gray-500">Manage standard charges for billing.</p>
+                <h2 class="text-xl font-bold text-slate-800">Hospital Fees</h2>
+                <p class="text-sm text-slate-500">Manage standard charges for billing.</p>
             </div>
-            
+
             <div class="flex gap-2">
                 <form action="{{ route('accountant.fees.index') }}" method="GET" class="flex items-center gap-2">
-                    <input type="text" name="search" class="input input-bordered input-sm" placeholder="Search Fee..." value="{{ request('search') }}">
-                    <button class="btn text-white btn-primary btn-sm">Search</button>
+                    <input type="text" name="search" class="input-enterprise text-sm" placeholder="Search Fee..." value="{{ request('search') }}">
+                    <button class="btn-enterprise-primary text-sm">Search</button>
                 </form>
-                <button @click="openCreate()" class="btn bg-blue-600 btn-sm text-white hover:bg-blue-400 font-bold transition-transform duration-200 hover:scale-110">+ Add Fee</button>
+                <button @click="openCreate()" class="btn-enterprise-primary text-sm">+ Add Fee</button>
             </div>
         </div>
 
         <!-- TABLE -->
         <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead class="bg-slate-800 text-white uppercase text-xs">
+            <table class="table-enterprise">
+                <thead>
                     <tr>
                         <th>Fee Name</th>
                         <th>Price (PHP)</th>
@@ -81,12 +81,12 @@
                         </td>
                         <td class="text-right">
                             <div class="flex items-center gap-2 justify-end">
-                                <button @click="openEdit({{ $fee }})" class="btn bg-emerald-600 btn-sm text-white hover:bg-emerald-400 font-bold transition-transform duration-200 hover:scale-110">Edit</button>
+                                <button @click="openEdit({{ $fee }})" class="btn-enterprise-primary text-xs py-1.5 px-3">Edit</button>
 
                                 <form action="{{ route('accountant.fees.destroy', $fee->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this fee?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn bg-rose-600 btn-sm text-white hover:bg-rose-700 font-bold transition-transform duration-200 hover:scale-110">Delete</button>
+                                    <button class="btn-enterprise-danger text-xs py-1.5 px-3">Delete</button>
                                 </form>
                             </div>
                         </td>
@@ -107,9 +107,9 @@
 
     <!-- SHARED MODAL (Create & Edit) -->
     <dialog id="fee_modal" class="modal">
-        <div class="modal-box">
+        <div class="modal-enterprise">
             <h3 class="font-bold text-lg mb-4" x-text="editMode ? 'Edit Fee' : 'Create New Fee'"></h3>
-            
+
             <form :action="editMode ? editAction : '{{ route('accountant.fees.store') }}'" method="POST">
                 @csrf
                 <template x-if="editMode">
@@ -117,18 +117,18 @@
                 </template>
 
                 <div class="form-control w-full mb-4">
-                    <label class="label font-bold">Fee Name</label>
-                    <input type="text" name="name" x-model="editName" class="input input-bordered w-full" placeholder="e.g. Ambulance, ECG Reading" required />
+                    <label class="label font-semibold text-slate-700">Fee Name</label>
+                    <input type="text" name="name" x-model="editName" class="input-enterprise w-full" placeholder="e.g. Ambulance, ECG Reading" required />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="form-control w-full">
-                        <label class="label font-bold">Price</label>
-                        <input type="number" step="0.01" name="price" x-model="editPrice" class="input input-bordered w-full" placeholder="0.00" required />
+                        <label class="label font-semibold text-slate-700">Price</label>
+                        <input type="number" step="0.01" name="price" x-model="editPrice" class="input-enterprise w-full" placeholder="0.00" required />
                     </div>
                     <div class="form-control w-full">
-                        <label class="label font-bold">Unit Logic</label>
-                        <select name="unit" x-model="editUnit" class="select select-bordered w-full">
+                        <label class="label font-semibold text-slate-700">Unit Logic</label>
+                        <select name="unit" x-model="editUnit" class="select-enterprise w-full">
                             <option value="per_use">Per Use (Standard)</option>
                             <option value="per_day">Per Day (Recurring)</option>
                             <option value="flat">Flat Rate</option>
@@ -138,7 +138,7 @@
 
                 <template x-if="editMode">
                     <div class="form-control w-full mb-4 px-0">
-                        <label class="label font-bold">Status</label>
+                        <label class="label font-semibold text-slate-700">Status</label>
                         <input type="hidden" name="is_active" x-bind:value="editIsActive ? 1 : 0">
                         <label class="flex items-center gap-3">
                             <span class="text-sm text-gray-600">Inactive</span>
@@ -149,8 +149,8 @@
                 </template>
 
                 <div class="modal-action">
-                    <button type="button" class="btn" onclick="fee_modal.close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary" x-text="editMode ? 'Update Fee' : 'Save Fee'">Save</button>
+                    <button type="button" class="btn-enterprise-secondary" onclick="fee_modal.close()">Cancel</button>
+                    <button type="submit" class="btn-enterprise-primary" x-text="editMode ? 'Update Fee' : 'Save Fee'">Save</button>
                 </div>
             </form>
         </div>

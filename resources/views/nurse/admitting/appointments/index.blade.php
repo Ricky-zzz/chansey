@@ -1,21 +1,20 @@
 @extends('layouts.layout')
 
 @section('content')
-<div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+<div class="card-enterprise p-6">
 
     {{-- Header --}}
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h2 class="text-3xl font-bold text-neutral">Today's Appointments</h2>
-            <p class="text-sm text-gray-500">{{ now()->format('l, F d, Y') }} • {{ $todayAppointments->count() }} {{ Str::plural('patient', $todayAppointments->count()) }} expected</p>
+            <h2 class="text-xl font-bold text-slate-800">Today's Appointments</h2>
+            <p class="text-sm text-slate-500">{{ now()->format('l, F d, Y') }} • {{ $todayAppointments->count() }} {{ Str::plural('patient', $todayAppointments->count()) }} expected</p>
         </div>
     </div>
 
     {{-- Appointments Table --}}
-    <div class="card bg-white shadow-sm border border-slate-200">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead class="bg-slate-800 text-white uppercase text-xs">
+    <div class="overflow-x-auto">
+            <table class="table-enterprise">
+                <thead>
                     <tr>
                         <th class="w-24">Time</th>
                         <th>Patient</th>
@@ -29,7 +28,7 @@
                     @forelse($todayAppointments as $app)
                     <tr class="hover">
                         {{-- TIME --}}
-                        <td class="font-mono font-bold text-primary">
+                        <td class="font-mono font-bold text-emerald-700">
                             {{ \Carbon\Carbon::parse($app->appointmentSlot->start_time)->format('h:i A') }}
                         </td>
 
@@ -48,7 +47,7 @@
 
                         {{-- DEPARTMENT --}}
                         <td>
-                            <span class="badge badge-ghost badge-sm">
+                            <span class="badge-enterprise bg-slate-100 text-slate-600 text-xs">
                                 {{ $app->appointmentSlot->physician->department->name }}
                             </span>
                         </td>
@@ -63,7 +62,7 @@
                         {{-- ACTION --}}
                         <td class="text-right">
                             <a href="{{ route('nurse.admitting.patients.create', ['prefill' => $app->id]) }}"
-                               class="btn btn-sm btn-success text-white gap-1">
+                               class="btn-enterprise-primary text-xs gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                 </svg>
@@ -87,6 +86,4 @@
             </table>
         </div>
     </div>
-
-</div>
 @endsection

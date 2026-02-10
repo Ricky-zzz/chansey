@@ -1,19 +1,18 @@
 @extends('layouts.physician')
 
 @section('content')
-<div class="max-w-7xl mx-auto bg-white rounded-lg p-6 shadow-xl border border-slate-200">
+<div class="card-enterprise p-6">
 
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h2 class="text-3xl font-black text-slate-800">Daily Consultations</h2>
-            <p class="text-sm text-gray-500">{{ now()->format('l, F d, Y') }}</p>
+            <h2 class="text-xl font-bold text-slate-800">Daily Consultations</h2>
+            <p class="text-sm text-slate-500">{{ now()->format('l, F d, Y') }}</p>
         </div>
     </div>
 
-    <div class="card bg-white shadow-sm border border-slate-200">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead class="bg-slate-800 text-white uppercase text-xs">
+    <div class="overflow-x-auto">
+        <table class="table-enterprise w-full">
+            <thead>
                     <tr>
                         <th class="w-24">Time</th>
                         <th>Patient Name</th>
@@ -26,7 +25,7 @@
                     @forelse($appointments as $app)
                     <tr class="hover">
                         <!-- TIME -->
-                        <td class="font-mono font-bold text-primary">
+                        <td class="font-mono font-bold text-emerald-700">
                             {{ $app->formatted_start_time ?? 'N/A' }}
                         </td>
 
@@ -62,7 +61,7 @@
                             @elseif($app->admission_id)
                                 <!-- LINK TO CHART -->
                                 <a href="{{ route('physician.mypatients.show', $app->admission_id) }}"
-                                   class="px-3 py-1.5 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors inline-flex items-center gap-2">
+                                   class="btn-enterprise-info text-xs inline-flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                     Open Chart
                                 </a>
@@ -71,7 +70,7 @@
                                 <!-- MARK DONE (For Outpatients without Admission) -->
                                 <form action="{{ route('physician.appointments.complete', $app->id) }}" method="POST">
                                     @csrf @method('PATCH')
-                                    <button class="px-3 py-1.5 text-sm bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors inline-flex items-center gap-2">
+                                    <button class="btn-enterprise-primary text-xs inline-flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                         Mark Done
                                     </button>
@@ -89,7 +88,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
     </div>
 
 </div>

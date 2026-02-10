@@ -1,51 +1,51 @@
-@props(['clinicalLogs', 'admission' => null, 'displayMode' => 'physician']) 
+@props(['clinicalLogs', 'admission' => null, 'displayMode' => 'physician'])
 
-<div class="card bg-base-100 shadow-xl border border-base-200">
-    <div class="card-body p-4">
+<div class="card-enterprise">
+    <div class="p-4">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="card-title text-slate-700 text-lg">
+            <h3 class="font-semibold text-slate-800 text-base">
                 {{ $displayMode === 'nurse' ? 'Clinical History' : 'Clinical Log History' }}
             </h3>
-            <div class="flex gap-2 flex-wrap justify-end">
+            <div class="flex gap-1.5 flex-wrap justify-end">
                 @php
                     $currentType = request('type');
                     $routeName = $displayMode === 'nurse' ? 'nurse.clinical.ward.show' : 'physician.mypatients.show';
                     $patientId = $admission?->id ?? request()->route('id');
                 @endphp
-                <a href="{{ route($routeName, ['id' => $patientId]) }}" 
-                   class="btn btn-xs {{ !$currentType ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId]) }}"
+                   class="badge-enterprise text-xs {{ !$currentType ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     All
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Medication']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Medication' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Medication']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Medication' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Medication
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Vitals']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Vitals' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Vitals']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Vitals' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Vitals
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Laboratory']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Laboratory' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Laboratory']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Laboratory' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Lab
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Transfer']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Transfer' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Transfer']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Transfer' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Transfer
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Utility']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Utility' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Utility']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Utility' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Utility
                 </a>
-                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Discharge']) }}" 
-                   class="btn btn-xs {{ $currentType === 'Discharge' ? 'btn-active' : 'btn-outline' }}">
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Discharge']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Discharge' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Discharge
                 </a>
             </div>
         </div>
 
         <div class="overflow-x-auto max-h-96">
-            <table class="table table-sm">
-                <thead class="text-slate-600 sticky top-0 bg-base-100">
+            <table class="table-enterprise table-sm">
+                <thead class="sticky top-0">
                     <tr>
                         <th>Time</th>
                         <th>Type</th>
@@ -55,7 +55,7 @@
                 </thead>
                 <tbody>
                     @forelse($clinicalLogs as $log)
-                    <tr class="hover:bg-slate-50 cursor-pointer" @click="viewLog({
+                    <tr class="cursor-pointer" @click="viewLog({
                         type: '{{ $log->type }}',
                         data: {{ json_encode($log->data) }},
                         created_at: '{{ $log->created_at }}',
@@ -68,41 +68,41 @@
                             'file_size_readable' => $log->labResultFile->file_size_readable ?? 'Unknown'
                         ]) : '' }}
                     })">
-                        <td class="font-mono text-xs">{{ $log->created_at->format('M d H:i') }}</td>
+                        <td class="font-mono text-xs text-slate-600">{{ $log->created_at->format('M d H:i') }}</td>
                         <td>
-                            <div class="px-2 py-1 rounded-full text-xs font-bold text-white inline-block
-                                {{ $log->type === 'Medication' ? 'bg-emerald-600' : 
-                                  ($log->type === 'Vitals' ? 'bg-sky-600' : 
-                                  ($log->type === 'Laboratory' ? 'bg-amber-600' :
-                                  ($log->type === 'Transfer' ? 'bg-rose-600' :
-                                  ($log->type === 'Utility' ? 'bg-purple-600' :
-                                  ($log->type === 'Discharge' ? 'bg-lime-600' : 'bg-slate-400')))))}}">
+                            <span class="badge-enterprise text-xs
+                                {{ $log->type === 'Medication' ? 'bg-emerald-100 text-emerald-700' :
+                                  ($log->type === 'Vitals' ? 'bg-sky-100 text-sky-700' :
+                                  ($log->type === 'Laboratory' ? 'bg-amber-100 text-amber-700' :
+                                  ($log->type === 'Transfer' ? 'bg-rose-100 text-rose-700' :
+                                  ($log->type === 'Utility' ? 'bg-purple-100 text-purple-700' :
+                                  ($log->type === 'Discharge' ? 'bg-lime-100 text-lime-700' : 'bg-slate-100 text-slate-600')))))}}">
                                 {{ $log->type }}
-                            </div>
+                            </span>
                         </td>
-                        <td class="text-xs max-w-xs">
+                        <td class="text-xs max-w-xs text-slate-600">
                             @if($log->type === 'Medication')
-                                Given: <strong>{{ $log->data['medicine'] ?? 'Unknown' }}</strong> ({{ $log->data['dosage'] ?? '--' }})
+                                Given: <strong class="text-slate-800">{{ $log->data['medicine'] ?? 'Unknown' }}</strong> ({{ $log->data['dosage'] ?? '--' }})
                             @elseif($log->type === 'Vitals')
                                 BP: {{ $log->data['bp'] ?? '--' }} | T: {{ $log->data['temp'] ?? '--' }}°C
                             @elseif($log->type === 'Laboratory')
-                                Uploaded: <strong>{{ $log->data['note'] ?? 'Lab Result' }}</strong>
+                                Uploaded: <strong class="text-slate-800">{{ $log->data['note'] ?? 'Lab Result' }}</strong>
                                 @if($log->labResultFile)
-                                <div class="text-xs text-gray-500 mt-1 line-clamp-1">{{ $log->labResultFile->file_name }}</div>
+                                <div class="text-xs text-slate-400 mt-1 line-clamp-1">{{ $log->labResultFile->file_name }}</div>
                                 @endif
                             @elseif($log->type === 'Transfer')
-                                Moved: <strong>{{ $log->data['from_bed'] ?? 'Unknown' }}</strong> → <strong>{{ $log->data['to_bed'] ?? 'Unknown' }}</strong>
+                                Moved: <strong class="text-slate-800">{{ $log->data['from_bed'] ?? 'Unknown' }}</strong> → <strong class="text-slate-800">{{ $log->data['to_bed'] ?? 'Unknown' }}</strong>
                             @elseif($log->type === 'Discharge')
                                 {{ $log->data['note'] ?? 'Patient discharged' }}
                             @else
                                 {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
                             @endif
                         </td>
-                        <td class="text-xs text-gray-500">{{ $log->user->name ?? 'Unknown' }}</td>
+                        <td class="text-xs text-slate-500">{{ $log->user->name ?? 'Unknown' }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center text-gray-400 italic py-6">No clinical logs recorded yet.</td>
+                        <td colspan="4" class="text-center text-slate-400 italic py-6 text-sm">No clinical logs recorded yet.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -111,29 +111,29 @@
 
         <!-- Pagination Controls -->
         @if($clinicalLogs->hasPages())
-        <div class="mt-4 pt-4 border-t border-base-200 flex justify-between items-center text-xs">
-            <span class="text-gray-500">
+        <div class="mt-4 pt-4 border-t border-slate-200 flex justify-between items-center text-xs">
+            <span class="text-slate-500">
                 Showing {{ $clinicalLogs->firstItem() ?? 0 }} to {{ $clinicalLogs->lastItem() ?? 0 }} of {{ $clinicalLogs->total() }} logs
             </span>
-            <div class="join">
+            <div class="flex gap-1">
                 @if($clinicalLogs->onFirstPage())
-                    <button class="join-item btn btn-xs btn-disabled">Previous</button>
+                    <span class="btn-enterprise-secondary text-xs opacity-50 cursor-not-allowed px-2 py-1">Previous</span>
                 @else
-                    <a href="{{ $clinicalLogs->previousPageUrl() }}" class="join-item btn btn-xs btn-outline">Previous</a>
+                    <a href="{{ $clinicalLogs->previousPageUrl() }}" class="btn-enterprise-secondary text-xs px-2 py-1">Previous</a>
                 @endif
 
                 @foreach($clinicalLogs->getUrlRange(1, $clinicalLogs->lastPage()) as $page => $url)
                     @if($page == $clinicalLogs->currentPage())
-                        <button class="join-item btn btn-xs btn-active">{{ $page }}</button>
+                        <span class="btn-enterprise-primary text-xs px-2 py-1">{{ $page }}</span>
                     @else
-                        <a href="{{ $url }}" class="join-item btn btn-xs btn-outline">{{ $page }}</a>
+                        <a href="{{ $url }}" class="btn-enterprise-secondary text-xs px-2 py-1">{{ $page }}</a>
                     @endif
                 @endforeach
 
                 @if($clinicalLogs->hasMorePages())
-                    <a href="{{ $clinicalLogs->nextPageUrl() }}" class="join-item btn btn-xs btn-outline">Next</a>
+                    <a href="{{ $clinicalLogs->nextPageUrl() }}" class="btn-enterprise-secondary text-xs px-2 py-1">Next</a>
                 @else
-                    <button class="join-item btn btn-xs btn-disabled">Next</button>
+                    <span class="btn-enterprise-secondary text-xs opacity-50 cursor-not-allowed px-2 py-1">Next</span>
                 @endif
             </div>
         </div>

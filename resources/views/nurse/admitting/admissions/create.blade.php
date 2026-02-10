@@ -4,18 +4,18 @@
 <div class="max-w-5xl mx-auto" x-data='{
     step: 1,
     errorMessage: "",
-    
+
     validateAndNext() {
         this.errorMessage = "";
         const form = document.querySelector("form");
         const requiredFields = form.querySelectorAll("[data-step=\"" + this.step + "\"][required]");
-        
+
         let firstInvalidField = null;
-        
+
         requiredFields.forEach(field => {
             const value = field.value?.trim();
             const isEmpty = !value || value === "";
-            
+
             if (isEmpty) {
                 if (!firstInvalidField) {
                     firstInvalidField = field;
@@ -25,7 +25,7 @@
                 field.classList.remove("input-error", "select-error");
             }
         });
-        
+
         if (this.step === 2) {
             const allergiesContainer = document.querySelector("[x-data*=\"allergies\"]");
             if (allergiesContainer && allergiesContainer.__x_data && allergiesContainer.__x_data.allergies.length === 0) {
@@ -33,32 +33,32 @@
                 firstInvalidField = allergiesContainer;
             }
         }
-        
+
         if (firstInvalidField) {
             this.errorMessage = this.errorMessage || "Please fill in all required fields before proceeding.";
             firstInvalidField.scrollIntoView({ behavior: "smooth", block: "center" });
             firstInvalidField.focus();
             return;
         }
-        
+
         this.step++;
     }
 }'">
     <!-- DISPLAY ALL VALIDATION ERRORS -->
     @if ($errors->any())
-    <div class="alert alert-error mb-6 shadow-lg" x-data="{ show: true }" x-show="show" @click.outside="show = false">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+    <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg mb-6" x-data="{ show: true }" x-show="show" @click.outside="show = false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-red-600 shrink-0 h-5 w-5 mt-0.5" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <div>
-            <h3 class="font-bold">Validation Errors:</h3>
-            <ul class="list-disc list-inside text-sm mt-2">
+        <div class="flex-1">
+            <h3 class="font-bold text-sm text-red-800">Validation Errors:</h3>
+            <ul class="list-disc list-inside text-sm mt-1 text-red-700">
                 @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
-        <button @click="show = false" class="btn btn-sm btn-ghost">
+        <button @click="show = false" class="text-red-600 hover:text-red-800">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -67,22 +67,23 @@
     @endif
 
     @if (session('error'))
-    <div class="alert alert-error mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+    <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-red-600 shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>{{ session('error') }}</span>
+        <span class="text-sm text-red-800">{{ session('error') }}</span>
     </div>
     @endif
     <div class=" flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
-        <div class="text-md md:text-lg lg:text-2xl breadcrumbs text-slate-900 font-bold">
-            <ul>
-                <li><a href="{{ route('nurse.admitting.dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ route('nurse.admitting.patients.index') }}">Patients</a></li>
-                <li class=" text-primary"><a href="{{ route('nurse.admitting.patients.show',$patient ) }}">{{ $patient->last_name }}, {{ $patient->first_name }}</a></li>
-                <li><a href="">New Admission</a></li>
-            </ul>
+        <div class="flex items-center gap-1.5 text-sm text-slate-500">
+                <a href="{{ route('nurse.admitting.dashboard') }}" class="hover:text-emerald-600">Dashboard</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <a href="{{ route('nurse.admitting.patients.index') }}" class="hover:text-emerald-600">Patients</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <a href="{{ route('nurse.admitting.patients.show',$patient ) }}" class="text-emerald-600 font-medium">{{ $patient->last_name }}, {{ $patient->first_name }}</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <span class="text-slate-800 font-semibold">New Admission</span>
         </div>
     </div>
 </div>
@@ -102,25 +103,25 @@
 
     <!-- STEP 1: ADMISSION DETAILS -->
     <div x-show="step === 1" class="animate-fade-in w-full max-w-5xl mx-auto">
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body p-8">
+        <div class="card-enterprise">
+            <div class="p-8">
 
                 <!-- ERROR MESSAGE DISPLAY -->
-                <div x-show="step === 1 && errorMessage" class="alert alert-error mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <div x-show="step === 1 && errorMessage" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-red-600 shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span x-text="errorMessage"></span>
+                    <span class="text-sm text-red-800" x-text="errorMessage"></span>
                 </div>
 
                 <!-- CENTERED MAIN TITLE -->
-                <h3 class="card-title text-3xl font-bold text-primary justify-center mb-8 border-b pb-4">
+                <h3 class="text-2xl font-bold text-slate-800 text-center mb-8 border-b border-slate-200 pb-4">
                     Admission Details
                 </h3>
 
                 <!-- 1. ADMISSION INFO -->
                 <fieldset class="mb-8"
-                    x-data="{ 
+                    x-data="{
                                     stations: {{ Js::from($stations) }},
                                     allBeds: {{ Js::from($rawBeds) }},
                                     selectedStation: '',
@@ -141,7 +142,7 @@
                         <!-- 1. SELECT STATION (The Filter Trigger) -->
                         <label class="floating-label w-full">
                             <span>Nursing Station / Ward</span>
-                            <select name="station_id" data-step="1" x-model="selectedStation" class="select select-bordered w-full @error('station_id') select-error @enderror" required>
+                            <select name="station_id" data-step="1" x-model="selectedStation" class="select-enterprise w-full @error('station_id') select-error @enderror" required>
                                 <option value="" disabled selected>Select Station First</option>
                                 <template x-for="station in stations" :key="station.id">
                                     <option :value="station.id" :selected="'{{ old('station_id') }}' == station.id" x-text="station.station_name"></option>
@@ -155,7 +156,7 @@
                         <!-- 2. SELECT BED (Filtered Results) -->
                         <label class="floating-label w-full" :hidden="admissionType === 'Outpatient'">
                             <span>Room and Bed Assignment</span>
-                            <select name="bed_id" data-step="1" class="select select-bordered w-full @error('bed_id') select-error @enderror" :disabled="!selectedStation">
+                            <select name="bed_id" data-step="1" class="select-enterprise w-full @error('bed_id') select-error @enderror" :disabled="!selectedStation">
                                 <option value="" disabled selected x-text="selectedStation ? 'Select Available Bed' : 'Please Select Station First'"></option>
 
                                 <template x-for="bed in filteredBeds" :key="bed.id">
@@ -174,7 +175,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
                             <label class="floating-label w-full">
                                 <span>Admission Type</span>
-                                <select name="admission_type" data-step="1" x-model="admissionType" class="select select-bordered w-full @error('admission_type') select-error @enderror" required>
+                                <select name="admission_type" data-step="1" x-model="admissionType" class="select-enterprise w-full @error('admission_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Admission Type</option>
                                     <option value="Emergency" {{ old('admission_type') == 'Emergency' ? 'selected' : '' }}>Emergency Encounter</option>
                                     <option value="Outpatient" {{ old('admission_type') == 'Outpatient' ? 'selected' : '' }}>Outpatient Consultation</option>
@@ -188,7 +189,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Attending Physician</span>
-                                <select name="attending_physician_id" data-step="1" class="select select-bordered w-full @error('attending_physician_id') select-error @enderror" required>
+                                <select name="attending_physician_id" data-step="1" class="select-enterprise w-full @error('attending_physician_id') select-error @enderror" required>
                                     <option value="">Select an Attending Physician</option>
                                     @foreach($physicians as $doc)
                                     <option value="{{ $doc->id }}" {{ old('attending_physician_id') == $doc->id ? 'selected' : '' }}>Dr. {{ $doc->getFullNameAttribute() }}</option>
@@ -201,7 +202,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Case Type</span>
-                                <select name="case_type" data-step="1" class="select select-bordered w-full @error('case_type') select-error @enderror" required>
+                                <select name="case_type" data-step="1" class="select-enterprise w-full @error('case_type') select-error @enderror" required>
                                     <option value="" disabled selected>Select Case Type</option>
                                     <option value="New Case" {{ old('case_type') == 'New Case' ? 'selected' : '' }}>New Case</option>
                                     <option value="Returning" {{ old('case_type') == 'Returning' ? 'selected' : '' }}>Returning</option>
@@ -214,7 +215,7 @@
 
                             <label class="floating-label w-full">
                                 <span>Mode of Arrival</span>
-                                <select name="mode_of_arrival" data-step="1" class="select select-bordered w-full @error('mode_of_arrival') select-error @enderror" required>
+                                <select name="mode_of_arrival" data-step="1" class="select-enterprise w-full @error('mode_of_arrival') select-error @enderror" required>
                                     <option value="" disabled selected>Select Mode of Arrival</option>
                                     <option value="Walk-in" {{ old('mode_of_arrival') == 'Walk-in' ? 'selected' : '' }}>Walk-in</option>
                                     <option value="Ambulance" {{ old('mode_of_arrival') == 'Ambulance' ? 'selected' : '' }}>Ambulance</option>
@@ -237,7 +238,7 @@
                     <div class="grid grid-cols-1 gap-6">
                         <label class="floating-label w-full">
                             <span>Chief Complaint</span>
-                            <textarea name="chief_complaint" data-step="1" class="textarea textarea-bordered w-full @error('chief_complaint') textarea-error @enderror" placeholder="Describe the patient's primary complaint" required>{{ old('chief_complaint') }}</textarea>
+                            <textarea name="chief_complaint" data-step="1" class="textarea-enterprise w-full @error('chief_complaint') textarea-error @enderror" placeholder="Describe the patient's primary complaint" required>{{ old('chief_complaint') }}</textarea>
                             @error('chief_complaint')
                                 <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
                             @enderror
@@ -245,7 +246,7 @@
 
                         <label class="floating-label w-full">
                             <span>Initial Diagnosis</span>
-                            <textarea name="initial_diagnosis" class="textarea textarea-bordered w-full @error('initial_diagnosis') textarea-error @enderror" placeholder="Initial medical impression or suspected diagnosis">{{ old('initial_diagnosis') }}</textarea>
+                            <textarea name="initial_diagnosis" class="textarea-enterprise w-full @error('initial_diagnosis') textarea-error @enderror" placeholder="Initial medical impression or suspected diagnosis">{{ old('initial_diagnosis') }}</textarea>
                             @error('initial_diagnosis')
                                 <label class="label"><span class="label-text-alt text-error">{{ $message }}</span></label>
                             @enderror
@@ -304,8 +305,8 @@
 
                 <!-- 4. ALLERGIES -->
                 <fieldset class="mb-2"
-                    x-data="{ 
-                                  allergies: [], 
+                    x-data="{
+                                  allergies: [],
                                   currentInput: '',
                                   addAllergy() {
                                       if (this.currentInput.trim() !== '' && !this.allergies.includes(this.currentInput.trim())) {
@@ -326,23 +327,23 @@
                         <label class="label">
                             <span class="label-text font-bold">Add Allergy</span>
                         </label>
-                        <div class="join w-full mb-4">
+                        <div class="flex w-full mb-4">
                             <input
                                 type="text"
                                 x-model="currentInput"
                                 @keydown.enter.prevent="addAllergy()"
-                                class="input input-bordered join-item w-full focus:outline-none"
+                                class="input-enterprise rounded-r-none w-full"
                                 placeholder="Type allergy (e.g. Penicillin, Peanuts)..." />
                             <button
                                 type="button"
                                 @click="addAllergy()"
-                                class="btn btn-primary join-item text-white">
+                                class="btn-enterprise-primary rounded-l-none">
                                 Add +
                             </button>
                         </div>
 
                         <!-- The List of Added Allergies -->
-                        <div class="flex flex-wrap gap-2 min-h-12 p-4 bg-base-200 rounded-lg border border-base-300">
+                        <div class="flex flex-wrap gap-2 min-h-12 p-4 bg-slate-50 rounded-lg border border-slate-200">
                             <!-- Empty State -->
                             <div x-show="allergies.length === 0" class="text-gray-400 text-sm italic w-full text-center py-2">
                                 No allergies recorded.
@@ -350,7 +351,7 @@
 
                             <!-- Allergy Tags -->
                             <template x-for="(allergy, index) in allergies" :key="index">
-                                <div class="badge badge-error text-white gap-2 p-3 font-bold shadow-sm">
+                                <div class="badge-enterprise bg-red-50 text-red-700 border border-red-100 gap-2 px-3 py-2 font-bold">
                                     <span x-text="allergy"></span>
                                     <button type="button" @click="removeAllergy(index)" class="hover:text-black transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 stroke-current">
@@ -377,11 +378,11 @@
 
     <!-- STEP 2: DOCUMENTS -->
     <div x-show="step === 2" style="display: none;">
-        <div class="card bg-base-100 shadow border">
-            <div class="card-body">
-                <h3 class="card-title text-primary">Required Documents</h3>
-                <div class="alert alert-warning text-sm mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <div class="card-enterprise">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Required Documents</h3>
+                <div class="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-amber-600 shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <span>Please ensure scanned documents are clear. Allowed formats: JPG, PNG, PDF.</span>
@@ -423,9 +424,9 @@
 
     <!-- STEP 3: REVIEW -->
     <div x-show="step === 3" style="display: none;">
-        <div class="card bg-base-100 shadow border">
-            <div class="card-body">
-                <div class="alert alert-warning">
+        <div class="card-enterprise">
+            <div class="p-6">
+                <div class="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
@@ -438,7 +439,7 @@
 
     <div class="flex justify-between mt-6">
         <!-- Back Button -->
-        <button type="button" class="btn btn-neutral"
+        <button type="button" class="btn-enterprise-secondary"
             x-show="step > 1"
             @click="step--; errorMessage = ''">
             Previous
@@ -446,14 +447,14 @@
         <div x-show="step === 1"></div>
 
         <!-- Next Button -->
-        <button type="button" class="btn btn-primary text-white"
+        <button type="button" class="btn-enterprise-primary"
             x-show="step < 3"
             @click="validateAndNext()">
             Next Step
         </button>
 
         <!-- Final Submit Button -->
-        <button type="submit" class="btn btn-error"
+        <button type="submit" class="btn-enterprise-danger"
             x-show="step === 3">
             Confirm & Admit Patient
         </button>

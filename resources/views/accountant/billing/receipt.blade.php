@@ -2,25 +2,25 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto">
-    
+
     <div class="text-center mb-8">
-        <div class="inline-flex p-4 bg-success text-white rounded-full mb-4 shadow-lg">
+        <div class="inline-flex p-4 bg-emerald-100 text-emerald-600 rounded-full mb-4 shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
         </div>
-        <h1 class="text-4xl font-black text-slate-800">Payment Complete</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Payment Complete</h1>
         <p class="text-gray-500">Receipt #: {{ $billing->receipt_number }}</p>
     </div>
 
     <!-- TICKET CARD -->
-    <div class="card bg-white shadow-xl border border-slate-200 overflow-hidden">
-        
+    <div class="card-enterprise overflow-hidden">
+
         <!-- Top Tear -->
         <div class="bg-slate-800 p-6 text-white text-center">
             <div class="text-xs uppercase font-bold opacity-50 tracking-widest">Amount Paid</div>
             <div class="text-5xl font-mono font-bold mt-2">₱{{ number_format($billing->final_total, 2) }}</div>
         </div>
 
-        <div class="card-body p-8">
+        <div class="p-8">
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <div class="text-xs font-bold text-gray-400 uppercase">Billed To</div>
@@ -34,7 +34,7 @@
 
             <!-- SUMMARY LIST WITH ACCORDIONS -->
             <div class="space-y-2 border-t border-b border-dashed border-gray-300 py-6 my-2">
-                
+
                 <!-- ROOM CHARGES ACCORDION -->
                 <div class="collapse collapse-arrow bg-gray-50 border border-gray-200">
                     <input type="radio" name="billing-accordion" />
@@ -128,17 +128,17 @@
             <!-- Footer -->
             <div class="flex justify-between items-center text-sm text-gray-500 mt-4">
                 <span>Processed by: {{ $billing->processedBy->name ?? 'Admin' }}</span>
-                <span class="badge badge-success text-white">CLEARED</span>
+                <span class="badge-enterprise bg-emerald-50 text-emerald-700 border-emerald-200">CLEARED</span>
             </div>
         </div>
     </div>
 
     <!-- ACTIONS -->
     <div class="flex justify-center gap-4 mt-8">
-        <a href="{{ route('accountant.dashboard') }}" class="btn btn-error">Back to Dashboard</a>
-        
+        <a href="{{ route('accountant.dashboard') }}" class="btn-enterprise-danger inline-flex items-center">Back to Dashboard</a>
+
         <!-- PRINT BUTTON -->
-        <a href="{{ route('accountant.billing.print', $billing->id) }}" target="_blank" class="btn btn-primary text-white gap-2 shadow-lg">
+        <a href="{{ route('accountant.billing.print', $billing->id) }}" target="_blank" class="btn-enterprise-primary inline-flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Print Receipt (PDF)
         </a>

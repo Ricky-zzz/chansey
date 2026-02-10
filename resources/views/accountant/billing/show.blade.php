@@ -2,17 +2,17 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto"
-    x-data="billingSystem({ 
-        roomTotal: {{ $roomTotal }}, 
-        itemsTotal: {{ $itemsTotal }} 
+    x-data="billingSystem({
+        roomTotal: {{ $roomTotal }},
+        itemsTotal: {{ $itemsTotal }}
      })">
 
     <!-- HEADER -->
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h2 class="text-3xl font-black text-slate-800">Process Billing</h2>
+            <h2 class="text-xl font-bold text-slate-800">Process Billing</h2>
             <div class="text-sm text-gray-500">
-                Patient: <span class="font-bold text-primary">{{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}</span>
+                Patient: <span class="font-bold text-emerald-700">{{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}</span>
                 | ID: {{ $admission->admission_number }}
             </div>
         </div>
@@ -30,13 +30,13 @@
         <div class="lg:col-span-2 space-y-6">
 
             <!-- A. ROOM CHARGES -->
-            <div class="card bg-white shadow-sm border border-slate-200">
-                <div class="card-body p-0">
-                    <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl font-bold text-black">
+            <div class="card-enterprise overflow-hidden">
+                <div class="p-0">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg font-bold text-slate-800">
                         Room & Board Charges
                     </div>
                     <div class="overflow-x-auto max-h-64">
-                        <table class="table table-sm">
+                        <table class="table-enterprise">
                             <thead>
                                 <tr>
                                     <th>Room</th>
@@ -69,11 +69,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <table class="table table-sm">
+                    <table class="table-enterprise">
                         <tfoot class="bg-slate-50">
                             <tr>
                                 <td colspan="4" class="text-right font-bold text-slate-500">Room Subtotal:</td>
-                                <td class="text-right font-black text-slate-800 text-lg">₱{{ number_format($roomTotal, 2) }}</td>
+                                <td class="text-right font-bold text-slate-800 text-lg">₱{{ number_format($roomTotal, 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -81,16 +81,16 @@
             </div>
 
             <!-- B. ITEMS & SERVICES (Meds, Labs, Fees) -->
-            <div class="card bg-white shadow-sm border border-slate-200">
-                <div class="card-body p-0">
-                    <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl flex justify-between items-center">
-                        <span class="font-bold text-black">Medications, Labs & Other Fees</span>
+            <div class="card-enterprise overflow-hidden">
+                <div class="p-0">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg flex justify-between items-center">
+                        <span class="font-bold text-slate-800">Medications, Labs & Other Fees</span>
 
                         <!-- ADD FEE BUTTON -->
-                        <button onclick="fee_modal.showModal()" class="btn btn-xs btn-primary">+ Add Fee</button>
+                        <button onclick="fee_modal.showModal()" class="btn-enterprise-primary text-xs py-1.5 px-3">+ Add Fee</button>
                     </div>
                     <div class="overflow-x-auto max-h-64">
-                        <table class="table table-sm">
+                        <table class="table-enterprise">
                             <thead>
                                 <tr>
                                     <th>Item / Service</th>
@@ -121,7 +121,7 @@
                                         <form action="{{ route('accountant.billing.remove_item', $item->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-xs btn-error btn-outline text-error">Remove</button>
+                                            <button type="submit" class="btn-enterprise-danger text-xs py-1 px-2">Remove</button>
                                         </form>
                                         @endif
                                     </td>
@@ -130,11 +130,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <table class="table table-sm">
+                    <table class="table-enterprise">
                         <tfoot class="bg-slate-50">
                             <tr>
                                 <td colspan="4" class="text-right font-bold text-slate-500">Items Subtotal:</td>
-                                <td class="text-right font-black text-slate-800 text-lg">₱{{ number_format($itemsTotal, 2) }}</td>
+                                <td class="text-right font-bold text-slate-800 text-lg">₱{{ number_format($itemsTotal, 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -151,16 +151,16 @@
                 <input type="hidden" name="room_total" value="{{ $roomTotal }}">
                 <input type="hidden" name="items_total" value="{{ $itemsTotal }}">
 
-                <div class="card bg-white shadow-lg border-t-4 border-primary">
-                    <div class="card-body p-6 space-y-4">
-                        <h3 class="text-lg font-bold text-black">Billing Adjustments</h3>
+                <div class="card-enterprise border-t-4 border-emerald-500">
+                    <div class="p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800">Billing Adjustments</h3>
 
                         <!-- 1. PROFESSIONAL FEE -->
                         <div class="form-control">
-                            <label class="label text-xs text-black font-bold uppercase">Professional Fee (Doctor)</label>
+                            <label class="label text-xs text-slate-700 font-bold uppercase">Professional Fee (Doctor)</label>
                             <div class="input-group">
                                 <span>₱</span>
-                                <input type="number" step="0.01" name="pf_fee" x-model.number="pf" class="input text-2xl input-bordered w-full font-mono text-right">
+                                <input type="number" step="0.01" name="pf_fee" x-model.number="pf" class="input-enterprise text-2xl w-full font-mono text-right">
                             </div>
                         </div>
 
@@ -171,7 +171,7 @@
                             <label class="label text-xs font-bold uppercase text-emerald-600">PhilHealth</label>
                             <div class="input-group">
                                 <span>- ₱</span>
-                                <input type="number" step="0.01" name="philhealth" x-model.number="philhealth" class="input input-bordered text-2xl w-full font-mono text-right text-emerald-600">
+                                <input type="number" step="0.01" name="philhealth" x-model.number="philhealth" class="input-enterprise text-2xl w-full font-mono text-right text-emerald-600">
                             </div>
                         </div>
 
@@ -179,7 +179,7 @@
                             <label class="label text-xs font-bold uppercase text-emerald-600">HMO / Insurance</label>
                             <div class="input-group">
                                 <span>- ₱</span>
-                                <input type="number" step="0.01" name="hmo" x-model.number="hmo" class="input input-bordered w-full text-2xl font-mono text-right text-emerald-600">
+                                <input type="number" step="0.01" name="hmo" x-model.number="hmo" class="input-enterprise w-full text-2xl font-mono text-right text-emerald-600">
                             </div>
                         </div>
 
@@ -196,16 +196,16 @@
                             <div class="divider my-1"></div>
                             <div class="flex justify-between items-end">
                                 <span class="font-bold text-lg">NET AMOUNT DUE</span>
-                                <span class="font-black text-3xl text-red-500">₱<span x-text="netAmount.toFixed(2)"></span></span>
+                                <span class="font-bold text-3xl text-red-500">₱<span x-text="netAmount.toFixed(2)"></span></span>
                             </div>
                         </div>
 
                         <!-- 4. PAYMENT -->
                         <div class="form-control mt-4">
-                            <label class="label text-xs text-black font-bold uppercase">Cash Tendered</label>
+                            <label class="label text-xs text-slate-700 font-bold uppercase">Cash Tendered</label>
                             <div class="input-group">
                                 <span>₱</span>
-                                <input type="number" step="0.01" name="cash_tendered" x-model.number="cash" class="input text-3xl text-black bg-yellow-300 input-bordered w-full font-mono text-right input-lg">
+                                <input type="number" step="0.01" name="cash_tendered" x-model.number="cash" class="input-enterprise text-3xl text-slate-800 bg-amber-100 w-full font-mono text-right">
                             </div>
                         </div>
 
@@ -236,15 +236,15 @@
 
 <!-- ADD FEE MODAL -->
 <dialog id="fee_modal" class="modal">
-    <div class="modal-box">
+    <div class="modal-enterprise">
         <h3 class="font-bold text-lg mb-4">Add Hospital Fee</h3>
         <form action="{{ route('accountant.billing.add_fee') }}" method="POST">
             @csrf
             <input type="hidden" name="admission_id" value="{{ $admission->id }}">
 
             <div class="form-control w-full mb-4">
-                <label class="label font-bold">Select Fee</label>
-                <select name="fee_id" class="select select-bordered">
+                <label class="label font-semibold text-slate-700">Select Fee</label>
+                <select name="fee_id" class="select-enterprise w-full">
                     @foreach($fees as $fee)
                     <option value="{{ $fee->id }}">
                         {{ $fee->name }} (₱{{ number_format($fee->price, 2) }} / {{ $fee->unit }})
@@ -254,13 +254,13 @@
             </div>
 
             <div class="form-control w-full mb-6">
-                <label class="label font-bold">Quantity / Days</label>
-                <input type="number" name="quantity" class="input input-bordered" value="1" min="1">
+                <label class="label font-semibold text-slate-700">Quantity / Days</label>
+                <input type="number" name="quantity" class="input-enterprise w-full" value="1" min="1">
             </div>
 
             <div class="modal-action">
-                <button type="button" class="btn" onclick="fee_modal.close()">Cancel</button>
-                <button type="submit" class="btn btn-success text-white">Add to Bill</button>
+                <button type="button" class="btn-enterprise-secondary" onclick="fee_modal.close()">Cancel</button>
+                <button type="submit" class="btn-enterprise-primary">Add to Bill</button>
             </div>
         </form>
     </div>

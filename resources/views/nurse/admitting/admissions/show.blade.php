@@ -7,69 +7,73 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
 
-            <h2 class="text-xl font-black text-slate-800">
+            <h2 class="text-xl font-bold text-slate-800">
                 Admission Details
                 @if($admission->status === 'Admitted')
-                <span class="badge badge-success text-white align-middle ml-2">Active</span>
+                <span class="badge-enterprise bg-emerald-50 text-emerald-700 border border-emerald-200 align-middle ml-2">Active</span>
                 @else
-                <span class="badge badge-neutral text-white align-middle ml-2">{{ $admission->status }}</span>
+                <span class="badge-enterprise bg-slate-100 text-slate-600 border border-slate-200 align-middle ml-2">{{ $admission->status }}</span>
                 @endif
             </h2>
-            <div class="text-xs md:text-sm lg:text-md breadcrumbs text-slate-900 font-bold">
-                <ul>
-                    <li><a href="{{ route('nurse.admitting.dashboard') }}">Dashboard</a></li>
-                    <li><a href="{{ route('nurse.admitting.patients.index') }}">Patients</a></li>
-                    <li class=" text-primary"><a href="{{ route('nurse.admitting.patients.show',$admission->patient->id ) }}">{{ $admission->patient->getFullNameAttribute() }} </a></li>
-                    <li><a href="{{ route('nurse.admitting.admissions.index') }}">Admissions</a></li>
-                    <li class="font-bold text-primary">{{ $admission->admission_number }}</li>
-                </ul>
+            <div class="flex items-center gap-1.5 text-xs md:text-sm text-slate-500 mt-1">
+                <a href="{{ route('nurse.admitting.dashboard') }}" class="hover:text-emerald-600">Dashboard</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <a href="{{ route('nurse.admitting.patients.index') }}" class="hover:text-emerald-600">Patients</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <a href="{{ route('nurse.admitting.patients.show',$admission->patient->id ) }}" class="text-emerald-600 font-medium">{{ $admission->patient->getFullNameAttribute() }}</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <a href="{{ route('nurse.admitting.admissions.index') }}" class="hover:text-emerald-600">Admissions</a>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <span class="text-slate-800 font-semibold">{{ $admission->admission_number }}</span>
             </div>
         </div>
 
-        <a href="{{ route('nurse.admitting.admissions.edit', $admission) }}" class="inline-flex items-center gap-2 text-white bg-blue-500 btn btn-lg px-4 py-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-            </svg>
-            <span>Edit Details</span>
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ route('nurse.admitting.admissions.edit', $admission) }}" class="btn-enterprise-info text-xs px-3 py-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                </svg>
+                <span>Edit</span>
+            </a>
 
-        <a href="{{ route('admission.report', $admission->id) }}" target="_blank" class="inline-flex items-center gap-2 text-white bg-slate-600 hover:bg-slate-700 btn btn-lg px-4 py-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>Admission Report</span>
-        </a>
+            <a href="{{ route('admission.report', $admission->id) }}" target="_blank" class="btn-enterprise-secondary text-xs px-3 py-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Report</span>
+            </a>
+        </div>
     </div>
 
     <!-- 2. TOP ROW: PATIENT CONTEXT & LOCATION -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
         <!-- Patient Context Card -->
-        <div class="card bg-white shadow-sm border border-slate-200 lg:col-span-2">
-            <div class="card-body flex-row gap-4 lg:gap-6 items-center p-3 lg:p-4">
-                <div class="avatar placeholder shrink-0">
-                    <div class="bg-neutral text-neutral-content rounded-full w-14 h-14 lg:w-28 lg:h-28 flex items-center justify-center">
-                        <span class="text-base lg:text-4xl font-bold">{{ strtoupper(substr($admission->patient->first_name, 0, 1)) }}{{ strtoupper(substr($admission->patient->last_name, 0, 1)) }}</span>
+        <div class="card-enterprise lg:col-span-2">
+            <div class="flex flex-row gap-4 lg:gap-6 items-center p-4">
+                <div class="shrink-0">
+                    <div class="bg-emerald-100 text-emerald-700 rounded-lg w-14 h-14 lg:w-24 lg:h-24 flex items-center justify-center">
+                        <span class="text-base lg:text-3xl font-bold">{{ strtoupper(substr($admission->patient->first_name, 0, 1)) }}{{ strtoupper(substr($admission->patient->last_name, 0, 1)) }}</span>
                     </div>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 class="text-base lg:text-3xl font-bold text-slate-700 truncate">
-                        <a href="{{ route('nurse.admitting.patients.show', $admission->patient_id) }}" class="link link-hover">
+                    <h3 class="text-base lg:text-2xl font-bold text-slate-800 truncate">
+                        <a href="{{ route('nurse.admitting.patients.show', $admission->patient_id) }}" class="hover:text-emerald-600 transition-colors">
                             {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}
                         </a>
                     </h3>
-                    <div class=" text-sm lg:text-base text-slate-600 font-mono mb-1 lg:mb-2 truncate">{{ $admission->patient->patient_unique_id }}</div>
-                    <div class="flex gap-2 flex-wrap">
-                        <span class="badge badge-xs lg:badge-sm badge-ghost">{{ $admission->patient->age }} yrs</span>
-                        <span class="badge badge-xs lg:badge-sm badge-ghost">{{ $admission->patient->sex }}</span>
+                    <div class="text-sm text-slate-500 font-mono mb-1 truncate">{{ $admission->patient->patient_unique_id }}</div>
+                    <div class="flex gap-1.5 flex-wrap">
+                        <span class="badge-enterprise bg-slate-100 text-slate-600">{{ $admission->patient->age }} yrs</span>
+                        <span class="badge-enterprise bg-slate-100 text-slate-600">{{ $admission->patient->sex }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Location & Doctor Card -->
-        <div class="card bg-white shadow-sm border border-slate-200">
-            <div class="card-body p-4">
+        <div class="card-enterprise">
+            <div class="p-4">
                 @if($admission->status !== 'Admitted')
                 <h4 class="uppercase font-bold text-sm tracking-widest text-red-500 mb-2">Last location</h4>
                 @else
@@ -107,9 +111,9 @@
         <div class="lg:col-span-2 space-y-6">
 
             <!-- A. VITALS SNAPSHOT -->
-            <div class="card bg-base-100 shadow-sm border border-slate-200">
-                <div class="card-body p-6">
-                    <h3 class="card-title text-sm uppercase font-bold mb-4">Initial Vital Signs</h3>
+            <div class="card-enterprise">
+                <div class="p-5">
+                    <h3 class="text-xs uppercase font-bold text-slate-500 tracking-wider mb-4">Initial Vital Signs</h3>
                     <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
                         <div class="p-2 bg-slate-50 rounded-lg">
                             <div class="text-xs text-slate-500">Temp</div>
@@ -140,9 +144,9 @@
             </div>
 
             <!-- B. CLINICAL DETAILS -->
-            <div class="card bg-base-100 shadow-sm border border-slate-200">
-                <div class="card-body">
-                    <h3 class="card-title text-lg mb-4">Clinical Information</h3>
+            <div class="card-enterprise">
+                <div class="p-5">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Clinical Information</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                         <div>
@@ -179,7 +183,7 @@
                         @if(!empty($admission->known_allergies))
                         <div class="flex flex-wrap gap-2">
                             @foreach($admission->known_allergies as $allergy)
-                            <span class="badge badge-error text-white font-bold">{{ $allergy }}</span>
+                            <span class="badge-enterprise bg-red-50 text-red-700 border border-red-100">{{ $allergy }}</span>
                             @endforeach
                         </div>
                         @else
@@ -190,13 +194,13 @@
             </div>
 
             <!-- C. UPLOADED DOCUMENTS -->
-            <div class="card bg-base-100 shadow-sm border border-slate-200">
-                <div class="card-body">
-                    <h3 class="card-title text-lg mb-4">Attached Documents</h3>
+            <div class="card-enterprise">
+                <div class="p-5">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Attached Documents</h3>
 
                     @if($admission->files->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="table table-sm">
+                        <table class="table-enterprise text-sm">
                             <thead>
                                 <tr>
                                     <th>Document Type</th>
@@ -218,7 +222,7 @@
                                         {{ $file->uploader->name ?? 'System' }}
                                     </td>
                                     <td>
-                                        <a href="{{ route('document.view', $file->id) }}" target="_blank" class="btn btn-xs btn-outline btn-primary">
+                                        <a href="{{ route('document.view', $file->id) }}" target="_blank" class="btn-enterprise-primary text-xs px-2 py-0.5">
                                             View File
                                         </a>
                                     </td>
@@ -228,8 +232,8 @@
                         </table>
                     </div>
                     @else
-                    <div class="alert alert-warning text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-amber-600 shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                         <span>No documents uploaded for this admission.</span>
@@ -241,9 +245,9 @@
         </div>
         <div class="lg:col-span-1 space-y-6">
 
-            <div class="card bg-base-100 shadow-sm border border-slate-200">
-                <div class="card-body">
-                    <h3 class="card-title text-primary text-lg mb-4">Financial Info</h3>
+            <div class="card-enterprise">
+                <div class="p-5">
+                    <h3 class="text-base font-bold text-emerald-700 mb-4">Financial Info</h3>
 
                     @if($admission->billingInfo)
                     <div class="space-y-4">
@@ -261,7 +265,7 @@
                         </div>
                         @endif
 
-                        <div class="divider"></div>
+                        <div class="border-t border-slate-200 my-4"></div>
 
                         <div>
                             <div class="text-xs font-bold text-slate-500 uppercase">Guarantor</div>

@@ -3,20 +3,20 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+    <div class="card-enterprise p-6">
 
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
-                <h2 class="text-3xl font-bold text-neutral">Ready for Discharge</h2>
-                <p>These patients have settled their bills. Discharge them to free up beds.</p>
+                <h2 class="text-xl font-bold text-slate-800">Ready for Discharge</h2>
+                <p class="text-sm text-slate-500">These patients have settled their bills. Discharge them to free up beds.</p>
             </div>
 
             <div class="flex gap-2 w-full md:w-auto">
-                <form action="{{ route('nurse.admitting.admissions.index') }}" method="GET" class="join w-full md:w-96">
-                    <input type="text" name="search" class="input input-bordered join-item w-full"
+                <form action="{{ route('nurse.admitting.admissions.index') }}" method="GET" class="flex w-full md:w-96">
+                    <input type="text" name="search" class="input-enterprise rounded-r-none w-full"
                         placeholder="Search Admission #, Patient Name, or PID..."
                         value="{{ request('search') }}">
-                    <button type="submit" class="btn btn-primary join-item">
+                    <button type="submit" class="btn-enterprise-primary rounded-l-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -26,10 +26,9 @@
             </div>
         </div>
 
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="overflow-x-auto">
-                <table class="table table-zebra">
-                    <thead class="bg-neutral text-white">
+        <div class="overflow-x-auto">
+                <table class="table-enterprise">
+                    <thead>
                         <tr>
                             <th>Admission # | Type</th>
                             <th>Patient</th>
@@ -59,7 +58,7 @@
 
                             <td>
                                 <div class="font-semibold text-base">{{ $admission->patient->last_name }}, {{ $admission->patient->first_name }}</div>
-                                <div class="text-sm text-secondary font-mono">{{ $admission->patient->patient_unique_id }}</div>
+                            <div class="text-sm text-slate-500 font-mono">{{ $admission->patient->patient_unique_id }}</div>
                             </td>
                             <td>
                                 <div class="font-semibold text-sm">{{ $admission->admission_date->format('M d, Y') }}</div>
@@ -67,7 +66,7 @@
                             </td>
                             <td>
                                 @if($admission->bed)
-                                <div class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border border-gray-200">{{ $admission->bed->bed_code }}</div>
+                                <div class="badge-enterprise text-xs font-bold border border-slate-200">{{ $admission->bed->bed_code }}</div>
                                 @else
                                 <span class="text-xs italic text-gray-400">No Bed Assigned</span>
                                 @endif
@@ -97,7 +96,7 @@
                                 @if($admission->status === 'Cleared')
                                 <form action="{{ route('nurse.admitting.discharge', $admission->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm font-bold bg-orange-600 text-white w-full" onclick="return confirm('Confirm patient has physically left the bed?')">
+                                    <button type="submit" class="btn-enterprise-warning text-xs w-full" onclick="return confirm('Confirm patient has physically left the bed?')">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 md:h-5 md:w-5 inline-block " aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                         </svg>
@@ -106,7 +105,7 @@
                                     </button>
                                 </form>
                                 @else
-                                <a href="{{ route('nurse.admitting.admissions.show', $admission->id) }}" class="btn btn-xs md:btn-sm btn-neutral w-full inline-flex items-center justify-center gap-2">
+                                <a href="{{ route('nurse.admitting.admissions.show', $admission->id) }}" class="btn-enterprise-secondary text-xs w-full inline-flex items-center justify-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 md:h-5 md:w-5 inline-block mr-2" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -129,10 +128,9 @@
                 </table>
             </div>
 
-            <div class="p-4">
+            <div class="p-4 border-t border-slate-200">
                 {{ $admissions->links() }}
             </div>
-        </div>
 
     </div>
 </div>

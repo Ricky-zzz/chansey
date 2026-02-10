@@ -3,25 +3,25 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <div class="bg-white border border-base-300 rounded-xl p-6 shadow">
+    <div class="card-enterprise p-6">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-slate-800">Billing History</h2>
-                <p class="text-sm text-gray-500">All cleared and discharged patient transactions.</p>
+                <h2 class="text-xl font-bold text-slate-800">Billing History</h2>
+                <p class="text-sm text-slate-500">All cleared and discharged patient transactions.</p>
             </div>
 
             <!-- Simple Search -->
-            <form action="{{ route('accountant.history') }}" method="GET" class="join">
-                <input type="text" name="search" class="input input-bordered join-item input-sm"
+            <form action="{{ route('accountant.history') }}" method="GET" class="flex">
+                <input type="text" name="search" class="input-enterprise rounded-r-none text-sm"
                     placeholder="Search Patient..."
                     value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary join-item btn-sm">Search</button>
+                <button type="submit" class="btn-enterprise-primary rounded-l-none text-sm">Search</button>
             </form>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
+            <table class="table-enterprise w-full">
+                <thead>
                     <tr>
                         <th>Receipt #</th>
                         <th>Patient</th>
@@ -35,7 +35,7 @@
                 <tbody>
                     @forelse($billings as $billing)
                     <tr>
-                        <td class="font-mono font-bold text-primary">{{ $billing->receipt_number }}</td>
+                        <td class="font-mono font-bold text-emerald-700">{{ $billing->receipt_number }}</td>
 
                         <td>
                             <div class="font-bold">{{ $billing->admission->patient->last_name }}, {{ $billing->admission->patient->first_name }}</div>
@@ -61,7 +61,7 @@
 
                         <td class="text-right">
                             <a href="{{route('accountant.billing.show', $billing->admission->id)}}"
-                                class="btn btn-sm bg-blue-500 text-white gap-2 border border-blue-600">
+                                class="btn-enterprise-info text-xs inline-flex items-center gap-1.5 py-1.5 px-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

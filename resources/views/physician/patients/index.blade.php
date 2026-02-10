@@ -3,19 +3,19 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
 
-    <div class="bg-white rounded-lg p-6 shadow-xl border border-slate-200">
+    <div class="card-enterprise p-6">
 
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
-                <h2 class="text-3xl font-bold text-slate-800">My Patient List</h2>
-                <p class="text-sm text-gray-500">List of all Active Patients</p>
+                <h2 class="text-xl font-bold text-slate-800">My Patient List</h2>
+                <p class="text-sm text-slate-500">List of all Active Patients</p>
             </div>
 
             <!-- SEARCH -->
-            <form action="{{ route('physician.mypatients.index') }}" method="GET" class="join w-full md:w-96">
-                <input type="text" name="search" class="input input-bordered join-item w-full" placeholder="Search Patient..." value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary join-item">
+            <form action="{{ route('physician.mypatients.index') }}" method="GET" class="flex w-full md:w-96">
+                <input type="text" name="search" class="input-enterprise rounded-r-none w-full" placeholder="Search Patient..." value="{{ request('search') }}">
+                <button type="submit" class="btn-enterprise-primary rounded-l-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
             </form>
@@ -23,8 +23,8 @@
 
         <!-- TABLE -->
         <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead class="bg-slate-800 text-white">
+            <table class="table-enterprise">
+                <thead>
                     <tr>
                         <th>Location</th> <!-- Critical for rounds -->
                         <th>Patient</th>
@@ -42,14 +42,14 @@
                             <div class="font-bold text-slate-700">
                                 {{ $admission->station->station_name ?? 'Floating' }}
                             </div>
-                            <div class="badge badge-neutral font-mono text-xs">
+                            <div class="badge-enterprise bg-slate-100 text-slate-600 font-mono text-xs">
                                 {{ $admission->bed->bed_code ?? 'none' }}
                             </div>
                         </td>
 
                         <!-- Patient -->
                         <td>
-                            <div class="font-bold text-sm text-blue-500">
+                            <div class="font-bold text-sm text-emerald-700">
                                 {{ $admission->patient->getFullNameAttribute() }}
                             </div>
                             <div class="text-xs text-gray-500">
@@ -61,13 +61,13 @@
                         <td>
                             @php
                                 $typeColors = [
-                                    'Inpatient' => 'badge-primary',
-                                    'Outpatient' => 'badge-success',
-                                    'Emergency' => 'badge-error',
+                                    'Inpatient' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                    'Outpatient' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                    'Emergency' => 'bg-red-50 text-red-700 border border-red-200',
                                 ];
-                                $badgeClass = $typeColors[$admission->admission_type] ?? 'badge-ghost';
+                                $badgeClass = $typeColors[$admission->admission_type] ?? 'bg-slate-100 text-slate-600';
                             @endphp
-                            <span class="badge {{ $badgeClass }} badge-sm">{{ $admission->admission_type }}</span>
+                            <span class="badge-enterprise {{ $badgeClass }} text-xs">{{ $admission->admission_type }}</span>
                         </td>
 
                         <!-- Diagnosis -->
@@ -88,7 +88,7 @@
 
                         <!-- Action -->
                         <td class="text-right">
-                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn btn-sm text-white btn-primary gap-2">
+                            <a href="{{ route('physician.mypatients.show', $admission->id) }}" class="btn-enterprise-primary text-xs gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 Open Chart
                             </a>

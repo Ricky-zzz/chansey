@@ -2,20 +2,20 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-    
+
 
     <form action="{{ route('nurse.admitting.patients.update', $patient->id) }}" method="POST">
         @csrf
-        @method('PUT') 
+        @method('PUT')
 
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body p-8">
+        <div class="card-enterprise">
+            <div class="p-8">
                 <div class="mb-8 text-center">
-                    <h2 class="text-3xl font-bold text-neutral">Edit Patient Profile</h2>
+                    <h2 class="text-xl font-bold text-slate-800">Edit Patient Profile</h2>
                 </div>
 
                 <fieldset class="mb-8">
-                      <div class="divider text-lg font-bold text-neutral">BASIC INFORMATION</div>
+                      <div class="border-t border-slate-200 my-6 flex items-center gap-3"><span class="text-xs font-bold text-slate-500 uppercase tracking-wider bg-white px-3 py-1 -mt-3 ml-4">BASIC INFORMATION</span></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <label class="floating-label w-full">
                             <span>First Name</span>
@@ -33,10 +33,10 @@
                             <span>Date of Birth</span>
                             <input type="date" name="date_of_birth" value="{{ old('date_of_birth', $patient->date_of_birth->format('Y-m-d')) }}" class="input input-md w-full" required />
                         </label>
-                        
+
                         <label class="floating-label w-full">
                             <span>Sex</span>
-                            <select name="sex" class="select select-bordered w-full">
+                            <select name="sex" class="select-enterprise w-full">
                                 <option value="Male" {{ $patient->sex == 'Male' ? 'selected' : '' }}>Male</option>
                                 <option value="Female" {{ $patient->sex == 'Female' ? 'selected' : '' }}>Female</option>
                             </select>
@@ -44,7 +44,7 @@
 
                         <label class="floating-label w-full">
                             <span>Civil Status</span>
-                            <select name="civil_status" class="select select-bordered w-full">
+                            <select name="civil_status" class="select-enterprise w-full">
                                 @foreach(['Single', 'Married', 'Widowed', 'Separated'] as $status)
                                     <option value="{{ $status }}" {{ $patient->civil_status == $status ? 'selected' : '' }}>{{ $status }}</option>
                                 @endforeach
@@ -53,7 +53,7 @@
                     </div>
                 </fieldset>
 
-                <div class="divider text-lg font-bold text-neutral">CONTACT DETAILS</div>
+                <div class="border-t border-slate-200 my-6 flex items-center gap-3"><span class="text-xs font-bold text-slate-500 uppercase tracking-wider bg-white px-3 py-1 -mt-3 ml-4">CONTACT DETAILS</span></div>
 
                 <fieldset class="mb-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -76,7 +76,7 @@
                     </div>
                 </fieldset>
 
-                <div class="divider text-lg font-bold text-neutral"> EMERGENCY CONTACT</div>
+                <div class="border-t border-slate-200 my-6 flex items-center gap-3"><span class="text-xs font-bold text-slate-500 uppercase tracking-wider bg-white px-3 py-1 -mt-3 ml-4">EMERGENCY CONTACT</span></div>
 
                 <fieldset class="mb-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -95,7 +95,7 @@
                     </div>
                 </fieldset>
 
-                <div class="divider text-lg font-bold text-neutral"> IDENTIFICATION</div>
+                <div class="border-t border-slate-200 my-6 flex items-center gap-3"><span class="text-xs font-bold text-slate-500 uppercase tracking-wider bg-white px-3 py-1 -mt-3 ml-4">IDENTIFICATION</span></div>
 
                 <fieldset class="mb-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,8 +119,8 @@
                 </fieldset>
 
                 <div class="flex justify-center items-center gap-4 mt-8">
-                    <a href="{{ route('nurse.admitting.patients.show', $patient->id) }}" class="btn text-white bg-rose-500 btn-lg">Cancel</a>
-                    <button type="submit" class="btn btn-primary  text-white btn-lg">Update Profile</button>
+                    <a href="{{ route('nurse.admitting.patients.show', $patient->id) }}" class="btn-enterprise-danger">Cancel</a>
+                    <button type="submit" class="btn-enterprise-primary">Update Profile</button>
                 </div>
 
             </div>
@@ -128,12 +128,12 @@
     </form>
 
     @if($patient->admissions->count() === 0)
-        <div class="card bg-base-100 shadow border border-error mt-8">
-            <div class="card-body">
-                <h3 class="font-bold text-error">Danger Zone</h3>
-                <p class="text-sm">Deleting this patient will remove all their data permanently. This action cannot be undone.</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-error btn-sm text-white">Delete Patient</button>
+        <div class="card-enterprise border-red-200 mt-8">
+            <div class="p-6">
+                <h3 class="font-bold text-red-700">Danger Zone</h3>
+                <p class="text-sm text-slate-600">Deleting this patient will remove all their data permanently. This action cannot be undone.</p>
+                <div class="flex justify-end mt-4">
+                    <button class="btn-enterprise-danger text-xs">Delete Patient</button>
                 </div>
             </div>
         </div>
