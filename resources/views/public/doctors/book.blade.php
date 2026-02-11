@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book with Dr. {{ $doctor->last_name }} - Chansey Hospital</title>
+    <title>Book with Dr. {{ $doctor->last_name }} - Golden Gate Academy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -32,7 +32,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                         C
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Chansey Hospital</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Golden Gate Academy</h1>
                 </a>
 
                 <!-- Back Button -->
@@ -48,7 +48,7 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12" x-data="bookingApp()">
-        
+
         <!-- Breadcrumb -->
         <div class="text-sm breadcrumbs mb-6">
             <ul>
@@ -148,9 +148,9 @@
                 <form method="dialog">
                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
-                
+
                 <h3 class="font-bold text-xl mb-2">Book Appointment</h3>
-                
+
                 <!-- Selected Slot Info -->
                 <div class="bg-emerald-50 rounded-lg p-4 mb-6 border border-emerald-200">
                     <p class="text-sm text-slate-600">You are booking with:</p>
@@ -173,42 +173,42 @@
                 <form action="{{ route('public.appointment.store') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="appointment_slot_id" x-model="selectedSlotId">
-                    
+
                     <!-- Name Row -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">First Name <span class="text-error">*</span></span>
                             </label>
-                            <input type="text" name="first_name" placeholder="John" 
-                                   class="input input-bordered" 
+                            <input type="text" name="first_name" placeholder="John"
+                                   class="input input-bordered"
                                    value="{{ old('first_name') }}" required>
                         </div>
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Last Name <span class="text-error">*</span></span>
                             </label>
-                            <input type="text" name="last_name" placeholder="Doe" 
-                                   class="input input-bordered" 
+                            <input type="text" name="last_name" placeholder="Doe"
+                                   class="input input-bordered"
                                    value="{{ old('last_name') }}" required>
                         </div>
                     </div>
-                    
+
                     <!-- Contact Row -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Mobile Number <span class="text-error">*</span></span>
                             </label>
-                            <input type="tel" name="contact_number" placeholder="+63 912 345 6789" 
-                                   class="input input-bordered" 
+                            <input type="tel" name="contact_number" placeholder="+63 912 345 6789"
+                                   class="input input-bordered"
                                    value="{{ old('contact_number') }}" required>
                         </div>
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text font-semibold">Email</span>
                             </label>
-                            <input type="email" name="email" placeholder="john@email.com" 
+                            <input type="email" name="email" placeholder="john@email.com"
                                    class="input input-bordered"
                                    value="{{ old('email') }}">
                             <label class="label">
@@ -216,17 +216,17 @@
                             </label>
                         </div>
                     </div>
-                    
+
                     <!-- Purpose -->
                     <div class="form-control">
                         <label class="label">
                             <span class="label-text font-semibold">Reason for Visit <span class="text-error">*</span></span>
                         </label>
-                        <textarea name="purpose" class="textarea textarea-bordered h-24" 
-                                  placeholder="Please briefly describe your symptoms or reason for the appointment..." 
+                        <textarea name="purpose" class="textarea textarea-bordered h-24"
+                                  placeholder="Please briefly describe your symptoms or reason for the appointment..."
                                   required>{{ old('purpose') }}</textarea>
                     </div>
-                    
+
                     <div class="modal-action">
                         <button type="submit" class="btn btn-primary w-full gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -246,7 +246,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-300 py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-            <p>&copy; {{ date('Y') }} Chansey Hospital. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Golden Gate Academy. All rights reserved.</p>
         </div>
     </footer>
 
@@ -258,7 +258,7 @@
             selectedDay: '',
             selectedTime: '',
             remainingSlots: 0,
-            
+
             openBookingModal(slotId, date, day, startTime, endTime, remaining) {
                 this.selectedSlotId = slotId;
                 this.selectedDate = date;

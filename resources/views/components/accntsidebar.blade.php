@@ -6,11 +6,11 @@
         <div class="mb-8 px-4 pt-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg overflow-hidden ring-1 ring-slate-200 shrink-0">
-                    <img src="{{ asset('images/chansey.jpg') }}" alt="Chansey Logo" class="w-full h-full object-cover" />
+                    <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover" />
                 </div>
                 <div>
                     <div class="text-lg font-bold text-slate-800 tracking-tight leading-none">
-                        Chansey
+                        Golden Gate Academy
                     </div>
                     <div class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em] mt-1">
                         Accounting Console

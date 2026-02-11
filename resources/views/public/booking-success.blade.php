@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Confirmed - Chansey Hospital</title>
+    <title>Booking Confirmed - Golden Gate Academy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
     <style>
@@ -50,7 +50,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                         C
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Chansey Hospital</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Golden Gate Academy</h1>
                 </a>
             </div>
         </div>
@@ -179,7 +179,7 @@
 
         <!-- Contact Info -->
         <div class="text-center mt-8 text-slate-500 text-sm">
-            <p>Questions? Contact us at <strong class="text-slate-700">(555) 123-4567</strong> or <strong class="text-slate-700">contact@chansey.com</strong></p>
+            <p>Questions? Contact us at <strong class="text-slate-700">(555) 123-4567</strong> or <strong class="text-slate-700">contact@goldengateacademy.com</strong></p>
         </div>
 
     </main>
@@ -187,7 +187,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-300 py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-            <p>&copy; {{ date('Y') }} Chansey Hospital. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Golden Gate Academy. All rights reserved.</p>
         </div>
     </footer>
 

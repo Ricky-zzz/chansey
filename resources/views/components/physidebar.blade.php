@@ -6,11 +6,11 @@
         <div class="mb-8 px-4 pt-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
-                    <img src="{{ asset('images/chansey.jpg') }}" alt="Chansey Logo" class="w-8 h-8 rounded-md object-cover" />
+                    <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-8 h-8 rounded-md object-cover" />
                 </div>
                 <div>
                     <div class="text-lg font-bold text-slate-800 tracking-tight leading-none">
-                        Chansey
+                        Golden Gate Academy
                     </div>
                     <div class="text-[10px] font-semibold text-emerald-600 uppercase tracking-[0.15em] mt-0.5">
                         Physician Console

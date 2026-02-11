@@ -39,8 +39,7 @@ class PharmacyPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Pharmacy/Widgets'), for: 'App\Filament\Pharmacy\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,

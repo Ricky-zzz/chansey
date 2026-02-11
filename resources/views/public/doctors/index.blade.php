@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $department->name }} Specialists - Chansey Hospital</title>
+    <title>{{ $department->name }} Specialists - Golden Gate Academy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
 </head>
@@ -20,7 +20,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                         C
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Chansey Hospital</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Golden Gate Academy</h1>
                 </a>
 
                 <!-- Back Button -->
@@ -36,7 +36,7 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
+
         <!-- Breadcrumb -->
         <div class="text-sm breadcrumbs mb-6">
             <ul>
@@ -100,7 +100,7 @@
                     <!-- Book Button -->
                     <div class="card-actions">
                         @if($doctor->available_slots_count > 0)
-                            <a href="{{ route('public.doctors.book', $doctor->id) }}" 
+                            <a href="{{ route('public.doctors.book', $doctor->id) }}"
                                class="btn btn-primary w-full gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -132,7 +132,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-300 py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-            <p>&copy; {{ date('Y') }} Chansey Hospital. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Golden Gate Academy. All rights reserved.</p>
         </div>
     </footer>
 

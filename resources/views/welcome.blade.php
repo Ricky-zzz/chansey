@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chansey Hospital - Trusted Care, Anytime, Anywhere</title>
+    <title>Golden Gate Academy - Hospital Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
 </head>
@@ -28,11 +28,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
-                        C
+                <div class="flex items-center gap-4 min-h-[6rem] py-2">
+                    <div class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center bg-white">
+                        <a href="{{ route('welcome') }}">
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover rounded-full" />
+                        </a>
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Chansey Hospital</h1>
+                    <h1 class="text-3xl font-bold text-slate-800">Golden Gate Academy</h1>
                 </div>
 
                 <!-- Navigation -->
@@ -67,7 +69,7 @@
             <!-- Left Content -->
             <div class="space-y-6">
                 <div class="space-y-3">
-                    <span class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">Welcome to Chansey Hospital</span>
+                    <span class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">Welcome to Golden Gate Academy</span>
                     <h2 class="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                         Your Health Is Our Priority
                     </h2>
@@ -221,7 +223,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <h3 class="font-semibold text-white mb-4">Chansey Hospital</h3>
+                    <h3 class="font-semibold text-white mb-4">Golden Gate Academy</h3>
                     <p class="text-sm">Providing quality healthcare services to our community since 2024.</p>
                 </div>
                 <div>
@@ -236,7 +238,7 @@
                     <h3 class="font-semibold text-white mb-4">Contact Info</h3>
                     <ul class="space-y-2 text-sm">
                         <li>📞 (555) 123-4567</li>
-                        <li>📧 contact@chansey.com</li>
+                        <li>📧 contact@goldengateacademy.com</li>
                         <li>📍 123 Health Street</li>
                     </ul>
                 </div>
@@ -250,7 +252,7 @@
                 </div>
             </div>
             <div class="border-t border-slate-700 pt-8 text-center text-sm">
-                <p>&copy; 2024 Chansey Hospital. All rights reserved.</p>
+                <p>&copy; 2024 Golden Gate Academy. All rights reserved.</p>
             </div>
         </div>
     </footer>

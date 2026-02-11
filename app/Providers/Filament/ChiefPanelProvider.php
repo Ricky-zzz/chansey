@@ -39,8 +39,7 @@ class ChiefPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Chief/Widgets'), for: 'App\Filament\Chief\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,

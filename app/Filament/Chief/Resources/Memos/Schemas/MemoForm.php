@@ -46,7 +46,7 @@ class MemoForm
                     ]),
 
                 Section::make('Target Audience')
-                    ->description('Select who should receive this announcement. Leave empty to not target that category.')
+                    ->description('**TARGETING RULES:** Select roles, then optionally narrow by location. Stations are automatically filtered to match selected units. Leave Units/Stations empty for GLOBAL broadcast. Specify them for TARGETED messaging. Strict role matching is enforced.')
                     ->schema([
                         Select::make('target_roles')
                             ->label('Target by Role')
@@ -84,32 +84,66 @@ class MemoForm
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 $units = $get('target_units');
                                 if (is_array($units) && in_array('*all*', $units)) {
-                                    // Get all unit IDs as strings
-                                    $allUnitIds = Unit::pluck('id')->map(fn($id) => (string) $id)->toArray();
+                                    // Get all unit IDs as integers
+                                    $allUnitIds = Unit::pluck('id')->toArray();
                                     $set('target_units', $allUnitIds);
+                                } else {
+                                    // Clear stations that don't belong to selected units
+                                    $selectedStations = $get('target_stations');
+                                    if (is_array($selectedStations) && !empty($units) && !in_array('*all*', $units)) {
+                                        $validStations = Station::whereIn('unit_id', $units)->pluck('id')->toArray();
+                                        $filteredStations = array_intersect($selectedStations, $validStations);
+                                        if (count($filteredStations) !== count($selectedStations)) {
+                                            $set('target_stations', array_values($filteredStations));
+                                        }
+                                    }
                                 }
                             })
                             ->columnSpanFull(),
 
                         Select::make('target_stations')
                             ->label('Target by Station/Ward')
-                            ->options(
-                                Station::all()->mapWithKeys(fn($station) => [
-                                    $station->id => $station->station_name,
-                                ])->toArray() + ['*all*' => '✓ All Stations']
-                            )
+                            ->options(function (Get $get) {
+                                $selectedUnits = $get('target_units');
+
+                                // If no units selected or "*all*" was used, show all stations
+                                if (empty($selectedUnits) || !is_array($selectedUnits)) {
+                                    return Station::all()->mapWithKeys(fn($station) => [
+                                        $station->id => $station->station_name . ' (' . $station->unit->name . ')',
+                                    ])->toArray() + ['*all*' => '✓ All Stations'];
+                                }
+
+                                // Filter stations by selected units
+                                return Station::whereIn('unit_id', $selectedUnits)
+                                    ->get()
+                                    ->mapWithKeys(fn($station) => [
+                                        $station->id => $station->station_name . ' (' . $station->unit->name . ')',
+                                    ])->toArray() + ['*all*' => '✓ All Stations (in selected units)'];
+                            })
                             ->placeholder('Select stations...')
                             ->multiple()
                             ->nullable()
                             ->live()
                             ->afterStateUpdated(function (Get $get, Set $set) {
                                 $stations = $get('target_stations');
+                                $selectedUnits = $get('target_units');
+
                                 if (is_array($stations) && in_array('*all*', $stations)) {
-                                    // Get all station IDs as strings
-                                    $allStationIds = Station::pluck('id')->map(fn($id) => (string) $id)->toArray();
+                                    // If units are selected, get all stations in those units
+                                    if (!empty($selectedUnits) && is_array($selectedUnits)) {
+                                        $allStationIds = Station::whereIn('unit_id', $selectedUnits)->pluck('id')->toArray();
+                                    } else {
+                                        // Otherwise get all stations
+                                        $allStationIds = Station::pluck('id')->toArray();
+                                    }
                                     $set('target_stations', $allStationIds);
                                 }
                             })
+                            ->helperText(fn(Get $get) =>
+                                !empty($get('target_units'))
+                                    ? '✓ Filtered to show only stations in selected units'
+                                    : 'Select units first to filter stations, or leave empty for global'
+                            )
                             ->columnSpanFull(),
                     ]),
             ]);

@@ -13,7 +13,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>Chansey Hospital</h2>
+        <h2>Golden Gate Academy</h2>
         <p>Official Receipt</p>
         <h3>{{ $billing->receipt_number }}</h3>
     </div>

@@ -4,13 +4,15 @@ namespace App\Filament\Supervisor\Resources\StaffNurses\Tables;
 
 use App\Models\Nurse;
 use App\Models\Station;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class StaffNursesTable
 {
@@ -85,7 +87,24 @@ class StaffNursesTable
                     ->searchable(),
             ])
             ->recordActions([
-                EditAction::make(),
+                Action::make('reassignStation')
+                    ->label('Reassign Station')
+                    ->modalHeading('Reassign Nurse to Station')
+                    ->form([
+                        Select::make('station_id')
+                            ->label('Select New Station')
+                            ->options(function (Nurse $record) {
+                                $supervisorUnitId = Auth::user()->nurse->unit_id;
+                                return Station::where('unit_id', $supervisorUnitId)
+                                    ->pluck('station_name', 'id');
+                            })
+                            ->default(fn(Nurse $record) => $record->station_id)
+                            ->required(),
+                    ])
+                    ->action(function (array $data, Nurse $record): void {
+                        $record->update($data);
+                    })
+                    ->successNotificationTitle('Station Assigned'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

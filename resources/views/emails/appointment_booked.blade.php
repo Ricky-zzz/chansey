@@ -119,12 +119,12 @@
     <div class="container">
         <div class="header">
             <div class="logo">C</div>
-            <h1>Chansey Hospital</h1>
+            <h1>Golden Gate Academy</h1>
             <span class="success-badge">✓ Appointment Confirmed</span>
         </div>
 
         <p>Hello <strong>{{ $appointment->first_name }}</strong>,</p>
-        
+
         <p>Great news! Your appointment has been successfully booked. Here are your appointment details:</p>
 
         <div class="doctor-info">
@@ -163,12 +163,12 @@
 
         <p>
             Best regards,<br>
-            <strong>Chansey Hospital Team</strong>
+            <strong>Golden Gate Academy Team</strong>
         </p>
 
         <div class="footer">
-            <p>Chansey Hospital | 123 Health Street | contact@chansey.com</p>
-            <p>© {{ date('Y') }} Chansey Hospital. All rights reserved.</p>
+            <p>Golden Gate Academy | 123 Health Street | contact@goldengateacademy.com</p>
+            <p>© {{ date('Y') }} Golden Gate Academy. All rights reserved.</p>
         </div>
     </div>
 </body>

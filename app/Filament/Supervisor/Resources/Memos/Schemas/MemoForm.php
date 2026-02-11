@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 
 use App\Models\Station;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -26,6 +27,9 @@ class MemoForm
 
         return $schema
             ->components([
+                Hidden::make('created_by_user_id')
+                    ->default(fn() => Auth::id()),
+
                 Section::make('Announcement Details')
                     ->description('Create a new announcement for staff in your unit.')
                     ->schema([
@@ -53,7 +57,7 @@ class MemoForm
                     ]),
 
                 Section::make('Target Audience')
-                    ->description('Select who should receive this announcement. Only staff and stations under your unit are allowed.')
+                    ->description('**IMPORTANT:** Memos are automatically restricted to YOUR UNIT. Select roles to target specific positions. Leave stations empty to send to ALL stations in your unit, or select specific stations.')
                     ->schema([
                         Select::make('target_roles')
                             ->label('Target by Role')
@@ -71,6 +75,7 @@ class MemoForm
                             ->placeholder('Select stations...')
                             ->multiple()
                             ->nullable()
+                            ->helperText('✓ Showing only stations in your unit. Leave empty to send to all stations.')
                             ->columnSpanFull(),
                     ]),
             ]);

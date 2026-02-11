@@ -74,7 +74,9 @@
 
     /* Modal */
     .modal-enterprise {
-        @apply bg-white rounded-xl border border-slate-200 shadow-lg;
+        @apply bg-white rounded-xl border border-slate-200 shadow-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto;
+        margin-top: -10vh !important;
+        margin-bottom: auto !important;
     }
 
     /* Badge */

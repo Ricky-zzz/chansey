@@ -1,0 +1,174 @@
+@extends('layouts.clinic')
+
+@section('content')
+<div class="max-w-4xl mx-auto">
+
+    {{-- Header --}}
+    <div class="card-enterprise p-5 mb-6">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('nurse.headnurse.memos.index') }}" class="btn btn-sm btn-ghost normal-case h-9 min-h-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
+            </a>
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">{{ $title }}</h2>
+                <p class="text-sm text-slate-500 mt-0.5">Update memo for {{ $headNurse->station->station_name }}</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Form --}}
+    <form action="{{ route('nurse.headnurse.memos.update', $memo->id) }}" method="POST" enctype="multipart/form-data" id="memoEditForm">
+        @csrf
+        @method('PUT')
+
+        <div class="card-enterprise p-6 space-y-6">
+
+            {{-- Title --}}
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Memo Title <span class="text-red-500">*</span></label>
+                <input type="text"
+                       name="title"
+                       value="{{ old('title', $memo->title) }}"
+                       class="input-enterprise w-full @error('title') border-red-500 @enderror"
+                       placeholder="e.g. Staff Meeting Reminder"
+                       required>
+                @error('title')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Content (CKEditor) --}}
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Memo Content <span class="text-red-500">*</span></label>
+                <textarea name="content"
+                          id="content"
+                          class="@error('content') border-red-500 @enderror">{{ old('content', $memo->content) }}</textarea>
+                @error('content')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Current Attachment --}}
+            @if($memo->attachment_path)
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        <div>
+                            <p class="text-sm font-semibold text-blue-800">Current Attachment</p>
+                            <p class="text-xs text-blue-600">{{ basename($memo->attachment_path) }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ asset('storage/' . $memo->attachment_path) }}"
+                       target="_blank"
+                       class="btn btn-sm btn-ghost text-blue-600 hover:bg-blue-100 normal-case h-8 min-h-0">
+                        View
+                    </a>
+                </div>
+            </div>
+            @endif
+
+            {{-- New Attachment --}}
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    @if($memo->attachment_path)
+                        Replace Attachment (Optional)
+                    @else
+                        Add Attachment (Optional)
+                    @endif
+                </label>
+                <input type="file"
+                       name="attachment"
+                       class="file-input file-input-bordered w-full @error('attachment') border-red-500 @enderror"
+                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                @if($memo->attachment_path)
+                    <p class="text-xs text-slate-400 mt-1">Upload a new file to replace the current attachment</p>
+                @else
+                    <p class="text-xs text-slate-400 mt-1">Max 5MB. Accepted: PDF, Word, Images</p>
+                @endif
+                @error('attachment')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Target Info --}}
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-slate-700 mb-2">Target Audience</h3>
+                <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mb-2">
+                    <strong>Note:</strong> This memo will ONLY be sent to Staff Nurses in your station. Strict role matching is enforced.
+                </p>
+                <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span><strong>Target Roles:</strong> Staff Nurses</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span><strong>Target Station:</strong> {{ $headNurse->station->station_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <a href="{{ route('nurse.headnurse.memos.index') }}" class="btn-enterprise-secondary">Cancel</a>
+                <button type="submit" class="btn-enterprise-primary inline-flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Update Memo
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+<script>
+    let editorInstance;
+
+    ClassicEditor
+        .create(document.querySelector('#content'), {
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'blockQuote', 'undo', 'redo'],
+            heading: {
+                options: [
+                    { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                    { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                    { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+                ]
+            }
+        })
+        .then(editor => {
+            editorInstance = editor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    // Sync CKEditor content before form submission
+    document.getElementById('memoEditForm').addEventListener('submit', function(e) {
+        if (editorInstance) {
+            const content = editorInstance.getData().trim();
+            if (!content) {
+                e.preventDefault();
+                alert('Please enter memo content.');
+                return false;
+            }
+            document.querySelector('#content').value = content;
+        }
+    });
+</script>
+@endpush
+@endsection

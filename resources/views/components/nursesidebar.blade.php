@@ -7,12 +7,12 @@
             <div class="flex items-center gap-3">
                 <div class="avatar">
                     <div class="w-10 rounded-lg ring-1 ring-slate-200">
-                        <img src="{{ asset('images/chansey.jpg') }}" alt="Chansey Logo" class="object-cover" />
+                        <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="object-cover" />
                     </div>
                 </div>
                 <div>
                     <div class="text-xl font-bold text-slate-800 tracking-tight leading-none">
-                        Chansey
+                        Golden Gate Academy
                     </div>
                     <div class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mt-0.5">
                         {{ Auth::user()->nurse->designation }} Console
@@ -41,6 +41,21 @@
                 </a>
             </li>
 
+            <!-- NEWS SECTION -->
+            <li>
+                <span class="sidebar-section-title">News</span>
+            </li>
+
+            <li>
+                <a href="{{ route('nurse.announcement.index') }}"
+                    class="{{ request()->routeIs('nurse.announcement.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+                    </svg>
+                    Announcement
+                </a>
+            </li>
+
             <!-- HEAD NURSE SECTION -->
             @if(in_array(Auth::user()->nurse->role_level, ['Head', 'Supervisor', 'Chief']))
             <li>
@@ -66,7 +81,15 @@
                     Shift Schedules
                 </a>
             </li>
-            @endif
+            <li>
+                <a href="{{ route('nurse.headnurse.memos.index') }}"
+                    class="{{ request()->routeIs('nurse.headnurse.memos.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Memos
+                </a>
+            </li>            @endif
 
             <!-- ADMISSION SECTION -->
             @if(Auth::user()->nurse->designation === 'Admitting')

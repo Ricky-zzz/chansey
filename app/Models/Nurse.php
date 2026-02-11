@@ -63,4 +63,25 @@ class Nurse extends Model
     {
         return $this->hasMany(NursingCarePlan::class);
     }
+
+    /**
+     * Get the unit ID - from nurse.unit_id or from station.unit_id (for Head Nurses)
+     */
+    public function getUnitId()
+    {
+        return $this->unit_id ?? ($this->station ? $this->station->unit_id : null);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($nurse) {
+            if ($nurse->isDirty('station_id')) {
+                $station = Station::find($nurse->station_id);
+                $isAdmissionStation = $station && strtolower($station->station_name) === 'admission';
+                $nurse->designation = $isAdmissionStation ? 'Admitting' : 'Clinical';
+            }
+        });
+    }
 }

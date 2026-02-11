@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Clock - Chansey Hospital</title>
+    <title>Time Clock - Golden Gate Academy</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-white to-emerald-50 min-h-screen flex items-center justify-center p-4">
@@ -13,10 +13,10 @@
         <div class="text-center mb-12">
             <div class="flex justify-center mb-6">
                 <div class="w-20 h-20 rounded-xl overflow-hidden ring-1 ring-slate-200 shadow-sm">
-                    <img src="{{ asset('images/chansey.jpg') }}" alt="Chansey Logo" class="w-full h-full object-cover" />
+                    <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover" />
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Chansey</h1>
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">Golden Gate Academy</h1>
             <p class="text-base text-slate-500">Time Clock System</p>
         </div>
 
@@ -132,7 +132,6 @@
     </div>
 
     <script>
-        // Update clock every second
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');

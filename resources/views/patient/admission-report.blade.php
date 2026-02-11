@@ -37,7 +37,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>CHANSEY HOSPITAL</h2>
+        <h2>GOLDEN GATE ACADEMY</h2>
         <p>Detailed Admission Report</p>
         <p>Generated: {{ now()->format('M d, Y H:i') }}</p>
     </div>

@@ -58,7 +58,7 @@
 <body>
     {{-- COVER / SUMMARY PAGE --}}
     <div class="cover">
-        <h1>CHANSEY HOSPITAL</h1>
+        <h1>GOLDEN GATE ACADEMY</h1>
         <h2>Batch Daily Time Record Report</h2>
         <div class="subtitle">Reporting Period</div>
         <div class="date-range">{{ $dateFromFormatted }} — {{ $dateToFormatted }}</div>
@@ -117,7 +117,7 @@
         <div class="nurse-number">Nurse {{ $index + 1 }} of {{ count($allReports) }}</div>
 
         <div class="header">
-            <h2>CHANSEY HOSPITAL</h2>
+            <h2>GOLDEN GATE ACADEMY</h2>
             <p>Daily Time Record Report</p>
             <h3>{{ $dateFromFormattedShort }} — {{ $dateToFormattedShort }}</h3>
         </div>
