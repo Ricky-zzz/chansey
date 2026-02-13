@@ -149,6 +149,11 @@ class Admission extends Model
         return $this->hasMany(Billing::class);
     }
 
+    public function stationTasks(): HasMany
+    {
+        return $this->hasMany(StationTask::class);
+    }
+
     // --- ACCESSOR METHODS ---
 
     public function truncatedChiefComplaint(int $limit = 20): string

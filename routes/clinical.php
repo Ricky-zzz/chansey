@@ -5,9 +5,10 @@ use \App\Http\Controllers\Clinical\WardController;
 use App\Http\Controllers\Clinical\CarePlanController;
 use App\Http\Controllers\Clinical\ClinicalLogController;
 use \App\Http\Controllers\Clinical\OrderExecutionController;
+use App\Http\Controllers\Clinical\MyTaskController;
 use Illuminate\Support\Facades\Route;
 
-//  Clinical NURSES 
+//  Clinical NURSES
 Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->group(function () {
 
     // Clinical Dashboard
@@ -17,7 +18,7 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     Route::get('/my-ward', [WardController::class, 'index'])
         ->name('ward.index');
 
-    // PATIENT CHART 
+    // PATIENT CHART
     Route::get('/patient/{id}', [WardController::class, 'show'])
         ->name('ward.show');
 
@@ -39,4 +40,11 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // Charge Supply Item
     Route::post('/supplies/charge', [\App\Http\Controllers\Clinical\SupplyController::class, 'store'])
     ->name('supplies.store');
+});
+
+// MY TASKS (for all nurses)
+Route::middleware(['auth', 'nurse'])->prefix('nurse')->name('nurse.')->group(function () {
+    Route::get('/my-tasks', [MyTaskController::class, 'index'])->name('mytasks.index');
+    Route::patch('/my-tasks/{task}/done', [MyTaskController::class, 'markDone'])->name('mytasks.markDone');
+    Route::patch('/my-tasks/{task}/in-progress', [MyTaskController::class, 'markInProgress'])->name('mytasks.markInProgress');
 });

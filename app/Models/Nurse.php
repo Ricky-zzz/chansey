@@ -64,6 +64,11 @@ class Nurse extends Model
         return $this->hasMany(NursingCarePlan::class);
     }
 
+    public function assignedTasks()
+    {
+        return $this->hasMany(StationTask::class, 'assigned_to_nurse_id');
+    }
+
     /**
      * Get the unit ID - from nurse.unit_id or from station.unit_id (for Head Nurses)
      */

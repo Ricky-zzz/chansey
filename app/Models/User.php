@@ -124,6 +124,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Memo::class, 'created_by_user_id');
     }
 
+    public function stationTask()
+    {
+        return $this->hasMany(StationTask::class, 'created_by_user_id');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {

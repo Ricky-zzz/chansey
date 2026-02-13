@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Maintenance\Resources\Stations;
+namespace App\Filament\Supervisor\Resources\Stations;
+
 use Filament\Notifications\Notification;
-use App\Filament\Maintenance\Resources\Stations\Pages\CreateStation;
-use App\Filament\Maintenance\Resources\Stations\Pages\EditStation;
-use App\Filament\Maintenance\Resources\Stations\Pages\ListStations;
+use App\Filament\Supervisor\Resources\Stations\Pages\CreateStation;
+use App\Filament\Supervisor\Resources\Stations\Pages\EditStation;
+use App\Filament\Supervisor\Resources\Stations\Pages\ListStations;
 use App\Models\Station;
-use App\Models\Unit;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,13 +16,13 @@ use App\Models\Room;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\Select;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class StationResource extends Resource
 {
@@ -38,10 +38,9 @@ class StationResource extends Resource
             ->components([
                 Section::make('Station Details')
                     ->schema([
-                        Select::make('unit_id')
-                            ->label('Unit / Building')
-                            ->options(Unit::all()->pluck('name', 'id'))
-                            ->required(),
+                        // Auto-assign to MY Unit (hidden field)
+                        Hidden::make('unit_id')
+                            ->default(fn() => Auth::user()->nurse->unit_id),
 
                         TextInput::make('station_name')
                             ->label('Station Name')
@@ -91,6 +90,13 @@ class StationResource extends Resource
                         }),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        // Only show stations belonging to MY unit
+        return parent::getEloquentQuery()
+            ->where('unit_id', Auth::user()->nurse->unit_id);
     }
 
     public static function getRelations(): array

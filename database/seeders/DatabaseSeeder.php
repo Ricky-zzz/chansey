@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             'OB Nurse' => 'Obstetrics and gynecology nursing care',
             'OR Nurse' => 'Operating room and surgical assistance',
             'Pediatric Nurse' => 'Pediatric and neonatal care',
+            'Floating Nurse' => 'Flexible assignment nurse available for any station',
         ];
         $nurseTypes = [];
         foreach ($nurseTypeNames as $ntName => $ntDesc) {
@@ -576,6 +577,9 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->call(PatientAdmissionSeeder::class);
+        $this->call([
+            PatientAdmissionSeeder::class,
+            FloatingNurseSeeder::class,
+        ]);
     }
 }

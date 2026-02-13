@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Gate Academy - Hospital Management System</title>
+    <title>Golden Gate College - Hospital Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
 </head>
@@ -28,7 +28,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
-                <div class="flex items-center gap-4 min-h-[6rem] py-2">
+                <div class="flex items-center gap-4 min-h-24 py-2">
                     <div class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center bg-white">
                         <a href="{{ route('welcome') }}">
                             <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover rounded-full" />
@@ -159,37 +159,73 @@
                             <span class="group-hover:scale-110 transition-transform">
                                 @switch($dept->name)
                                     @case('Cardiology')
-                                        ❤️
+                                        <!-- Heart Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.676 0-3.154.936-3.937 2.337C11.154 4.686 9.676 3.75 8 3.75 5.41 3.75 3.312 5.765 3.312 8.25c0 7.22 8.188 11.25 8.188 11.25s8.188-4.03 8.188-11.25z" />
+                                        </svg>
                                         @break
                                     @case('Pediatrics')
-                                        👶
+                                        <!-- User Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75v-.75z" />
+                                        </svg>
                                         @break
                                     @case('Orthopedics')
-                                        🦴
+                                        <!-- Bone Icon (Wrench as closest) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-1.5a2.25 2.25 0 11-3.182 3.182l-7.5 7.5a2.25 2.25 0 103.182 3.182l7.5-7.5a2.25 2.25 0 013.182-3.182z" />
+                                        </svg>
                                         @break
                                     @case('Neurology')
-                                        🧠
+                                        <!-- Brain Icon (Light Bulb as closest) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a7.5 7.5 0 00-4.5 13.5V19.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5v-3A7.5 7.5 0 0012 3z" />
+                                        </svg>
                                         @break
                                     @case('Dermatology')
-                                        🧴
+                                        <!-- Sparkles Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25M12 18.75V21m7.5-9H21m-18 0h2.25m15.364-6.364l-1.591 1.591M4.227 19.773l1.591-1.591m0-12.364l-1.591 1.591m15.364 15.364l-1.591-1.591" />
+                                        </svg>
                                         @break
                                     @case('Ophthalmology')
-                                        👁️
+                                        <!-- Eye Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
+                                            <circle cx="12" cy="12" r="3" fill="currentColor" />
+                                        </svg>
                                         @break
                                     @case('ENT')
-                                        👂
+                                        <!-- Ear Icon (Speaker as closest) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 01-9 0V9a4.5 4.5 0 019 0v3z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2.25" />
+                                        </svg>
                                         @break
                                     @case('Gynecology')
-                                        🩺
+                                        <!-- Stethoscope Icon (Medical cross as closest) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
                                         @break
                                     @case('General Medicine')
-                                        💊
+                                        <!-- Capsule/Pill Icon (Beaker as closest) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v2.25m4.5-2.25V5.25m-7.5 4.5h10.5m-10.5 0a2.25 2.25 0 00-2.25 2.25v7.5A2.25 2.25 0 006.75 21h10.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25m-10.5 0V5.25A2.25 2.25 0 018.25 3h7.5A2.25 2.25 0 0118 5.25V9.75" />
+                                        </svg>
                                         @break
                                     @case('Surgery')
-                                        🏥
+                                        <!-- Hospital Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21V5a2 2 0 012-2h14a2 2 0 012 2v16" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 21V9h6v12" />
+                                        </svg>
                                         @break
                                     @default
-                                        🩺
+                                        <!-- Medical Icon (Plus) -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
                                 @endswitch
                             </span>
                         </div>
@@ -237,9 +273,9 @@
                 <div>
                     <h3 class="font-semibold text-white mb-4">Contact Info</h3>
                     <ul class="space-y-2 text-sm">
-                        <li>📞 (555) 123-4567</li>
-                        <li>📧 contact@goldengateacademy.com</li>
-                        <li>📍 123 Health Street</li>
+                        <li> (555) 123-4567</li>
+                        <li> contact@goldengateacademy.com</li>
+                        <li> 123 Health Street</li>
                     </ul>
                 </div>
                 <div>

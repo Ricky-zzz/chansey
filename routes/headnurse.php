@@ -4,6 +4,8 @@ use App\Http\Controllers\DTRController;
 use App\Http\Controllers\HeadNurse\ShiftScheduleController;
 use App\Http\Controllers\HeadNurse\NurseController;
 use App\Http\Controllers\HeadNurse\MemoController;
+use App\Http\Controllers\HeadNurse\StationTaskController;
+use App\Http\Controllers\HeadNurse\FloaterController;
 use Illuminate\Support\Facades\Route;
 
 // HEAD NURSE ROUTES
@@ -31,4 +33,15 @@ Route::middleware(['auth', 'headnurse'])->prefix('nurse/headnurse')->name('nurse
     Route::get('/memos/{memo}/edit', [MemoController::class, 'edit'])->name('memos.edit');
     Route::put('/memos/{memo}', [MemoController::class, 'update'])->name('memos.update');
     Route::delete('/memos/{memo}', [MemoController::class, 'destroy'])->name('memos.destroy');
+
+    // Station Tasks CRUD
+    Route::get('/tasks', [StationTaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [StationTaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [StationTaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [StationTaskController::class, 'destroy'])->name('tasks.destroy');
+
+    // Floating Nurse Management
+    Route::get('/floaters', [FloaterController::class, 'index'])->name('floaters.index');
+    Route::post('/floaters/{nurse}/recruit', [FloaterController::class, 'recruit'])->name('floaters.recruit');
+    Route::post('/floaters/{nurse}/release', [FloaterController::class, 'release'])->name('floaters.release');
 });
