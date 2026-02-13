@@ -43,7 +43,7 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
 });
 
 // MY TASKS (for all nurses)
-Route::middleware(['auth', 'nurse'])->prefix('nurse')->name('nurse.')->group(function () {
+Route::middleware(['auth'])->prefix('nurse')->name('nurse.')->group(function () {
     Route::get('/my-tasks', [MyTaskController::class, 'index'])->name('mytasks.index');
     Route::patch('/my-tasks/{task}/done', [MyTaskController::class, 'markDone'])->name('mytasks.markDone');
     Route::patch('/my-tasks/{task}/in-progress', [MyTaskController::class, 'markInProgress'])->name('mytasks.markInProgress');

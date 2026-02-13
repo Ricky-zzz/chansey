@@ -201,7 +201,7 @@
                         <option value="">None (General Task)</option>
                         @foreach($admissions as $admission)
                             <option value="{{ $admission->id }}">
-                                {{ $admission->patient->last_name }}, {{ $admission->patient->first_name }} ({{ $admission->admission_number }})
+                                {{ $admission->patient->getFullNameAttribute() }} - ({{ $admission->admission_number }})
                             </option>
                         @endforeach
                     </select>

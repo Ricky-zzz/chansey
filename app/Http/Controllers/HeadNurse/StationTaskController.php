@@ -19,27 +19,25 @@ class StationTaskController extends Controller
         $query = StationTask::where('station_id', $stationId)
             ->with(['assignee', 'admission.patient', 'creator']);
 
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Search by title
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
         $tasks = $query->latest()->paginate(15);
 
-        // Get nurses in the same station for assignment dropdown
+        //  nurses in the same station
         $stationNurses = Nurse::where('station_id', $stationId)
             ->where('status', 'Active')
             ->with('user')
             ->get();
 
-        // Get active admissions in the station for patient dropdown
+        //  active admissions in the station
         $admissions = Admission::where('station_id', $stationId)
-            ->where('status', 'Active')
+            ->where('status', '!=', 'Discharged')
             ->with('patient')
             ->get();
 
@@ -80,7 +78,6 @@ class StationTaskController extends Controller
 
     public function update(Request $request, StationTask $task)
     {
-        // Ensure task belongs to the head nurse's station
         $nurse = Auth::user()->nurse;
         if ($task->station_id !== $nurse->station_id) {
             abort(403);
@@ -108,7 +105,6 @@ class StationTaskController extends Controller
 
     public function destroy(StationTask $task)
     {
-        // Ensure task belongs to the head nurse's station
         $nurse = Auth::user()->nurse;
         if ($task->station_id !== $nurse->station_id) {
             abort(403);
