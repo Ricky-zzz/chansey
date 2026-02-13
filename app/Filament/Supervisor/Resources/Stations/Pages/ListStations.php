@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Maintenance\Resources\Stations\Pages;
+namespace App\Filament\Supervisor\Resources\Stations\Pages;
 
-use App\Filament\Maintenance\Resources\Stations\StationResource;
+use App\Filament\Supervisor\Resources\Stations\StationResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
