@@ -31,10 +31,10 @@
                 <div class="flex items-center gap-4 min-h-24 py-2">
                     <div class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center bg-white">
                         <a href="{{ route('welcome') }}">
-                            <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover rounded-full" />
+                            <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate College Logo" class="w-full h-full object-cover rounded-full" />
                         </a>
                     </div>
-                    <h1 class="text-3xl font-bold text-slate-800">Golden Gate Academy</h1>
+                    <h1 class="text-3xl font-bold text-slate-800">Golden Gate College</h1>
                 </div>
 
                 <!-- Navigation -->
@@ -69,7 +69,7 @@
             <!-- Left Content -->
             <div class="space-y-6">
                 <div class="space-y-3">
-                    <span class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">Welcome to Golden Gate Academy</span>
+                    <span class="inline-block px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">Welcome to Golden Gate College</span>
                     <h2 class="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                         Your Health Is Our Priority
                     </h2>
@@ -259,7 +259,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <h3 class="font-semibold text-white mb-4">Golden Gate Academy</h3>
+                    <h3 class="font-semibold text-white mb-4">Golden Gate College</h3>
                     <p class="text-sm">Providing quality healthcare services to our community since 2024.</p>
                 </div>
                 <div>
@@ -274,7 +274,7 @@
                     <h3 class="font-semibold text-white mb-4">Contact Info</h3>
                     <ul class="space-y-2 text-sm">
                         <li> (555) 123-4567</li>
-                        <li> contact@goldengateacademy.com</li>
+                        <li> contact@goldengateCollege.com</li>
                         <li> 123 Health Street</li>
                     </ul>
                 </div>
@@ -288,7 +288,7 @@
                 </div>
             </div>
             <div class="border-t border-slate-700 pt-8 text-center text-sm">
-                <p>&copy; 2024 Golden Gate Academy. All rights reserved.</p>
+                <p>&copy; 2024 Golden Gate College. All rights reserved.</p>
             </div>
         </div>
     </footer>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book with Dr. {{ $doctor->last_name }} - Golden Gate Academy</title>
+    <title>Book with Dr. {{ $doctor->last_name }} - Golden Gate Collge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -32,7 +32,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                         C
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Golden Gate Academy</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Golden Gate Collge</h1>
                 </a>
 
                 <!-- Back Button -->
@@ -246,7 +246,7 @@
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-300 py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-            <p>&copy; {{ date('Y') }} Golden Gate Academy. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Golden Gate Collge. All rights reserved.</p>
         </div>
     </footer>
 
