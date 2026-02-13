@@ -373,22 +373,28 @@ class StudentImportSeeder extends Seeder
                 ];
 
                 // Create Rooms and Beds for clinical stations with capacity
+                // Create 5 rooms per station to match DatabaseSeeder standard
                 if ($sType['cap'] > 0) {
-                    $room = Room::create([
-                        'station_id' => $station->id,
-                        'room_number' => "$shortCode-{$sType['code']}-01",
-                        'room_type' => $sType['type'],
-                        'capacity' => $sType['cap'],
-                        'price_per_night' => 1000,
-                        'status' => 'Active',
-                    ]);
+                    for ($r = 1; $r <= 5; $r++) {
+                        $roomNum = "$shortCode-{$sType['code']}-" . str_pad($r, 2, '0', STR_PAD_LEFT);
 
-                    for ($b = 1; $b <= $sType['cap']; $b++) {
-                        Bed::create([
-                            'room_id' => $room->id,
-                            'bed_code' => "$shortCode-{$sType['code']}-01-" . chr(64 + $b),
-                            'status' => 'Available',
+                        $room = Room::create([
+                            'station_id' => $station->id,
+                            'room_number' => $roomNum,
+                            'room_type' => $sType['type'],
+                            'capacity' => $sType['cap'],
+                            'price_per_night' => 1000,
+                            'status' => 'Active',
                         ]);
+
+                        // Create beds in each room
+                        for ($b = 1; $b <= $sType['cap']; $b++) {
+                            Bed::create([
+                                'room_id' => $room->id,
+                                'bed_code' => "{$roomNum}-" . chr(64 + $b),
+                                'status' => 'Available',
+                            ]);
+                        }
                     }
                 }
             }
