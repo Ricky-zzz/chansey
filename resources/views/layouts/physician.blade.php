@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <title>Golden Gate Academy - Physician Console</title>
+    <title>Golden Gate College - Physician Console</title>
 
     <style>
         body {
@@ -67,7 +67,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </label>
                 </div>
-                <div class="flex-1 px-2 mx-2 font-bold text-lg text-slate-800 tracking-tight">Golden Gate Academy</div>
+                <div class="flex-1 px-2 mx-2 font-bold text-lg text-slate-800 tracking-tight">Golden Gate College</div>
             </div>
 
             <!-- Content Injection -->

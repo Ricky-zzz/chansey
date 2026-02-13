@@ -7,12 +7,12 @@
             <div class="flex items-center gap-4">
                 <div class="avatar">
                     <div class="w-12 rounded-full ring ring-primary ring-offset-neutral ring-offset-2">
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="object-cover" />
+                        <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate College Logo" class="object-cover" />
                     </div>
                 </div>
                 <div>
                     <div class="text-3xl font-black text-white tracking-tighter leading-none">
-                        Golden Gate Academy
+                        Golden Gate College
                     </div>
                     <div class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-1">
                         Admitting Console

@@ -7,12 +7,12 @@
             <div class="flex items-center gap-3">
                 <div class="avatar">
                     <div class="w-10 rounded-lg ring-1 ring-slate-200">
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="object-cover" />
+                        <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate College Logo" class="object-cover" />
                     </div>
                 </div>
                 <div>
                     <div class="text-xl font-bold text-slate-800 tracking-tight leading-none">
-                        Golden Gate Academy
+                        Golden Gate College
                     </div>
                     <div class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mt-0.5">
                         {{ Auth::user()->nurse->designation }} Console
