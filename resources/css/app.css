@@ -1,11 +1,14 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light, dark, emerald, winter;
+    themes: light, dark, emerald, winter;
+}
+
+html {
+    font-size: 90%;
 }
 
 /* ─── Enterprise Medical Design System ─── */
 @layer components {
-
     /* Cards */
     .card-enterprise {
         @apply bg-white border border-slate-200 shadow-sm rounded-xl;
@@ -92,4 +95,3 @@
         @apply bg-red-50 border border-red-200 text-red-800 rounded-lg shadow-sm;
     }
 }
-
