@@ -43,15 +43,6 @@ class StaffNursesTable
                     ->label('First Name')
                     ->searchable(),
 
-                TextColumn::make('designation')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'Admitting' => 'warning',
-                        'Clinical' => 'success',
-                        default => 'gray',
-                    })
-                    ->sortable(),
-
                 TextColumn::make('nurseType.name')
                     ->label('Nurse Type')
                     ->default('—')
@@ -82,7 +73,7 @@ class StaffNursesTable
 
                 SelectFilter::make('station_id')
                     ->label('Station')
-                    ->relationship('station', 'station_name')
+                    ->relationship('station', 'station_name', fn($query) => $query->where('unit_id', Auth::user()->nurse->unit_id))
                     ->preload()
                     ->searchable(),
             ])

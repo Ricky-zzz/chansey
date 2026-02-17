@@ -206,10 +206,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Building A',
             'description' => 'Main Hospital Building',
         ]);
-        $unitB = Unit::create([
-            'name' => 'Building B',
-            'description' => 'Annex Building',
-        ]);
 
         $stationConfigs = [
             [
@@ -248,7 +244,7 @@ class DatabaseSeeder extends Seeder
                 'room_type' => 'Ward',
                 'capacity' => 4,
                 'price' => 1500.00,
-                'unit_id' => $unitB->id,
+                'unit_id' => $unitA->id,
             ],
             [
                 'name' => 'Private Wing',
@@ -258,7 +254,7 @@ class DatabaseSeeder extends Seeder
                 'capacity' => 1,
                 'price' => 4000.00,
                 'room_count' => 5,
-                'unit_id' => $unitB->id,
+                'unit_id' => $unitA->id,
             ],
         ];
 
@@ -429,28 +425,6 @@ class DatabaseSeeder extends Seeder
             'date_hired' => now(),
             'station_id' => null,
             'unit_id' => $unitA->id,
-        ]);
-
-        // Supervisor for Building B
-        $supBUser = User::create([
-            'name' => 'Lorna Aquino',
-            'email' => 'lorna.aquino@chansey.test',
-            'password' => $password,
-            'user_type' => 'nurse',
-            'badge_id' => 'NUR-LA-001',
-        ]);
-        Nurse::create([
-            'user_id' => $supBUser->id,
-            'employee_id' => 'NUR-LA-001',
-            'first_name' => 'Lorna',
-            'last_name' => 'Aquino',
-            'license_number' => 'RN-9003',
-            'designation' => 'Clinical',
-            'role_level' => 'Supervisor',
-            'nurse_type_id' => $nurseTypes['Administrative'],
-            'date_hired' => now(),
-            'station_id' => null,
-            'unit_id' => $unitB->id,
         ]);
 
         // ==========================================

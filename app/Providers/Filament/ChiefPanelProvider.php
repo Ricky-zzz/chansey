@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Chief\Widgets\NurseStatsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -39,7 +40,7 @@ class ChiefPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Chief/Widgets'), for: 'App\Filament\Chief\Widgets')
             ->widgets([
-
+                NurseStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

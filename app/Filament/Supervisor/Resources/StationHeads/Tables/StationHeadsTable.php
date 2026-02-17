@@ -12,6 +12,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Auth;
 
 class StationHeadsTable
@@ -43,23 +44,10 @@ class StationHeadsTable
                     ->label('First Name')
                     ->searchable(),
 
-                TextColumn::make('designation')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'Admitting' => 'warning',
-                        'Clinical' => 'success',
-                        default => 'gray',
-                    })
-                    ->sortable(),
-
-                TextColumn::make('nurseType.name')
-                    ->label('Nurse Type')
-                    ->default('—')
-                    ->sortable(),
-
                 TextColumn::make('station.station_name')
                     ->label('Station')
                     ->default('—')
+                    ->searchable()
                     ->sortable(),
 
                 TextColumn::make('status')
@@ -68,25 +56,32 @@ class StationHeadsTable
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('designation')
-                    ->options([
-                        'Clinical' => 'Clinical',
-                        'Admitting' => 'Admitting',
-                    ]),
-
-                SelectFilter::make('nurse_type_id')
-                    ->label('Nurse Type')
-                    ->relationship('nurseType', 'name')
-                    ->preload()
-                    ->searchable(),
-
                 SelectFilter::make('station_id')
                     ->label('Station')
-                    ->relationship('station', 'station_name')
+                    ->relationship('station', 'station_name', fn($query) => $query->where('unit_id', Auth::user()->nurse->unit_id))
                     ->preload()
                     ->searchable(),
             ])
             ->recordActions([
+                Action::make('viewStats')
+                    ->label('View Stats')
+                    ->icon('heroicon-o-chart-bar')
+                    ->color('info')
+                    ->modalHeading(fn(Nurse $record) => "{$record->first_name} {$record->last_name} - Station Stats")
+                    ->modalContent(function (Nurse $record) {
+                        $station = $record->station;
+                        if (!$station) {
+                            return new HtmlString('<div class="p-4 text-center text-gray-500">No station assigned</div>');
+                        }
+
+                        $nurseCount = Nurse::where('station_id', $station->id)->count();
+                        $stationName = $station->station_name;
+
+                        $content = '<div class="space-y-4"><div class="p-4 bg-sky-50 rounded-lg border border-sky-200"><p class="text-sm text-gray-600">Station / Department</p><p class="text-lg font-bold text-sky-900">' . $stationName . '</p></div><div class="grid grid-cols-1 gap-4"><div class="p-4 bg-green-50 rounded-lg border border-green-200"><p class="text-xs text-gray-600 mb-1">Total Nurses Under This Station</p><p class="text-3xl font-bold text-green-600">' . $nurseCount . '</p></div></div></div>';
+
+                        return new HtmlString($content);
+                    })
+                    ->modalWidth('lg'),
                 Action::make('reassignStation')
                     ->label('Reassign Station')
                     ->modalHeading('Reassign Station')
@@ -106,10 +101,6 @@ class StationHeadsTable
                     })
                     ->successNotificationTitle('Station Assigned'),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 }

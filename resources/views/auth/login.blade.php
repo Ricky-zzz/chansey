@@ -34,11 +34,11 @@
                         <div class="flex justify-center mb-4">
                             <div class="w-40 h-40 rounded-xl overflow-hidden ring-1 ring-slate-200 shadow-sm">
                                 <a href="{{ route('welcome') }}">
-                                <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover" />
+                                <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate College Logo" class="w-full h-full object-cover" />
                                 </a>
                             </div>
                         </div>
-                        <h1 class="text-3xl font-bold text-slate-800 mb-1">Golden Gate Academy</h1>
+                        <h1 class="text-3xl font-bold text-slate-800 mb-1">Golden Gate College</h1>
                         <p class="text-sm text-slate-500">Hospital Informatics System</p>
                     </div>
 

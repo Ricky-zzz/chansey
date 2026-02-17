@@ -6,6 +6,7 @@ use Filament\Notifications\Notification;
 use App\Filament\Supervisor\Resources\Stations\Pages\CreateStation;
 use App\Filament\Supervisor\Resources\Stations\Pages\EditStation;
 use App\Filament\Supervisor\Resources\Stations\Pages\ListStations;
+use App\Filament\Supervisor\Resources\Stations\Pages\ManageStation;
 use App\Models\Station;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,7 +18,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Hidden;
-use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -69,26 +70,32 @@ class StationResource extends Resource
                 TextColumn::make('station_name')->sortable()->searchable()->weight('bold'),
                 TextColumn::make('station_code')->sortable(),
                 TextColumn::make('floor_location'),
-
                 TextColumn::make('rooms_count')->counts('rooms')->label('Rooms'),
+                TextColumn::make('beds_count')
+                    ->label('Total Beds')
+                    ->getStateUsing(fn(Station $record) => $record->beds()->count()),
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                    DeleteAction::make()
-                        ->before(function ($record, DeleteAction $action) {
-                            if ($record->beds()->where('beds.status', 'Occupied')->exists()) {
-                                Notification::make()
-                                    ->title('Action Blocked')
-                                    ->body('Cannot delete station. It contains rooms with occupied beds.')
-                                    ->danger()
-                                    ->send();
+                Action::make('manageStation')
+                    ->label('Manage Station')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->color('info')
+                    ->url(fn(Station $record) => route('filament.supervisor.resources.stations.manage', $record))
+                    ->openUrlInNewTab(false),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
+                    ->before(function ($record, DeleteAction $action) {
+                        if ($record->beds()->where('beds.status', 'Occupied')->exists()) {
+                            Notification::make()
+                                ->title('Action Blocked')
+                                ->body('Cannot delete station. It contains rooms with occupied beds.')
+                                ->danger()
+                                ->send();
 
-                                $action->cancel();
-                            }
-                        }),
-                ]),
+                            $action->cancel();
+                        }
+                    }),
             ]);
     }
 
@@ -112,6 +119,7 @@ class StationResource extends Resource
             'index' => ListStations::route('/'),
             'create' => CreateStation::route('/create'),
             'edit' => EditStation::route('/{record}/edit'),
+            'manage' => ManageStation::route('/{record}/manage'),
         ];
     }
 }
