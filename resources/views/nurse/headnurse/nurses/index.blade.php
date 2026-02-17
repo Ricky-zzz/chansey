@@ -71,7 +71,6 @@
             },
             schedules: window.schedulesData,
 
-            // Calendar data
             currentMonth: new Date(),
             selectedDate: null,
             scheduledNurses: {
@@ -81,7 +80,6 @@
             },
             loadingScheduledNurses: false,
 
-            // Tab & Schedule Modal
             openScheduleModal(nurse) {
                 this.selectedNurse = {
                     id: nurse.id,
@@ -91,7 +89,6 @@
                 this.$refs.scheduleModal.showModal();
             },
 
-            // DTR Modals
             openDtrModal(nurse) {
                 this.selectedDtrNurse = {
                     id: nurse.id,
