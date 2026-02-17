@@ -84,7 +84,7 @@ class Nurse extends Model
         static::updating(function ($nurse) {
             if ($nurse->isDirty('station_id')) {
                 $station = Station::find($nurse->station_id);
-                $isAdmissionStation = $station && strtolower($station->station_name) === 'admission';
+                $isAdmissionStation = $station && str_contains(strtolower($station->station_name), 'admission');
                 $nurse->designation = $isAdmissionStation ? 'Admitting' : 'Clinical';
             }
         });

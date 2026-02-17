@@ -13,6 +13,7 @@ Route::middleware(['auth', 'headnurse'])->prefix('nurse/headnurse')->name('nurse
 
     // My Nurses
     Route::get('/nurses', [NurseController::class, 'index'])->name('nurses.index');
+    Route::get('/nurses/scheduled', [NurseController::class, 'getScheduledNurses'])->name('nurses.getScheduled');
     Route::put('/nurses/{nurse}/schedule', [NurseController::class, 'updateSchedule'])->name('nurses.updateSchedule');
 
     // DTR Reports
