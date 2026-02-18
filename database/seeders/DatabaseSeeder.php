@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 0. CREATE DEPARTMENTS (Prerequisite)
         // ==========================================
-        $deptNames = ['Cardiology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Surgery', 'OB-GYN','ENT'];
+        $deptNames = ['Cardiology', 'Pediatrics', 'Neurology', 'Internal Medicine', 'Surgery', 'OB-GYN', 'ENT'];
         $depts = [];
         foreach ($deptNames as $name) {
             $depts[$name] = Department::create(['name' => $name])->id;
@@ -430,64 +430,64 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 8. SHIFT SCHEDULES
         // ==========================================
-        $schedules = [
-            // M-W-F Schedules (36 hours)
-            [
-                'name' => 'M-W-F Morning',
-                'start_time' => '08:00',
-                'end_time' => '16:00',
-                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
-            ],
-            [
-                'name' => 'M-W-F Night',
-                'start_time' => '20:00',
-                'end_time' => '08:00',
-                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
-            ],
-            // T-TH-S Schedules (36 hours)
-            [
-                'name' => 'T-TH-S Morning',
-                'start_time' => '08:00',
-                'end_time' => '16:00',
-                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
-            ],
-            [
-                'name' => 'T-TH-S Night',
-                'start_time' => '20:00',
-                'end_time' => '08:00',
-                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
-            ],
-            // SAT-SUN Schedules (12 hours each)
-            [
-                'name' => 'Weekend Morning',
-                'start_time' => '08:00',
-                'end_time' => '14:00',
-                'days' => ['saturday' => true, 'sunday' => true]
-            ],
-            [
-                'name' => 'Weekend Night',
-                'start_time' => '20:00',
-                'end_time' => '02:00',
-                'days' => ['saturday' => true, 'sunday' => true]
-            ],
-        ];
-
-        foreach ($schedules as $schedule) {
-            $days = $schedule['days'];
-            ShiftSchedule::create([
-                'name' => $schedule['name'],
-                'start_time' => $schedule['start_time'],
-                'end_time' => $schedule['end_time'],
-                'monday' => $days['monday'] ?? false,
-                'tuesday' => $days['tuesday'] ?? false,
-                'wednesday' => $days['wednesday'] ?? false,
-                'thursday' => $days['thursday'] ?? false,
-                'friday' => $days['friday'] ?? false,
-                'saturday' => $days['saturday'] ?? false,
-                'sunday' => $days['sunday'] ?? false,
-            ]);
-        }
-
+        //        $schedules = [
+        //            // M-W-F Schedules (36 hours)
+        //            [
+        //                'name' => 'M-W-F Morning',
+        //                'start_time' => '08:00',
+        //                'end_time' => '16:00',
+        //                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
+        //            ],
+        //            [
+        //                'name' => 'M-W-F Night',
+        //                'start_time' => '20:00',
+        //                'end_time' => '08:00',
+        //                'days' => ['monday' => true, 'wednesday' => true, 'friday' => true]
+        //            ],
+        //            // T-TH-S Schedules (36 hours)
+        //            [
+        //                'name' => 'T-TH-S Morning',
+        //                'start_time' => '08:00',
+        //                'end_time' => '16:00',
+        //                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
+        //            ],
+        //            [
+        //                'name' => 'T-TH-S Night',
+        //                'start_time' => '20:00',
+        //                'end_time' => '08:00',
+        //                'days' => ['tuesday' => true, 'thursday' => true, 'saturday' => true]
+        //            ],
+        //            // SAT-SUN Schedules (12 hours each)
+        //            [
+        //                'name' => 'Weekend Morning',
+        //                'start_time' => '08:00',
+        //                'end_time' => '14:00',
+        //                'days' => ['saturday' => true, 'sunday' => true]
+        //            ],
+        //            [
+        //                'name' => 'Weekend Night',
+        //                'start_time' => '20:00',
+        //                'end_time' => '02:00',
+        //                'days' => ['saturday' => true, 'sunday' => true]
+        //            ],
+        //        ];
+        //
+        //        foreach ($schedules as $schedule) {
+        //            $days = $schedule['days'];
+        //            ShiftSchedule::create([
+        //                'name' => $schedule['name'],
+        //                'start_time' => $schedule['start_time'],
+        //                'end_time' => $schedule['end_time'],
+        //                'monday' => $days['monday'] ?? false,
+        //                'tuesday' => $days['tuesday'] ?? false,
+        //                'wednesday' => $days['wednesday'] ?? false,
+        //                'thursday' => $days['thursday'] ?? false,
+        //                'friday' => $days['friday'] ?? false,
+        //                'saturday' => $days['saturday'] ?? false,
+        //                'sunday' => $days['sunday'] ?? false,
+        //            ]);
+        //        }
+        //
         // ==========================================
         // 9. MEDICINES (Pharmacy Stock)
         // ==========================================

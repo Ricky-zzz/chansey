@@ -93,7 +93,7 @@
                 </a>
             </li>
 
-            <li>
+            {{-- <li>
                 <a href="{{ route('nurse.headnurse.shifts.index') }}"
                     class="{{ request()->routeIs('nurse.headnurse.shifts.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -101,7 +101,7 @@
                     </svg>
                     Shift Schedules
                 </a>
-            </li>
+            </li> --}}
             <li>
                 <a href="{{ route('nurse.headnurse.memos.index') }}"
                     class="{{ request()->routeIs('nurse.headnurse.memos.*') ? 'sidebar-link-active' : 'sidebar-link' }}">

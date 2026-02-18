@@ -26,7 +26,6 @@ class Nurse extends Model
         'nurse_type_id',
         'station_id',
         'unit_id',
-        'shift_schedule_id',
     ];
 
     protected $casts = [
@@ -54,9 +53,14 @@ class Nurse extends Model
         return $this->belongsTo(NurseType::class);
     }
 
-    public function shiftSchedule()
+    // public function shiftSchedule()
+    // {
+    //     return $this->belongsTo(ShiftSchedule::class);
+    // }
+
+    public function dateSchedules()
     {
-        return $this->belongsTo(ShiftSchedule::class);
+        return $this->hasMany(DateSchedule::class);
     }
 
     public function nursingCarePlans()
@@ -67,6 +71,11 @@ class Nurse extends Model
     public function assignedTasks()
     {
         return $this->hasMany(StationTask::class, 'assigned_to_nurse_id');
+    }
+
+    public function patientLoads()
+    {
+        return $this->hasMany(PatientLoad::class);
     }
 
     /**

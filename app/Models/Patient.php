@@ -53,6 +53,11 @@ class Patient extends Model
         return $this->hasMany(PatientFile::class);
     }
 
+    public function patientLoads(): HasMany
+    {
+        return $this->hasMany(PatientLoad::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
@@ -61,7 +66,7 @@ class Patient extends Model
     public function getFullNameAttribute(): string
     {
         $middleInitial = $this->middle_name ? ' ' . strtoupper($this->middle_name[0]) . '.' : '';
-        return trim("{$this->last_name}, {$this->first_name}".$middleInitial);
+        return trim("{$this->last_name}, {$this->first_name}" . $middleInitial);
     }
 
     public function getAgeAttribute(): int

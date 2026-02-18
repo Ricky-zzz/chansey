@@ -42,12 +42,24 @@
     <div class="lg:col-span-3">
         <template x-if="selectedDate && !loadingScheduledNurses">
             <div class="card-enterprise p-4">
-                <h3 class="text-lg font-semibold text-slate-800 mb-1">
-                    Nurses Scheduled for <span x-text="formatDateDisplay(selectedDate)"></span>
-                </h3>
-                <p class="text-sm text-slate-500 mb-4">
-                    <span x-text="scheduledNurses.dayOfWeek"></span>
-                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-800">
+                            Nurses Scheduled for <span x-text="formatDateDisplay(selectedDate)"></span>
+                        </h3>
+                        <p class="text-sm text-slate-500">
+                            <span x-text="scheduledNurses.dayOfWeek"></span>
+                        </p>
+                    </div>
+                    <button
+                        @click="openAssignDateScheduleModalForDate()"
+                        class="btn-enterprise-primary inline-flex items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Assign Nurse
+                    </button>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="table-enterprise">
@@ -56,13 +68,15 @@
                                 <th></th>
                                 <th>Badge ID</th>
                                 <th>Name</th>
-                                <th>Shift</th>
-                                <th>License</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Assignment</th>
+                                <th class="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <template x-if="scheduledNurses.nurses.length > 0">
-                                <template x-for="nurse in scheduledNurses.nurses" :key="nurse.id">
+                                <template x-for="nurse in scheduledNurses.nurses" :key="nurse.dateschedule_id">
                                     <tr>
                                         <td>
                                             <div class="avatar">
@@ -84,20 +98,40 @@
                                             <div class="text-xs text-slate-400" x-text="nurse.license_number"></div>
                                         </td>
                                         <td>
-                                            <div class="flex flex-col">
-                                                <span class="badge-enterprise bg-emerald-50 text-emerald-700 border-emerald-200" x-text="nurse.schedule_name"></span>
-                                                <span class="text-xs text-slate-500 mt-1" x-text="`${nurse.start_time} - ${nurse.end_time}`"></span>
-                                            </div>
+                                            <span class="text-slate-600" x-text="nurse.start_time"></span>
                                         </td>
                                         <td>
-                                            <span class="text-sm text-slate-600" x-text="nurse.license_number"></span>
+                                            <span class="text-slate-600" x-text="nurse.end_time"></span>
+                                        </td>
+                                        <td>
+                                            <span class="text-sm" :class="nurse.assignment ? 'text-slate-600' : 'text-slate-400'" x-text="nurse.assignment || '—'"></span>
+                                        </td>
+                                        <td class="text-right">
+                                            <div class="flex gap-1 justify-end">
+                                                <button
+                                                    @click="openEditDateScheduleModal(nurse)"
+                                                    class="btn-enterprise-secondary text-xs px-2 py-1 inline-flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    @click="deleteSchedule(nurse.dateschedule_id)"
+                                                    class="btn-enterprise-danger text-xs px-2 py-1 inline-flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                             </template>
                             <template x-if="scheduledNurses.nurses.length === 0">
                                 <tr>
-                                    <td colspan="5" class="text-center py-10">
+                                    <td colspan="7" class="text-center py-10">
                                         <div class="flex flex-col items-center gap-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-slate-300">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

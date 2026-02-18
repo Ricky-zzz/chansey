@@ -9,6 +9,7 @@ use App\Models\Bed;
 use App\Models\InventoryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Nurse;
 
 class WardController extends Controller
 {
@@ -21,7 +22,7 @@ class WardController extends Controller
         }
 
         $query = Admission::query()
-            ->with(['patient', 'bed.room', 'attendingPhysician'])
+            ->with(['patient.patientLoads.nurse', 'bed.room', 'attendingPhysician'])
             ->whereIn('admissions.status', ['Admitted', 'Ready for Discharge'])
             ->where('admissions.station_id', $nurse->station_id);
 
@@ -44,7 +45,19 @@ class WardController extends Controller
             ->paginate(10)
             ->appends(['search' => $search]);
 
-        return view('nurse.clinical.ward.index', compact('patients', 'nurse'));
+        // Check if user is a head nurse
+        $isHeadNurse = $nurse->role_level === 'Head Nurse';
+
+        // Get available nurses for this station (only if head nurse)
+        $availableNurses = [];
+        if ($isHeadNurse) {
+            $availableNurses = Nurse::where('station_id', $nurse->station_id)
+                ->where('id', '!=', $nurse->id)
+                ->select('id', 'first_name', 'last_name', 'employee_id')
+                ->get();
+        }
+
+        return view('nurse.clinical.ward.index', compact('patients', 'nurse', 'isHeadNurse', 'availableNurses'));
     }
 
     // Patient chart View

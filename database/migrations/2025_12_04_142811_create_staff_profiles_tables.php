@@ -69,7 +69,8 @@ return new class extends Migration
             $table->foreignId('unit_id')->nullable()->constrained('units')->nullOnDelete();
 
             // 6. Scheduling
-            $table->foreignId('shift_schedule_id')->nullable()->constrained()->nullOnDelete();
+            // NOTE: Date-specific scheduling now uses date_schedules table instead
+            // $table->foreignId('shift_schedule_id')->nullable()->constrained()->nullOnDelete();
 
             $table->timestamps();
 

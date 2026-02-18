@@ -47,7 +47,9 @@
     </div>
 
     {{-- Modals --}}
-    @include('nurse.headnurse.nurses.components.modals.schedule-modal', ['schedules' => $schedules])
+    @include('nurse.headnurse.nurses.components.modals.view-schedule-modal')
+    @include('nurse.headnurse.nurses.components.modals.date-schedule-modal', ['availableNurses' => $availableNurses, 'nurseTypes' => $nurseTypes])
+    @include('nurse.headnurse.nurses.components.modals.nurse-patients-modal')
     @include('nurse.headnurse.nurses.components.modals.single-dtr-modal')
     @include('nurse.headnurse.nurses.components.modals.batch-dtr-modal')
 
@@ -55,7 +57,8 @@
 
 @push('scripts')
 <script>
-    window.schedulesData = @json($schedules);
+    window.availableNursesData = @json($availableNurses);
+    window.nurseTypesData = @json($nurseTypes);
 
     function nurseScheduleManager() {
         return {
@@ -63,13 +66,22 @@
             selectedNurse: {
                 id: null,
                 name: '',
-                current_schedule_id: null
             },
             selectedDtrNurse: {
                 id: null,
                 name: ''
             },
-            schedules: window.schedulesData,
+            availableNurses: window.availableNursesData,
+            nurseTypes: window.nurseTypesData,
+            nurseSchedules: [],
+            isEditingSchedule: false,
+            dateScheduleForm: {
+                date: '',
+                nurse_id: '',
+                start_shift: '',
+                end_shift: '',
+                assignment: '',
+            },
 
             currentMonth: new Date(),
             selectedDate: null,
@@ -80,13 +92,197 @@
             },
             loadingScheduledNurses: false,
 
-            openScheduleModal(nurse) {
+            // Patient Load Management State
+            viewNursePatientsOpen: false,
+            nursePatientsLoading: false,
+            assignedPatients: [],
+            nursePatientsRatio: '0:0',
+
+            // Toast notification helper
+            showToast(message, type = 'success') {
+                const toastHtml = `
+                    <div class="toast toast-top toast-end z-50">
+                        <div class="toast-enterprise-${type} flex items-center gap-3 px-4 py-3">
+                            ${type === 'success' ? `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            ` : `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m8-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            `}
+                            <div class="text-sm">
+                                <span class="font-semibold">${type === 'success' ? 'Success!' : 'Error!'}</span> ${message}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const temp = document.createElement('div');
+                temp.innerHTML = toastHtml;
+                document.body.appendChild(temp.firstElementChild);
+
+                setTimeout(() => {
+                    temp.firstElementChild?.remove();
+                }, 3000);
+            },
+
+            // View schedules modal
+            openViewSchedulesModal(nurse) {
                 this.selectedNurse = {
                     id: nurse.id,
                     name: nurse.name,
-                    current_schedule_id: nurse.current_schedule_id
                 };
-                this.$refs.scheduleModal.showModal();
+                this.fetchNurseSchedules(nurse.id);
+                this.$refs.viewSchedulesModal.showModal();
+            },
+
+            async fetchNurseSchedules(nurseId) {
+                try {
+                    const response = await fetch(
+                        `{{ route('nurse.headnurse.nurses.getDateSchedules', ':nurseId') }}`.replace(':nurseId', nurseId)
+                    );
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        this.nurseSchedules = data.schedules;
+                    } else {
+                        this.nurseSchedules = [];
+                        this.showToast('Could not load schedules', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error fetching nurse schedules:', error);
+                    this.nurseSchedules = [];
+                    this.showToast('Error loading schedules', 'error');
+                }
+            },
+
+            // Assign date schedule modal
+            openAssignDateScheduleModal(nurseId) {
+                this.isEditingSchedule = false;
+                this.resetDateScheduleForm();
+                this.dateScheduleForm.nurse_id = nurseId;
+                this.$refs.dateScheduleModal.showModal();
+            },
+
+            openAssignDateScheduleModalForDate() {
+                this.isEditingSchedule = false;
+                this.resetDateScheduleForm();
+                this.dateScheduleForm.date = this.selectedDate;
+                this.$refs.dateScheduleModal.showModal();
+            },
+
+            openEditDateScheduleModal(schedule) {
+                this.isEditingSchedule = true;
+                this.dateScheduleForm = {
+                    id: schedule.id || schedule.dateschedule_id,
+                    date: schedule.date || this.selectedDate,
+                    nurse_id: schedule.nurse_id || '',
+                    start_shift: schedule.start_shift,
+                    end_shift: schedule.end_shift,
+                    assignment: schedule.assignment || '',
+                };
+                this.$refs.dateScheduleModal.showModal();
+            },
+
+            openEditScheduleModal(schedule) {
+                this.isEditingSchedule = true;
+                this.dateScheduleForm = {
+                    id: schedule.id,
+                    date: schedule.date,
+                    nurse_id: schedule.nurse_id,
+                    start_shift: schedule.start_shift,
+                    end_shift: schedule.end_shift,
+                    assignment: schedule.assignment || '',
+                };
+                this.$refs.dateScheduleModal.showModal();
+            },
+
+            resetDateScheduleForm() {
+                this.dateScheduleForm = {
+                    date: '',
+                    nurse_id: '',
+                    start_shift: '',
+                    end_shift: '',
+                    assignment: '',
+                };
+            },
+
+            async submitDateScheduleForm() {
+                try {
+                    const url = this.isEditingSchedule
+                        ? `{{ route('nurse.headnurse.date-schedules.update', ':id') }}`.replace(':id', this.dateScheduleForm.id)
+                        : `{{ route('nurse.headnurse.date-schedules.store') }}`;
+
+                    const method = this.isEditingSchedule ? 'PUT' : 'POST';
+
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify(this.dateScheduleForm),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.showToast(data.message || 'Schedule saved successfully', 'success');
+                        this.$refs.dateScheduleModal.close();
+
+                        // Refresh the schedules
+                        if (this.selectedDate) {
+                            this.fetchScheduledNurses(this.selectedDate);
+                        }
+                        if (this.selectedNurse.id) {
+                            this.fetchNurseSchedules(this.selectedNurse.id);
+                        }
+                    } else {
+                        this.showToast(data.error || data.message || 'Error saving schedule', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    this.showToast('An error occurred while saving the schedule', 'error');
+                }
+            },
+
+            async deleteSchedule(scheduleId) {
+                if (!confirm('Are you sure you want to delete this schedule?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(
+                        `{{ route('nurse.headnurse.date-schedules.destroy', ':id') }}`.replace(':id', scheduleId),
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.showToast(data.message || 'Schedule deleted successfully', 'success');
+
+                        // Refresh the schedules
+                        if (this.selectedDate) {
+                            this.fetchScheduledNurses(this.selectedDate);
+                        }
+                        if (this.selectedNurse.id) {
+                            this.fetchNurseSchedules(this.selectedNurse.id);
+                        }
+                    } else {
+                        this.showToast(data.error || data.message || 'Error deleting schedule', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting schedule:', error);
+                    this.showToast('An error occurred while deleting the schedule', 'error');
+                }
             },
 
             openDtrModal(nurse) {
@@ -101,14 +297,37 @@
                 this.$refs.batchDtrModal.showModal();
             },
 
-            getScheduleDetails(scheduleId) {
-                if (!scheduleId) return null;
-                const schedule = this.schedules.find(s => s.id == scheduleId);
-                if (!schedule) return null;
-                return {
-                    name: schedule.name,
-                    hours: schedule.total_hours_per_week
+            viewNursePatients(nurseId, nurseName) {
+                this.nursePatientsLoading = true;
+                this.viewNursePatientsOpen = true;
+
+                fetch(`{{ route('nurse.headnurse.patient-loads.getPatients', ':nurseId') }}`.replace(':nurseId', nurseId))
+                    .then(response => response.json())
+                    .then(data => {
+                        this.assignedPatients = data.patients;
+                        this.nursePatientsRatio = data.ratio;
+                        // Update the ratio display on the table
+                        const ratioElement = document.getElementById(`ratio-${nurseId}`);
+                        if (ratioElement) {
+                            ratioElement.textContent = data.ratio;
+                        }
+                        this.nursePatientsLoading = false;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching patient loads:', error);
+                        this.nursePatientsLoading = false;
+                        this.showToast('Error loading patient assignments', 'error');
+                    });
+            },
+
+            getAcuityColor(acuity) {
+                const colors = {
+                    'Severe': '#dc2626',
+                    'High': '#f59e0b',
+                    'Moderate': '#0ea5e9',
+                    'Low': '#10b981',
                 };
+                return colors[acuity] || '#6b7280';
             },
 
             // Calendar functions
@@ -141,6 +360,14 @@
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const day = String(date.getDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
+            },
+
+            formatDate(dateStr) {
+                return new Date(dateStr).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
             },
 
             previousMonth() {
