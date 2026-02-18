@@ -70,17 +70,19 @@ class NurseController extends Controller
         }
 
         $dayOfWeek = Carbon::parse($date)->format('l'); // e.g., "Monday"
+        $daySingleLetter = substr($dayOfWeek, 0, 1); // e.g., "M"
+        $dayThreeLetter = substr($dayOfWeek, 0, 3); // e.g., "Mon"
 
         $query = Nurse::with(['user', 'shiftSchedule'])
             ->where('id', '!=', $me->id)
             ->where('station_id', $me->station_id)
             ->whereNotNull('shift_schedule_id');
 
-        $nurses = $query->get()->filter(function ($nurse) use ($dayOfWeek) {
+        $nurses = $query->get()->filter(function ($nurse) use ($daySingleLetter, $dayThreeLetter) {
             // Check if the shift schedule includes this day of week
-            $daysArray = explode(',', $nurse->shiftSchedule->days_short ?? '');
-            $dayShort = substr($dayOfWeek, 0, 3); // e.g., "Mon"
-            return in_array($dayShort, array_map('trim', $daysArray));
+            // Support both formats: "M,W,F" and "Mon,Wed,Fri"
+            $daysArray = array_map('trim', explode(',', $nurse->shiftSchedule->days_short ?? ''));
+            return in_array($daySingleLetter, $daysArray) || in_array($dayThreeLetter, $daysArray);
         })->values();
 
         return response()->json([

@@ -126,7 +126,7 @@
 
                 while (days.length < 42) {
                     days.push({
-                        date: currentDate.toISOString().split('T')[0],
+                        date: this.formatDateLocal(currentDate),
                         day: currentDate.getDate(),
                         isCurrentMonth: currentDate.getMonth() === month
                     });
@@ -134,6 +134,13 @@
                 }
 
                 return days;
+            },
+
+            formatDateLocal(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
             },
 
             previousMonth() {
