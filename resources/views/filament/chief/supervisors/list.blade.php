@@ -4,13 +4,6 @@
 
 <div>
     {{ $this->table }}
-
-    <!-- Stats Modal -->
-    <x-filament-notifications::notification
-        v-show="false"
-        x-data="{ open: false }"
-        x-ref="stateModal"
-    />
 </div>
 
 @push('scripts')
