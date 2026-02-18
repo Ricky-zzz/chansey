@@ -44,22 +44,8 @@ class StaffNursesTable
                     ->label('First Name')
                     ->searchable(),
 
-                TextColumn::make('designation')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'Admitting' => 'warning',
-                        'Clinical' => 'success',
-                        default => 'gray',
-                    })
-                    ->sortable(),
-
                 TextColumn::make('nurseType.name')
                     ->label('Nurse Type')
-                    ->default('—')
-                    ->sortable(),
-
-                TextColumn::make('station.station_name')
-                    ->label('Station')
                     ->default('—')
                     ->sortable(),
 
