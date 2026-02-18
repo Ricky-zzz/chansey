@@ -46,7 +46,7 @@ class WardController extends Controller
             ->appends(['search' => $search]);
 
         // Check if user is a head nurse
-        $isHeadNurse = $nurse->role_level === 'Head Nurse';
+        $isHeadNurse = in_array($nurse->role_level, ['Head', 'Supervisor', 'Chief']);
 
         // Get available nurses for this station (only if head nurse)
         $availableNurses = [];

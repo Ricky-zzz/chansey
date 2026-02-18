@@ -1,7 +1,7 @@
 @extends('layouts.clinic')
 
 @section('content')
-<div class="max-w-6xl mx-auto" x-data="nurseScheduleManager()">
+<div class="max-w-6xl mx-auto" x-data="nurseScheduleManager()" @load="init()" x-init="init()">
 
     {{-- Header --}}
     @include('nurse.headnurse.nurses.components.header', ['title' => $title])
@@ -97,6 +97,33 @@
             nursePatientsLoading: false,
             assignedPatients: [],
             nursePatientsRatio: '0:0',
+
+            // Initialize and load all nurse ratios
+            init() {
+                this.$nextTick(() => {
+                    // Load patient ratios for all visible nurses
+                    document.querySelectorAll('[data-nurse-id]').forEach(el => {
+                        const nurseId = el.getAttribute('data-nurse-id');
+                        if (nurseId) {
+                            this.loadNurseRatio(nurseId);
+                        }
+                    });
+                });
+            },
+
+            loadNurseRatio(nurseId) {
+                const url = `{{ route('nurse.headnurse.patient-loads.getPatients', 0) }}`.replace('/0', `/${nurseId}`);
+
+                fetch(url)
+                    .then(response => response.ok ? response.json() : Promise.reject('Error'))
+                    .then(data => {
+                        const ratioElement = document.getElementById(`ratio-${nurseId}`);
+                        if (ratioElement && data.ratio) {
+                            ratioElement.textContent = data.ratio;
+                        }
+                    })
+                    .catch(error => console.error('Error loading nurse ratio:', error));
+            },
 
             // Toast notification helper
             showToast(message, type = 'success') {
@@ -301,15 +328,25 @@
                 this.nursePatientsLoading = true;
                 this.viewNursePatientsOpen = true;
 
-                fetch(`{{ route('nurse.headnurse.patient-loads.getPatients', ':nurseId') }}`.replace(':nurseId', nurseId))
-                    .then(response => response.json())
+                const url = `{{ route('nurse.headnurse.patient-loads.getPatients', 0) }}`.replace('/0', `/${nurseId}`);
+                console.log('Fetching patient loads from:', url);
+
+                fetch(url)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        this.assignedPatients = data.patients;
-                        this.nursePatientsRatio = data.ratio;
+                        console.log('Patient loads data:', data);
+                        this.assignedPatients = data.patients || [];
+                        this.nursePatientsRatio = data.ratio || '0:0';
                         // Update the ratio display on the table
                         const ratioElement = document.getElementById(`ratio-${nurseId}`);
                         if (ratioElement) {
-                            ratioElement.textContent = data.ratio;
+                            ratioElement.textContent = this.nursePatientsRatio;
                         }
                         this.nursePatientsLoading = false;
                     })

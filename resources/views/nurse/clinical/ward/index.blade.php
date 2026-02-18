@@ -1,7 +1,7 @@
 @extends('layouts.clinic')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto" x-data="patientLoadManager()">
 
     <!-- PATIENT LIST -->
     <div class="card-enterprise p-6">
@@ -125,7 +125,7 @@
                                 <span class="italic text-slate-400 text-xs">No nurses assigned</span>
                             @endforelse
                             @if($admission->patient->patientLoads->count() > 0 || true)
-                                <button @click="viewNurses({{ $admission->patient->id }})"
+                                <button @click="viewNurses({{ $admission->patient->id }}, '{{ $admission->patient->getFullNameAttribute() }}')"
                                     class="btn btn-xs btn-ghost mt-1">
                                     View Details
                                 </button>
@@ -143,7 +143,7 @@
                                 </a>
                                 @if($isHeadNurse)
                                 <button @click="assignNurse({{ $admission->patient->id }}, '{{ $admission->patient->getFullNameAttribute() }}')"
-                                    class="btn btn-outline btn-sm gap-2 text-xs">
+                                    class="btn-enterprise-primary gap-2 text-xs">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                                     Assign Nurse
                                 </button>
@@ -174,7 +174,7 @@
 
     @if($isHeadNurse)
     <!-- PATIENT LOAD MANAGER -->
-    <div x-data="patientLoadManager()" @keydown.escape="closeAllModals">
+    <div @keydown.escape="closeAllModals">
 
         <!-- VIEW NURSES MODAL -->
         <div x-show="viewNursesOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style="display: none;">
@@ -236,17 +236,17 @@
                     </button>
                 </div>
 
-                <form @submit.prevent="submitPatientLoad">
+                <form @submit.prevent="submitPatientLoad" class="space-y-4">
                     <!-- Patient Names (display only) -->
-                    <div class="form-control mb-4">
-                        <label class="label"><span class="label-text font-semibold">Patient</span></label>
-                        <input type="text" :value="selectedPatientName" disabled class="input input-bordered bg-slate-100" />
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Patient</label>
+                        <input type="text" :value="selectedPatientName" disabled class="input-enterprise w-full bg-slate-100" />
                     </div>
 
                     <!-- Nurse Dropdown (only show when creating) -->
-                    <div class="form-control mb-4" x-show="!editingId">
-                        <label class="label"><span class="label-text font-semibold">Nurse <span class="text-error">*</span></span></label>
-                        <select x-model="formData.nurse_id" class="select select-bordered" required>
+                    <div x-show="!editingId">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nurse <span class="text-red-600">*</span></label>
+                        <select x-model="formData.nurse_id" class="input-enterprise w-full" required>
                             <option value="">Select a nurse...</option>
                             <template x-for="n in availableNurses" :key="n.id">
                                 <option :value="n.id" x-text="n.first_name + ' ' + n.last_name + ' (' + n.employee_id + ')'"></option>
@@ -255,15 +255,15 @@
                     </div>
 
                     <!-- Nurse Display (only show when editing) -->
-                    <div class="form-control mb-4" x-show="editingId">
-                        <label class="label"><span class="label-text font-semibold">Nurse</span></label>
-                        <input type="text" :value="editingNurseName" disabled class="input input-bordered bg-slate-100" />
+                    <div x-show="editingId">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nurse</label>
+                        <input type="text" :value="editingNurseName" disabled class="input-enterprise w-full bg-slate-100" />
                     </div>
 
                     <!-- Acuity Level -->
-                    <div class="form-control mb-4">
-                        <label class="label"><span class="label-text font-semibold">Acuity Level <span class="text-error">*</span></span></label>
-                        <select x-model="formData.acuity" class="select select-bordered" required>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Acuity Level <span class="text-red-600">*</span></label>
+                        <select x-model="formData.acuity" class="input-enterprise w-full" required>
                             <option value="">Select acuity...</option>
                             <option value="Severe">Severe (Score: 4)</option>
                             <option value="High">High (Score: 3)</option>
@@ -273,19 +273,19 @@
                     </div>
 
                     <!-- Description -->
-                    <div class="form-control mb-4">
-                        <label class="label"><span class="label-text font-semibold">Description (Additional Notes)</span></label>
-                        <textarea x-model="formData.description" class="textarea textarea-bordered"
-                            placeholder="Any additional notes or instructions..."></textarea>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Description (Additional Notes)</label>
+                        <textarea x-model="formData.description" class="input-enterprise w-full resize-none" rows="8"
+                            placeholder="Any additional notes or procedural steps..."></textarea>
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex gap-2 pt-4">
-                        <button type="submit" class="btn btn-primary flex-1" :disabled="submitting">
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" class="btn-enterprise-primary flex-1" :disabled="submitting">
                             <span x-show="!submitting">Save Assignment</span>
                             <span x-show="submitting"><span class="loading loading-spinner loading-sm"></span>Saving...</span>
                         </button>
-                        <button type="button" @click="closeAllModals" class="btn btn-ghost flex-1">Cancel</button>
+                        <button type="button" @click="closeAllModals" class="btn btn-outline flex-1">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -326,12 +326,13 @@ function patientLoadManager() {
             this.resetForm();
         },
 
-        viewNurses(patientId) {
+        viewNurses(patientId, patientName) {
             this.selectedPatientId = patientId;
+            this.selectedPatientName = patientName;
             this.nursesLoading = true;
             this.viewNursesOpen = true;
 
-            fetch(`{{ route('nurse.headnurse.patient-loads.getNurses', '') }}/${patientId}`)
+            fetch(`{{ route('nurse.headnurse.patient-loads.getNurses', 0) }}`.replace('/0', `/${patientId}`))
                 .then(response => response.json())
                 .then(data => {
                     this.assignedNurses = data.nurses;
@@ -366,7 +367,7 @@ function patientLoadManager() {
         removeNurseAssignment(assignmentId) {
             if (!confirm('Are you sure you want to remove this assignment?')) return;
 
-            fetch(`{{ route('nurse.headnurse.patient-loads.destroy', '') }}/${assignmentId}`, {
+            fetch(`{{ route('nurse.headnurse.patient-loads.destroy', 0) }}`.replace('/0', `/${assignmentId}`), {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -376,7 +377,7 @@ function patientLoadManager() {
             .then(response => response.json())
             .then(data => {
                 this.showToast(data.message, 'success');
-                this.viewNurses(this.selectedPatientId);
+                this.viewNurses(this.selectedPatientId, this.selectedPatientName);
             })
             .catch(error => {
                 console.error('Error removing assignment:', error);
@@ -390,7 +391,7 @@ function patientLoadManager() {
             const isEdit = this.editingId !== null;
             const method = isEdit ? 'PUT' : 'POST';
             const url = isEdit
-                ? `{{ route('nurse.headnurse.patient-loads.update', '') }}/${this.editingId}`
+                ? `{{ route('nurse.headnurse.patient-loads.update', 0) }}`.replace('/0', `/${this.editingId}`)
                 : `{{ route('nurse.headnurse.patient-loads.store') }}`;
 
             const payload = {
@@ -413,7 +414,7 @@ function patientLoadManager() {
                 this.submitting = false;
                 this.showToast(data.message, 'success');
                 this.closeAllModals();
-                // Refresh the page or reload the nurses list
+                // Refresh the page to see updates
                 location.reload();
             })
             .catch(error => {
@@ -445,17 +446,35 @@ function patientLoadManager() {
         },
 
         showToast(message, type = 'success') {
-            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-            const icon = type === 'success'
-                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>'
-                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
+            const toastClass = type === 'success' ? 'toast-enterprise-success' : 'toast-enterprise-error';
+            const titleText = type === 'success' ? 'Success!' : 'Error!';
+            const iconColor = type === 'success' ? 'text-emerald-600' : 'text-red-600';
+            const successIcon = type === 'success'
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 ' + iconColor + '" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 ' + iconColor + '" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m8-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+            const closeIcon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+            const closeColor = type === 'success' ? 'text-emerald-500 hover:text-emerald-700' : 'text-red-500 hover:text-red-700';
 
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type === 'success' ? 'success' : 'error'} flex items-center gap-3 fixed bottom-4 right-4 max-w-sm z-50`;
-            toast.innerHTML = `${icon}<span>${message}</span>`;
-            document.body.appendChild(toast);
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'toast toast-top toast-end z-50';
 
-            setTimeout(() => toast.remove(), 3000);
+            const toastContent = document.createElement('div');
+            toastContent.className = `${toastClass} flex items-center gap-3 px-4 py-3`;
+            toastContent.innerHTML = `
+                ${successIcon}
+                <div class="text-sm">
+                    <span class="font-semibold">${titleText}</span> ${message}
+                </div>
+                <button class="ml-2 ${closeColor}">${closeIcon}</button>
+            `;
+
+            toastContainer.appendChild(toastContent);
+            document.body.appendChild(toastContainer);
+
+            const closeBtn = toastContent.querySelector('button');
+            closeBtn.addEventListener('click', () => toastContainer.remove());
+
+            setTimeout(() => toastContainer.remove(), 3000);
         }
     };
 }

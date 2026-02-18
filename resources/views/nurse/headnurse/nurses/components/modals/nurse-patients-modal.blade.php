@@ -1,5 +1,5 @@
 <div x-show="viewNursePatientsOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style="display: none;">
-    <div @click.away="viewNursePatientsOpen = false" class="bg-white rounded-lg shadow-lg w-96 max-h-96 overflow-y-auto p-6">
+    <div @click.away="viewNursePatientsOpen = false" class="bg-white rounded-lg shadow-lg w-full md:w-2xl max-h-screen md:max-h-[500px] overflow-y-auto p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800">Assigned Patients</h3>
             <button @click="viewNursePatientsOpen = false" class="text-slate-400 hover:text-slate-600">
@@ -23,14 +23,16 @@
             <div x-show="assignedPatients.length > 0">
                 <div class="space-y-3">
                     <template x-for="patient in assignedPatients" :key="patient.id">
-                        <div class="p-3 bg-slate-50 rounded-lg border-l-4" :style="'border-left-color: ' + getAcuityColor(patient.acuity)">
-                            <p class="font-semibold text-slate-800" x-text="patient.patient_name"></p>
-                            <p class="text-xs text-slate-500" x-text="'ID: ' + patient.patient_id_code"></p>
-                            <div class="mt-2 flex gap-2">
-                                <span class="badge badge-sm" :style="'background-color: ' + getAcuityColor(patient.acuity)" x-text="patient.acuity"></span>
-                                <span class="badge badge-sm badge-ghost" x-text="'Score: ' + patient.score"></span>
+                        <div class="flex justify-between items-start p-3 bg-slate-50 rounded-lg border-l-4" :style="'border-left-color: ' + getAcuityColor(patient.acuity)">
+                            <div class="flex-1">
+                                <p class="font-semibold text-slate-800" x-text="patient.patient_name"></p>
+                                <p class="text-xs text-slate-500" x-text="'ID: ' + patient.patient_id_code"></p>
+                                <div class="mt-2 flex gap-3 items-center">
+                                    <span class="text-sm font-semibold" :style="'color: ' + getAcuityColor(patient.acuity)" x-text="patient.acuity"></span>
+                                    <span class="text-sm text-slate-600" x-text="'Score: ' + patient.score"></span>
+                                </div>
+                                <p x-show="patient.description" class="text-xs text-slate-600 mt-2 italic" x-text="patient.description"></p>
                             </div>
-                            <p x-show="patient.description" class="text-xs text-slate-600 mt-2 italic" x-text="patient.description"></p>
                         </div>
                     </template>
                 </div>
