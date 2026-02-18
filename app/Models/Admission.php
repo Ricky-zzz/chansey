@@ -27,6 +27,8 @@ class Admission extends Model
         'mode_of_arrival',
         'initial_vitals',
         'known_allergies',
+        'past_medical_history',
+        'medication_history',
     ];
 
     protected $casts = [
@@ -34,6 +36,9 @@ class Admission extends Model
         'discharge_date' => 'datetime',
         'known_allergies' => 'array',
         'initial_vitals' => 'array',
+        'past_medical_history' => 'array',
+        'medication_history' => 'array',
+
     ];
 
     protected $appends = ['formatted_admission_date', 'formatted_discharge_date', 'formatted_created_at', 'formatted_updated_at'];
@@ -73,6 +78,11 @@ class Admission extends Model
     public function files(): HasMany
     {
         return $this->hasMany(PatientFile::class);
+    }
+
+    public function endorsments(): HasMany
+    {
+        return $this->hasMany(Endorsment::class);
     }
 
     public function treatmentPlan(): HasOne

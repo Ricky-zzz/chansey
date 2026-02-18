@@ -5,6 +5,7 @@ namespace App\Http\Controllers\HeadNurse;
 use App\Http\Controllers\Controller;
 use App\Models\Nurse;
 use App\Models\DateSchedule;
+use App\Models\Admission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -36,7 +37,19 @@ class NurseController extends Controller
         // Get nurse types for the assignment field
         $nurseTypes = \App\Models\NurseType::orderBy('name')->get();
 
-        return view('nurse.headnurse.nurses.index', compact('nurses', 'title', 'availableNurses', 'nurseTypes'));
+        // Get current admitted patients in the station for assign-patient modal
+        $stationPatients = Admission::with('patient')
+            ->whereIn('status', ['Admitted', 'Ready for Discharge'])
+            ->where('station_id', $me->station_id)
+            ->orderByRaw('(SELECT last_name FROM patients WHERE patients.id = admissions.patient_id)')
+            ->get()
+            ->map(fn($a) => [
+                'id' => $a->patient->id,
+                'name' => $a->patient->last_name . ', ' . $a->patient->first_name,
+                'patient_unique_id' => $a->patient->patient_unique_id,
+            ]);
+
+        return view('nurse.headnurse.nurses.index', compact('nurses', 'title', 'availableNurses', 'nurseTypes', 'stationPatients'));
     }
 
     /**

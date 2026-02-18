@@ -8,6 +8,7 @@ use App\Http\Controllers\HeadNurse\MemoController;
 use App\Http\Controllers\HeadNurse\StationTaskController;
 use App\Http\Controllers\HeadNurse\FloaterController;
 use App\Http\Controllers\HeadNurse\PatientLoadController;
+use App\Http\Controllers\HeadNurse\EndorsmentController;
 use Illuminate\Support\Facades\Route;
 
 // HEAD NURSE ROUTES
@@ -60,4 +61,8 @@ Route::middleware(['auth', 'headnurse'])->prefix('nurse/headnurse')->name('nurse
     Route::get('/floaters', [FloaterController::class, 'index'])->name('floaters.index');
     Route::post('/floaters/{nurse}/recruit', [FloaterController::class, 'recruit'])->name('floaters.recruit');
     Route::post('/floaters/{nurse}/release', [FloaterController::class, 'release'])->name('floaters.release');
+
+    // Station Endorsements
+    Route::get('/endorsments', [EndorsmentController::class, 'index'])->name('endorsments.index');
 });
+

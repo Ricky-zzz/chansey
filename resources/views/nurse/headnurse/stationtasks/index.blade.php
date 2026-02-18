@@ -148,7 +148,7 @@
 
     {{-- CREATE/EDIT MODAL --}}
     <dialog id="task_modal" class="modal" x-ref="taskModal">
-        <div class="modal-enterprise">
+        <div class="modal-enterprise" style="transform: translateY(-10vh);">
             <form method="dialog">
                 <button class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">✕</button>
             </form>

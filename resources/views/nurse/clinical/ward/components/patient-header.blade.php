@@ -58,6 +58,13 @@
                     </svg>
                     Care Plan
                 </a>
+                <!-- CREATE ENDORSEMENT -->
+                <a href="{{ route('nurse.clinical.endorsments.create', $admission->id) }}" class="btn-enterprise-primary gap-2 text-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l6-6m0 0l6 6m-6-6v12a6 6 0 01-12 0v-3.5m12 3.5v3.5a6 6 0 01-12 0v-3.5m0-9.5h.008v.008H3V9zm16.5 0h.008v.008h-.008V9z" />
+                    </svg>
+                    Create Endorsement
+                </a>
             </div>
         </div>
     </div>

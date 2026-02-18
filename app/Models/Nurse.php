@@ -78,6 +78,11 @@ class Nurse extends Model
         return $this->hasMany(PatientLoad::class);
     }
 
+    public function incomingEndorsements()
+    {
+        return $this->hasMany(Endorsment::class, 'incoming_nurse_id');
+    }
+
     /**
      * Get the unit ID - from nurse.unit_id or from station.unit_id (for Head Nurses)
      */

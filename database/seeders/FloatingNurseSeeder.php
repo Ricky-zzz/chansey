@@ -63,7 +63,6 @@ class FloatingNurseSeeder extends Seeder
                 'nurse_type_id' => $floatingNurseType->id,
                 'date_hired' => now()->subMonths(rand(1, 24)),
                 'station_id' => null, // Floating nurses start unassigned
-                'shift_schedule_id' => null,
             ]);
         }
 

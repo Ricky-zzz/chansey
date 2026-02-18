@@ -5,7 +5,16 @@
 <div class="max-w-5xl mx-auto"
     x-data="{
         allergies: {{ Js::from($admission->known_allergies ?? []) }},
+        medications: {{ Js::from($admission->medication_history ?? []) }},
+        medicalHistory: {{ Js::from($admission->past_medical_history ?? []) }},
         currentInput: '',
+        currentMedInput: '',
+        currentForm: {
+            type: '',
+            description: '',
+            date: ''
+        },
+
         addAllergy() {
             if (this.currentInput.trim() !== '' && !this.allergies.includes(this.currentInput.trim())) {
                 this.allergies.push(this.currentInput.trim());
@@ -14,6 +23,39 @@
         },
         removeAllergy(index) {
             this.allergies.splice(index, 1);
+        },
+
+        addMedication() {
+            if (this.currentMedInput.trim() !== '' && !this.medications.includes(this.currentMedInput.trim())) {
+                this.medications.push(this.currentMedInput.trim());
+                this.currentMedInput = '';
+            }
+        },
+        removeMedication(index) {
+            this.medications.splice(index, 1);
+        },
+
+        addMedicalRecord() {
+            if (this.currentForm.type.trim() && this.currentForm.description.trim()) {
+                this.medicalHistory.push({
+                    type: this.currentForm.type,
+                    description: this.currentForm.description,
+                    date: this.currentForm.date || 'Unknown'
+                });
+                this.resetForm();
+            }
+        },
+
+        removeMedicalRecord(index) {
+            this.medicalHistory.splice(index, 1);
+        },
+
+        resetForm() {
+            this.currentForm = {
+                type: '',
+                description: '',
+                date: ''
+            };
         }
      }">
 
@@ -180,6 +222,104 @@
                                     <input type="hidden" name="known_allergies[]" :value="allergy">
                                 </div>
                             </template>
+                        </div>
+                    </div>
+
+                    <!-- Medication History -->
+                    <div class="form-control mt-6 pt-6 border-t border-slate-200">
+                        <label class="label"><span class="label-text font-bold">Medication History</span></label>
+                        <div class="flex w-full mb-2">
+                            <input type="text" x-model="currentMedInput" @keydown.enter.prevent="addMedication()" class="input-enterprise rounded-r-none w-full" placeholder="Add medication..." />
+                            <button type="button" @click="addMedication()" class="btn-enterprise-primary rounded-l-none">Add</button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 min-h-12 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div x-show="medications.length === 0" class="text-gray-400 text-sm italic w-full text-center py-2">
+                                No medications recorded.
+                            </div>
+                            <template x-for="(medication, index) in medications" :key="index">
+                                <div class="badge-enterprise bg-blue-50 text-blue-700 border border-blue-100 gap-2 px-3 py-2 font-bold">
+                                    <span x-text="medication"></span>
+                                    <button type="button" @click="removeMedication(index)" class="hover:text-black transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 stroke-current">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <input type="hidden" name="medication_history[]" :value="medication">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Past Medical History -->
+                    <div class="form-control mt-6 pt-6 border-t border-slate-200">
+                        <label class="label"><span class="label-text font-bold">Past Medical History</span></label>
+
+                        <div class="mb-6">
+                            <label class="label">
+                                <span class="label-text font-semibold text-sm">Condition Type</span>
+                            </label>
+                            <select x-model="currentForm.type" class="select-enterprise w-full mb-4">
+                                <option value="" disabled selected>Select condition type</option>
+                                <option value="Existing Illness">Existing Illness</option>
+                                <option value="Past Hospitalization">Past Hospitalization</option>
+                                <option value="Past Surgery">Past Surgery</option>
+                                <option value="Hereditary Condition">Hereditary Condition</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                            <label class="label">
+                                <span class="label-text font-semibold text-sm">Description / Details</span>
+                            </label>
+                            <textarea x-model="currentForm.description" class="textarea-enterprise w-full mb-4"
+                                placeholder="Describe the condition, surgery, hospitalization, or hereditary disease..."></textarea>
+
+                            <label class="label">
+                                <span class="label-text font-semibold text-sm">Date (Optional)</span>
+                            </label>
+                            <input type="date" x-model="currentForm.date" class="input-enterprise w-full mb-4" />
+
+                            <button type="button" @click="addMedicalRecord()" class="btn-enterprise-primary w-full">
+                                Add Medical Record
+                            </button>
+                        </div>
+
+                        <!-- Table of Medical History Records -->
+                        <div x-show="medicalHistory.length > 0" class="overflow-x-auto">
+                            <table class="table table-sm table-zebra w-full bg-white border border-slate-200 rounded-lg">
+                                <thead class="bg-slate-100 border-b border-slate-200">
+                                    <tr>
+                                        <th class="text-left text-xs font-bold text-slate-700">Type</th>
+                                        <th class="text-left text-xs font-bold text-slate-700">Description</th>
+                                        <th class="text-left text-xs font-bold text-slate-700">Date</th>
+                                        <th class="text-center text-xs font-bold text-slate-700">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(record, index) in medicalHistory" :key="index">
+                                        <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                            <td class="text-sm font-semibold text-slate-700" x-text="record.type"></td>
+                                            <td class="text-sm text-slate-600" x-text="record.description"></td>
+                                            <td class="text-sm text-slate-600" x-text="record.date"></td>
+                                            <td class="text-center">
+                                                <button type="button" @click="removeMedicalRecord(index)"
+                                                    class="btn btn-xs btn-error btn-outline">
+                                                    Remove
+                                                </button>
+                                            </td>
+
+                                            <!-- HIDDEN INPUTS: This sends the data to Laravel -->
+                                            <input type="hidden" name="past_medical_history_type[]" :value="record.type">
+                                            <input type="hidden" name="past_medical_history_description[]" :value="record.description">
+                                            <input type="hidden" name="past_medical_history_date[]" :value="record.date">
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div x-show="medicalHistory.length === 0" class="text-center p-6 bg-slate-50 rounded-lg border border-slate-200">
+                            <p class="text-gray-400 text-sm italic">No medical history records added yet.</p>
                         </div>
                     </div>
                 </div>

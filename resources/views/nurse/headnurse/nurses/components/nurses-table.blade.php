@@ -47,8 +47,8 @@
                     {{-- PATIENT RATIO --}}
                     <td>
                         <button @click="viewNursePatients({{ $nurse->id }}, '{{ $nurse->first_name }} {{ $nurse->last_name }}')"
-                            class="btn btn-sm btn-ghost font-mono">
-                            <span id="ratio-{{ $nurse->id }}" class="font-bold">-</span>
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono font-bold hover:bg-emerald-100 transition-colors">
+                            <span id="ratio-{{ $nurse->id }}">—</span>
                         </button>
                     </td>
 
@@ -63,6 +63,12 @@
                                 class="btn-enterprise-secondary text-xs px-3 py-1.5 inline-flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                 DTR
+                            </button>
+                            <button
+                                @click="openAssignPatientModal({ id: {{ $nurse->id }}, name: '{{ $nurse->first_name }} {{ $nurse->last_name }}' })"
+                                class="btn-enterprise-info text-xs px-3 py-1.5 inline-flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                Assign Patient
                             </button>
                             <button
                                 @click="openViewSchedulesModal({

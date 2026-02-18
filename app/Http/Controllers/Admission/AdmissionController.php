@@ -101,6 +101,18 @@ class AdmissionController extends Controller
             $admissionNumberGenerator = app(AdmissionNumberGenerator::class);
             $admNumber = $admissionNumberGenerator->generate();
 
+            // Process past medical history
+            $pastMedicalHistory = [];
+            if (isset($data['past_medical_history_type']) && is_array($data['past_medical_history_type'])) {
+                foreach ($data['past_medical_history_type'] as $index => $type) {
+                    $pastMedicalHistory[] = [
+                        'type' => $type,
+                        'description' => $data['past_medical_history_description'][$index] ?? '',
+                        'date' => $data['past_medical_history_date'][$index] ?? null,
+                    ];
+                }
+            }
+
             $admission = Admission::create([
                 'patient_id' => $patient_id,
                 'admission_number' => $admNumber,
@@ -131,6 +143,8 @@ class AdmissionController extends Controller
                 ],
 
                 'known_allergies' => $data['known_allergies'] ?? [],
+                'medication_history' => $data['medication_history'] ?? [],
+                'past_medical_history' => $pastMedicalHistory,
             ]);
 
             if ($admission->bed_id) {
@@ -185,6 +199,18 @@ class AdmissionController extends Controller
         try {
             DB::beginTransaction();
 
+            // Process past medical history
+            $pastMedicalHistory = [];
+            if (isset($data['past_medical_history_type']) && is_array($data['past_medical_history_type'])) {
+                foreach ($data['past_medical_history_type'] as $index => $type) {
+                    $pastMedicalHistory[] = [
+                        'type' => $type,
+                        'description' => $data['past_medical_history_description'][$index] ?? '',
+                        'date' => $data['past_medical_history_date'][$index] ?? null,
+                    ];
+                }
+            }
+
             $admission->update([
                 'admission_type' => $data['admission_type'],
                 'attending_physician_id' => $data['attending_physician_id'],
@@ -203,6 +229,8 @@ class AdmissionController extends Controller
                     'weight' => $data['weight'] ?? null,
                 ],
                 'known_allergies' => $data['known_allergies'] ?? [],
+                'medication_history' => $data['medication_history'] ?? [],
+                'past_medical_history' => $pastMedicalHistory,
             ]);
 
 

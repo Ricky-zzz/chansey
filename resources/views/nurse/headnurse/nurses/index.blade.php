@@ -50,6 +50,7 @@
     @include('nurse.headnurse.nurses.components.modals.view-schedule-modal')
     @include('nurse.headnurse.nurses.components.modals.date-schedule-modal', ['availableNurses' => $availableNurses, 'nurseTypes' => $nurseTypes])
     @include('nurse.headnurse.nurses.components.modals.nurse-patients-modal')
+    @include('nurse.headnurse.nurses.components.modals.assign-patient-modal')
     @include('nurse.headnurse.nurses.components.modals.single-dtr-modal')
     @include('nurse.headnurse.nurses.components.modals.batch-dtr-modal')
 
@@ -59,6 +60,7 @@
 <script>
     window.availableNursesData = @json($availableNurses);
     window.nurseTypesData = @json($nurseTypes);
+    window.stationPatientsData = @json($stationPatients);
 
     function nurseScheduleManager() {
         return {
@@ -97,6 +99,20 @@
             nursePatientsLoading: false,
             assignedPatients: [],
             nursePatientsRatio: '0:0',
+            selectedNurseForPatients: null,
+
+            // Assign Patient Modal State
+            assignPatientOpen: false,
+            editingPatientLoadId: null,
+            editingPatientName: '',
+            submittingPatientLoad: false,
+            stationPatients: window.stationPatientsData || [],
+            patientLoadForm: {
+                patient_id: '',
+                nurse_id: '',
+                acuity: '',
+                description: '',
+            },
 
             // Initialize and load all nurse ratios
             init() {
@@ -325,29 +341,22 @@
             },
 
             viewNursePatients(nurseId, nurseName) {
+                this.selectedNurseForPatients = { id: nurseId, name: nurseName };
                 this.nursePatientsLoading = true;
                 this.viewNursePatientsOpen = true;
 
                 const url = `{{ route('nurse.headnurse.patient-loads.getPatients', 0) }}`.replace('/0', `/${nurseId}`);
-                console.log('Fetching patient loads from:', url);
 
                 fetch(url)
                     .then(response => {
-                        console.log('Response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}`);
-                        }
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Patient loads data:', data);
                         this.assignedPatients = data.patients || [];
                         this.nursePatientsRatio = data.ratio || '0:0';
-                        // Update the ratio display on the table
                         const ratioElement = document.getElementById(`ratio-${nurseId}`);
-                        if (ratioElement) {
-                            ratioElement.textContent = this.nursePatientsRatio;
-                        }
+                        if (ratioElement) ratioElement.textContent = this.nursePatientsRatio;
                         this.nursePatientsLoading = false;
                     })
                     .catch(error => {
@@ -355,6 +364,102 @@
                         this.nursePatientsLoading = false;
                         this.showToast('Error loading patient assignments', 'error');
                     });
+            },
+
+            openAssignPatientModal(nurse) {
+                this.selectedNurseForPatients = nurse;
+                this.editingPatientLoadId = null;
+                this.editingPatientName = '';
+                this.patientLoadForm = { patient_id: '', nurse_id: nurse?.id ?? '', acuity: '', description: '' };
+                this.viewNursePatientsOpen = false;
+                this.assignPatientOpen = true;
+            },
+
+            editPatientAssignment(patient) {
+                this.editingPatientLoadId = patient.id;
+                this.editingPatientName = patient.patient_name;
+                this.patientLoadForm = {
+                    patient_id: patient.patient_id,
+                    nurse_id: this.selectedNurseForPatients?.id ?? '',
+                    acuity: patient.acuity,
+                    description: patient.description || '',
+                };
+                this.viewNursePatientsOpen = false;
+                this.assignPatientOpen = true;
+            },
+
+            closeAssignPatientModal() {
+                this.assignPatientOpen = false;
+                this.editingPatientLoadId = null;
+                this.editingPatientName = '';
+                this.patientLoadForm = { patient_id: '', nurse_id: '', acuity: '', description: '' };
+            },
+
+            removePatientAssignment(assignmentId) {
+                if (!confirm('Are you sure you want to remove this assignment?')) return;
+
+                fetch(`{{ route('nurse.headnurse.patient-loads.destroy', 0) }}`.replace('/0', `/${assignmentId}`), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.showToast(data.message, 'success');
+                    if (this.selectedNurseForPatients) {
+                        this.viewNursePatients(this.selectedNurseForPatients.id, this.selectedNurseForPatients.name);
+                    }
+                })
+                .catch(() => this.showToast('Error removing assignment', 'error'));
+            },
+
+            submitPatientLoadFromNurse() {
+                this.submittingPatientLoad = true;
+
+                const isEdit = this.editingPatientLoadId !== null;
+                const method = isEdit ? 'PUT' : 'POST';
+                const url = isEdit
+                    ? `{{ route('nurse.headnurse.patient-loads.update', 0) }}`.replace('/0', `/${this.editingPatientLoadId}`)
+                    : `{{ route('nurse.headnurse.patient-loads.store') }}`;
+
+                const payload = {
+                    nurse_id: this.selectedNurseForPatients?.id,
+                    patient_id: this.patientLoadForm.patient_id,
+                    acuity: this.patientLoadForm.acuity,
+                    description: this.patientLoadForm.description,
+                };
+
+                if (isEdit) {
+                    delete payload.patient_id;
+                    delete payload.nurse_id;
+                }
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.submittingPatientLoad = false;
+                    this.showToast(data.message, 'success');
+                    this.closeAssignPatientModal();
+                    // Reload the patient list for this nurse
+                    if (this.selectedNurseForPatients) {
+                        this.viewNursePatients(this.selectedNurseForPatients.id, this.selectedNurseForPatients.name);
+                        // Update ratio in table
+                        this.loadNurseRatio(this.selectedNurseForPatients.id);
+                    }
+                })
+                .catch(() => {
+                    this.submittingPatientLoad = false;
+                    this.showToast('Error saving assignment', 'error');
+                });
             },
 
             getAcuityColor(acuity) {

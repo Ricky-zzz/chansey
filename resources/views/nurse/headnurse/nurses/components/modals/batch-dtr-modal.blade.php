@@ -1,6 +1,6 @@
 {{-- Batch DTR Report Modal --}}
 <dialog id="dtr_batch_modal" class="modal" x-ref="batchDtrModal">
-    <div class="modal-enterprise">
+    <div class="modal-enterprise" style="transform: translateY(-18vh);">
         <form method="dialog">
             <button class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">✕</button>
         </form>

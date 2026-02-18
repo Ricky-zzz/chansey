@@ -6,6 +6,8 @@ use App\Http\Controllers\Clinical\CarePlanController;
 use App\Http\Controllers\Clinical\ClinicalLogController;
 use \App\Http\Controllers\Clinical\OrderExecutionController;
 use App\Http\Controllers\Clinical\MyTaskController;
+use App\Http\Controllers\Clinical\PatientLoadController;
+use App\Http\Controllers\Clinical\EndorsmentController;
 use Illuminate\Support\Facades\Route;
 
 //  Clinical NURSES
@@ -17,6 +19,10 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // WARD LIST
     Route::get('/my-ward', [WardController::class, 'index'])
         ->name('ward.index');
+
+    // PATIENT LOAD (My Assigned Patients)
+    Route::get('/my-patient-load', [PatientLoadController::class, 'index'])->name('patient-load.index');
+    Route::get('/patient-loads/{patientLoad}/details', [PatientLoadController::class, 'getAssignmentDetails'])->name('patient-load.details');
 
     // PATIENT CHART
     Route::get('/patient/{id}', [WardController::class, 'show'])
@@ -40,6 +46,14 @@ Route::middleware(['auth'])->prefix('nurse/clinical')->name('nurse.clinical.')->
     // Charge Supply Item
     Route::post('/supplies/charge', [\App\Http\Controllers\Clinical\SupplyController::class, 'store'])
     ->name('supplies.store');
+
+    // ENDORSEMENTS
+    Route::get('/endorsments', [EndorsmentController::class, 'index'])->name('endorsments.index');
+    Route::get('/endorsments/create/{admission}', [EndorsmentController::class, 'create'])->name('endorsments.create');
+    Route::post('/endorsments', [EndorsmentController::class, 'store'])->name('endorsments.store');
+    Route::get('/endorsments/{endorsment}', [EndorsmentController::class, 'show'])->name('endorsments.show');
+    Route::post('/endorsments/{endorsment}/submit', [EndorsmentController::class, 'submit'])->name('endorsments.submit');
+    Route::post('/endorsments/{endorsment}/notes', [EndorsmentController::class, 'storeNote'])->name('endorsments.notes.store');
 });
 
 // MY TASKS (for all nurses)

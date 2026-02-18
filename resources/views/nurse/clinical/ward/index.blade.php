@@ -105,29 +105,17 @@
                         @if($isHeadNurse)
                         <!-- 5. ASSIGNED NURSES -->
                         <td>
-                            @forelse($admission->patient->patientLoads as $load)
-                                <div class="flex items-center gap-2 mb-2 text-xs">
-                                    <span class="font-medium text-slate-700">
-                                        {{ $load->nurse->first_name }} {{ $load->nurse->last_name }}
-                                    </span>
-                                    <span class="badge badge-sm" style="background-color:
-                                        @if($load->acuity->value === 'Severe') #dc2626
-                                        @elseif($load->acuity->value === 'High') #f59e0b
-                                        @elseif($load->acuity->value === 'Moderate') #0ea5e9
-                                        @else #10b981
-                                        @endif;
-                                        color: white;">
-                                        {{ $load->acuity->value }}
-                                    </span>
-                                    <span class="text-slate-500">{{ $load->score }}</span>
-                                </div>
-                            @empty
-                                <span class="italic text-slate-400 text-xs">No nurses assigned</span>
-                            @endforelse
-                            @if($admission->patient->patientLoads->count() > 0 || true)
+                            @php $nurseCount = $admission->patient->patientLoads->count(); @endphp
+                            @if($nurseCount > 0)
                                 <button @click="viewNurses({{ $admission->patient->id }}, '{{ $admission->patient->getFullNameAttribute() }}')"
-                                    class="btn btn-xs btn-ghost mt-1">
-                                    View Details
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" /></svg>
+                                    {{ $nurseCount }} {{ Str::plural('Nurse', $nurseCount) }}
+                                </button>
+                            @else
+                                <button @click="viewNurses({{ $admission->patient->id }}, '{{ $admission->patient->getFullNameAttribute() }}')"
+                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 text-xs italic hover:bg-slate-100 hover:text-slate-500 transition-colors">
+                                    No nurses assigned
                                 </button>
                             @endif
                         </td>
@@ -135,20 +123,11 @@
 
                         <!-- {{ $isHeadNurse ? '6' : '5' }}. ACTION -->
                         <td class="text-right">
-                            <div class="flex flex-col gap-2 items-end">
-                                <a href="{{ route('nurse.clinical.ward.show', $admission->id) }}"
-                                   class="btn-enterprise-primary gap-2 text-xs">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                    Open Chart
-                                </a>
-                                @if($isHeadNurse)
-                                <button @click="assignNurse({{ $admission->patient->id }}, '{{ $admission->patient->getFullNameAttribute() }}')"
-                                    class="btn-enterprise-primary gap-2 text-xs">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                    Assign Nurse
-                                </button>
-                                @endif
-                            </div>
+                            <a href="{{ route('nurse.clinical.ward.show', $admission->id) }}"
+                               class="btn-enterprise-primary gap-2 text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                Open Chart
+                            </a>
                         </td>
                     </tr>
                     @empty
@@ -178,78 +157,102 @@
 
         <!-- VIEW NURSES MODAL -->
         <div x-show="viewNursesOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style="display: none;">
-            <div @click.away="viewNursesOpen = false" class="bg-white rounded-lg shadow-lg w-96 max-h-96 overflow-y-auto p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Assigned Nurses</h3>
-                    <button @click="viewNursesOpen = false" class="text-slate-400 hover:text-slate-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+            <div @click.away="viewNursesOpen = false" class="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[85vh] flex flex-col mx-4">
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 border-b border-slate-200">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Assigned Nurses</h3>
+                        <p class="text-sm text-slate-500 mt-0.5" x-text="selectedPatientName"></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button @click="assignNurse(selectedPatientId, selectedPatientName)" class="btn-enterprise-primary text-xs px-3 py-1.5 inline-flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                            Assign Nurse
+                        </button>
+                        <button @click="viewNursesOpen = false" class="text-slate-400 hover:text-slate-600 p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div x-show="!nursesLoading">
-                    <div x-show="assignedNurses.length === 0" class="text-center py-4">
-                        <p class="text-slate-400 text-sm">No nurses assigned yet</p>
+                <div class="overflow-y-auto flex-1 p-6" x-show="!nursesLoading">
+                    <div x-show="assignedNurses.length === 0" class="text-center py-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" /></svg>
+                        <p class="text-slate-400 text-sm font-medium">No nurses assigned yet</p>
                     </div>
                     <div x-show="assignedNurses.length > 0">
-                        <div class="space-y-3">
-                            <template x-for="nurse in assignedNurses" :key="nurse.id">
-                                <div class="flex justify-between items-start p-3 bg-slate-50 rounded-lg">
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-slate-800" x-text="nurse.nurse_name"></p>
-                                        <p class="text-xs text-slate-500" x-text="'ID: ' + nurse.employee_id"></p>
-                                        <div class="mt-2 flex gap-2">
-                                            <span class="badge badge-sm" :style="'background-color: ' + getAcuityColor(nurse.acuity)" x-text="nurse.acuity"></span>
-                                            <span class="badge badge-sm badge-ghost" x-text="'Score: ' + nurse.score"></span>
-                                        </div>
-                                        <p x-show="nurse.description" class="text-xs text-slate-600 mt-2 italic" x-text="nurse.description"></p>
-                                    </div>
-                                    <div class="flex gap-1 ml-2">
-                                        <button @click="editNurseAssignment(nurse)" class="btn btn-xs btn-ghost">Edit</button>
-                                        <button @click="removeNurseAssignment(nurse.id)" class="btn btn-xs btn-ghost btn-error">Remove</button>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
+                        <table class="table-enterprise w-full">
+                            <thead>
+                                <tr>
+                                    <th>Nurse</th>
+                                    <th>Employee ID</th>
+                                    <th>Acuity</th>
+                                    <th>Score</th>
+                                    <th>Notes</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="nurse in assignedNurses" :key="nurse.id">
+                                    <tr>
+                                        <td class="font-semibold text-slate-800" x-text="nurse.nurse_name"></td>
+                                        <td class="font-mono text-xs text-slate-500" x-text="nurse.employee_id"></td>
+                                        <td>
+                                            <span class="badge-enterprise text-white text-xs px-2 py-0.5" :style="'background-color: ' + getAcuityColor(nurse.acuity)" x-text="nurse.acuity"></span>
+                                        </td>
+                                        <td class="text-sm text-slate-600 font-medium" x-text="nurse.score"></td>
+                                        <td class="text-xs text-slate-500 italic max-w-[150px] truncate" x-text="nurse.description || '—'"></td>
+                                        <td class="text-right">
+                                            <div class="flex gap-1 justify-end">
+                                                <button @click="editNurseAssignment(nurse)" class="btn-enterprise-secondary text-xs px-2 py-1 inline-flex items-center gap-1 h-7 min-h-0">Edit</button>
+                                                <button @click="removeNurseAssignment(nurse.id)" class="btn-enterprise-danger text-xs px-2 py-1 inline-flex items-center gap-1 h-7 min-h-0">Remove</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div x-show="nursesLoading" class="flex justify-center py-4">
-                    <span class="loading loading-spinner loading-sm"></span>
+                <div x-show="nursesLoading" class="flex justify-center py-10">
+                    <span class="loading loading-spinner loading-md text-emerald-600"></span>
                 </div>
             </div>
         </div>
 
         <!-- ASSIGN NURSE MODAL -->
         <div x-show="assignNurseOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style="display: none;">
-            <div @click.away="assignNurseOpen = false" class="bg-white rounded-lg shadow-lg w-96 p-6">
-                <div class="flex justify-between items-center mb-4">
+            <div @click.away="assignNurseOpen = false" class="bg-white rounded-xl shadow-lg w-full max-w-xl mx-4">
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 border-b border-slate-200">
                     <h3 class="text-lg font-bold text-slate-800">
                         <span x-show="!editingId">Assign Nurse to Patient</span>
                         <span x-show="editingId">Update Nurse Assignment</span>
                     </h3>
-                    <button @click="closeAllModals" class="text-slate-400 hover:text-slate-600">
+                    <button @click="closeAllModals" class="text-slate-400 hover:text-slate-600 p-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                <form @submit.prevent="submitPatientLoad" class="space-y-4">
+                <form @submit.prevent="submitPatientLoad" class="p-6 space-y-4">
                     <!-- Patient Names (display only) -->
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Patient</label>
-                        <input type="text" :value="selectedPatientName" disabled class="input-enterprise w-full bg-slate-100" />
+                        <input type="text" :value="selectedPatientName" disabled class="input-enterprise w-full bg-slate-50 text-slate-600" />
                     </div>
 
                     <!-- Nurse Dropdown (only show when creating) -->
                     <div x-show="!editingId">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nurse <span class="text-red-600">*</span></label>
-                        <select x-model="formData.nurse_id" class="input-enterprise w-full" required>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nurse <span class="text-red-500">*</span></label>
+                        <select x-model="formData.nurse_id" class="select-enterprise w-full" required>
                             <option value="">Select a nurse...</option>
                             <template x-for="n in availableNurses" :key="n.id">
-                                <option :value="n.id" x-text="n.first_name + ' ' + n.last_name + ' (' + n.employee_id + ')'"></option>
+                                <option :value="n.id" x-text="n.last_name + ', ' + n.first_name + ' (' + n.employee_id + ')'"></option>
                             </template>
                         </select>
                     </div>
@@ -257,35 +260,35 @@
                     <!-- Nurse Display (only show when editing) -->
                     <div x-show="editingId">
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Nurse</label>
-                        <input type="text" :value="editingNurseName" disabled class="input-enterprise w-full bg-slate-100" />
+                        <input type="text" :value="editingNurseName" disabled class="input-enterprise w-full bg-slate-50 text-slate-600" />
                     </div>
 
                     <!-- Acuity Level -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Acuity Level <span class="text-red-600">*</span></label>
-                        <select x-model="formData.acuity" class="input-enterprise w-full" required>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Acuity Level <span class="text-red-500">*</span></label>
+                        <select x-model="formData.acuity" class="select-enterprise w-full" required>
                             <option value="">Select acuity...</option>
-                            <option value="Severe">Severe (Score: 4)</option>
-                            <option value="High">High (Score: 3)</option>
-                            <option value="Moderate">Moderate (Score: 2)</option>
-                            <option value="Low">Low (Score: 1)</option>
+                            <option value="Severe">Severe — Score: 4</option>
+                            <option value="High">High — Score: 3</option>
+                            <option value="Moderate">Moderate — Score: 2</option>
+                            <option value="Low">Low — Score: 1</option>
                         </select>
                     </div>
 
                     <!-- Description -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Description (Additional Notes)</label>
-                        <textarea x-model="formData.description" class="input-enterprise w-full resize-none" rows="8"
-                            placeholder="Any additional notes or procedural steps..."></textarea>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Additional Notes</label>
+                        <textarea x-model="formData.description" class="textarea-enterprise w-full resize-none" rows="4"
+                            placeholder="Any additional notes or care instructions..."></textarea>
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex gap-2 pt-2">
+                    <div class="flex gap-2 pt-1">
                         <button type="submit" class="btn-enterprise-primary flex-1" :disabled="submitting">
                             <span x-show="!submitting">Save Assignment</span>
-                            <span x-show="submitting"><span class="loading loading-spinner loading-sm"></span>Saving...</span>
+                            <span x-show="submitting" class="flex items-center justify-center gap-2"><span class="loading loading-spinner loading-sm"></span>Saving...</span>
                         </button>
-                        <button type="button" @click="closeAllModals" class="btn btn-outline flex-1">Cancel</button>
+                        <button type="button" @click="closeAllModals" class="btn-enterprise-secondary flex-1">Cancel</button>
                     </div>
                 </form>
             </div>

@@ -292,7 +292,10 @@
                 </div>
             </div>
 
-            <!-- B. CLINICAL LOG HISTORY TABLE -->
+            <!-- B. MEDICAL HISTORY CARD -->
+            <x-medical-history-card :admission="$admission" />
+
+            <!-- C. CLINICAL LOG HISTORY TABLE -->
             <x-clinical-history-table :clinicalLogs="$clinicalLogs" displayMode="physician" />
         </div>
     </div>

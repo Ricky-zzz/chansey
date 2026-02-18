@@ -25,6 +25,9 @@
             <!-- VITALS & CARE PLAN SNAPSHOTS -->
             @include('nurse.clinical.ward.components.vitals-snapshot')
 
+            <!-- MEDICAL HISTORY CARD -->
+            <x-medical-history-card :admission="$admission" />
+
             <!-- CLINICAL LOG HISTORY -->
             <x-clinical-history-table :clinicalLogs="$clinicalLogs" displayMode="nurse" />
         </div>

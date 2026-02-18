@@ -55,7 +55,7 @@ class StoreAdmissionRequest extends FormRequest
             'chief_complaint' => 'required|string',
             'initial_diagnosis' => 'nullable|string',
 
-            // E. Vitals 
+            // E. Vitals
             'bp' => ['nullable', 'string', 'regex:/^\d{2,3}\/\d{2,3}$/'],
             'temp' => 'nullable|numeric',
             'hr' => 'nullable|integer',
@@ -66,6 +66,13 @@ class StoreAdmissionRequest extends FormRequest
             'weight' => 'nullable|numeric',
             'known_allergies' => 'nullable|array',
 
+            // F. Medication History
+            'medication_history' => 'nullable|array',
+
+            // G. Past Medical History
+            'past_medical_history_type' => 'nullable|array',
+            'past_medical_history_description' => 'nullable|array',
+            'past_medical_history_date' => 'nullable|array',
 
             // H. Files
             'doc_valid_id' => 'nullable|file|mimes:jpg,png,pdf|max:5120',

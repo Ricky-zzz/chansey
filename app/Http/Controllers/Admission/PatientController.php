@@ -139,6 +139,18 @@ class PatientController extends Controller
             // --- 3. CREATE ADMISSION ---
             $admNumber = $this->admissionNumberGenerator->generate();
 
+            // Process past medical history
+            $pastMedicalHistory = [];
+            if (isset($data['past_medical_history_type']) && is_array($data['past_medical_history_type'])) {
+                foreach ($data['past_medical_history_type'] as $index => $type) {
+                    $pastMedicalHistory[] = [
+                        'type' => $type,
+                        'description' => $data['past_medical_history_description'][$index] ?? '',
+                        'date' => $data['past_medical_history_date'][$index] ?? null,
+                    ];
+                }
+            }
+
             $admission = Admission::create([
                 'patient_id' => $patient->id,
                 'admission_number' => $admNumber,
@@ -170,6 +182,8 @@ class PatientController extends Controller
 
                 // Arrays are handled automatically if validation passed
                 'known_allergies' => $data['known_allergies'] ?? [],
+                'medication_history' => $data['medication_history'] ?? [],
+                'past_medical_history' => $pastMedicalHistory,
             ]);
 
             if ($admission->bed_id) {

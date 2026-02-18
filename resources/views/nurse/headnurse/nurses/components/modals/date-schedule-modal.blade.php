@@ -1,6 +1,6 @@
 {{-- Assign/Edit Date Schedule Modal --}}
 <dialog id="date_schedule_modal" class="modal" x-ref="dateScheduleModal">
-    <div class="modal-enterprise">
+    <div class="modal-enterprise" style="transform: translateY(-20vh);">
         <form method="dialog">
             <button class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors">✕</button>
         </form>

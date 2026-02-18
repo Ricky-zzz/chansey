@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
 
             // Scope
-            $table->foreignId('station_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('station_id')->constrained()->cascadeOnDelete()->index(); // Which station this task belongs to
 
             // Actors
-            $table->foreignId('created_by_user_id')->constrained('users'); // Head Nurse
-            $table->foreignId('assigned_to_nurse_id')->constrained('nurses'); // Staff Nurse
+            $table->foreignId('created_by_user_id')->constrained('users')->index(); // Head Nurse
+            $table->foreignId('assigned_to_nurse_id')->constrained('nurses')->index(); // Staff Nurse
 
             // Content
             $table->string('title');
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreignId('admission_id')->nullable()->constrained()->nullOnDelete();
 
             // Workflow
-            $table->string('status')->default('Pending'); // Pending -> In Progress -> Done
+            $table->string('status')->default('Pending')->index(); // Pending -> In Progress -> Done
             $table->timestamp('completed_at')->nullable();
 
             $table->timestamps();

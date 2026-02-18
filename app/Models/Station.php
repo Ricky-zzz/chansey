@@ -46,4 +46,9 @@ class Station extends Model
     {
         return $this->hasMany(StationTask::class);
     }
+
+    public function endorsments()
+    {
+        return $this->hasMany(Endorsment::class);
+    }
 }

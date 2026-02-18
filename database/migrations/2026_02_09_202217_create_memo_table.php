@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             // Who sent it? (Link to the user/nurse)
-            $table->foreignId('created_by_user_id')->constrained('users');
+            $table->foreignId('created_by_user_id')->constrained('users')->index();
 
             $table->string('title');
             $table->text('content');

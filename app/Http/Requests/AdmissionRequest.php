@@ -22,7 +22,7 @@ class AdmissionRequest extends FormRequest
             'mode_of_arrival' => 'required|string',
             'chief_complaint' => 'required|string',
             'initial_diagnosis' => 'nullable|string',
-            
+
             // Vitals
             'bp' => ['nullable', 'string', 'regex:/^\d{2,3}\/\d{2,3}$/'],
             'temp' => 'nullable|numeric',
@@ -34,6 +34,13 @@ class AdmissionRequest extends FormRequest
             'weight' => 'nullable|numeric',
             'known_allergies' => 'nullable|array',
 
+            // Medication History
+            'medication_history' => 'nullable|array',
+
+            // Past Medical History
+            'past_medical_history_type' => 'nullable|array',
+            'past_medical_history_description' => 'nullable|array',
+            'past_medical_history_date' => 'nullable|array',
 
             'doc_valid_id' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_loa' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -41,12 +48,12 @@ class AdmissionRequest extends FormRequest
             'doc_privacy' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'doc_mdr' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
 
-            
+
         ];
 
         if ($this->isMethod('post')) {
             $rules['station_id'] = 'required|exists:stations,id';
-            
+
             $rules['bed_id'] = [
                 Rule::requiredIf($this->input('admission_type') !== 'Outpatient'),
                 Rule::exists('beds', 'id')->where('status', 'Available')

@@ -190,6 +190,49 @@
                         <span class="text-sm text-slate-500">No known allergies recorded.</span>
                         @endif
                     </div>
+
+                    <!-- Medication History -->
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-500 uppercase mb-2">Medication History</div>
+                        @if(!empty($admission->medication_history))
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($admission->medication_history as $medication)
+                            <span class="badge-enterprise bg-blue-50 text-blue-700 border border-blue-100">{{ $medication }}</span>
+                            @endforeach
+                        </div>
+                        @else
+                        <span class="text-sm text-slate-500">No medications recorded.</span>
+                        @endif
+                    </div>
+
+                    <!-- Past Medical History -->
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-500 uppercase mb-3">Past Medical History</div>
+                        @if(!empty($admission->past_medical_history) && count($admission->past_medical_history) > 0)
+                        <div class="overflow-x-auto">
+                            <table class="table table-sm table-zebra w-full bg-white border border-slate-200 rounded-lg">
+                                <thead class="bg-slate-100 border-b border-slate-200">
+                                    <tr>
+                                        <th class="text-left text-xs font-bold text-slate-700">Type</th>
+                                        <th class="text-left text-xs font-bold text-slate-700">Description</th>
+                                        <th class="text-left text-xs font-bold text-slate-700">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($admission->past_medical_history as $record)
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                        <td class="text-sm font-semibold text-slate-700">{{ $record['type'] ?? 'N/A' }}</td>
+                                        <td class="text-sm text-slate-600">{{ $record['description'] ?? 'N/A' }}</td>
+                                        <td class="text-sm text-slate-600">{{ $record['date'] ?? 'N/A' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @else
+                        <span class="text-sm text-slate-500">No past medical history recorded.</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
