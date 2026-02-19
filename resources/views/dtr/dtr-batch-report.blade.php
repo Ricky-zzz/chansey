@@ -106,7 +106,6 @@
     @foreach($allReports as $index => $report)
     @php
         $nurse = $report['nurse'];
-        $shiftSchedule = $report['shiftSchedule'];
         $records = $report['records'];
         $summary = $report['summary'];
     @endphp
@@ -143,16 +142,6 @@
                     <span class="info-value">{{ $nurse->station?->station_name ?? 'Admitting' }}</span>
                 </div>
             </div>
-
-            @if($shiftSchedule)
-            <div class="schedule-box">
-                <div class="schedule-label">ASSIGNED SHIFT SCHEDULE</div>
-                <div class="schedule-item"><strong>Shift:</strong> {{ $shiftSchedule->name }}</div>
-                <div class="schedule-item"><strong>Time:</strong> {{ $shiftSchedule->formatted_time_range }}</div>
-                <div class="schedule-item"><strong>Days:</strong> {{ $shiftSchedule->days_short }}</div>
-                <div class="schedule-item"><strong>Expected Hours/Week:</strong> {{ $shiftSchedule->total_hours_per_week }} hrs</div>
-            </div>
-            @endif
         </div>
 
         <!-- SUMMARY -->
@@ -172,11 +161,15 @@
                     <div class="value" style="color: #e65100;">{{ $summary['lateDays'] }}</div>
                 </div>
                 <div class="summary-box">
-                    <div class="label">Incomplete</div>
-                    <div class="value" style="color: #c62828;">{{ $summary['incompleteDays'] }}</div>
+                    <div class="label">Unscheduled</div>
+                    <div class="value" style="color: #1565c0;">{{ $summary['unscheduledDays'] ?? 0 }}</div>
                 </div>
             </div>
             <div class="summary-grid">
+                <div class="summary-box">
+                    <div class="label">Incomplete</div>
+                    <div class="value" style="color: #c62828;">{{ $summary['incompleteDays'] }}</div>
+                </div>
                 <div class="summary-box">
                     <div class="label">Total Hours Worked</div>
                     <div class="value">{{ number_format($summary['totalHours'], 2) }}h</div>
@@ -184,10 +177,6 @@
                 <div class="summary-box">
                     <div class="label">Expected Hours</div>
                     <div class="value">{{ number_format($summary['expectedHours'], 2) }}h</div>
-                </div>
-                <div class="summary-box" style="{{ $summary['overtime'] > 0 ? 'border-color: #6a1b9a;' : '' }}">
-                    <div class="label">Overtime</div>
-                    <div class="value overtime">{{ $summary['overtime'] > 0 ? '+' . number_format($summary['overtime'], 2) . 'h' : '—' }}</div>
                 </div>
                 <div class="summary-box" style="{{ $summary['deficit'] > 0 ? 'border-color: #c62828;' : '' }}">
                     <div class="label">Deficit</div>
@@ -229,6 +218,8 @@
                                 <span class="status-late">Late</span>
                             @elseif($record->status === 'Incomplete')
                                 <span class="status-incomplete">Incomplete</span>
+                            @elseif($record->status === 'Unscheduled')
+                                <span class="status-ongoing">Unscheduled</span>
                             @elseif($record->status === 'Ongoing')
                                 <span class="status-ongoing">Ongoing</span>
                             @else

@@ -42,10 +42,6 @@ class DTRController extends Controller
             return back()->with('error', 'Only nurses can use the time clock system.');
         }
 
-        if (!$nurse->shift_schedule_id) {
-            return back()->with('error', 'You have no assigned schedule. Contact Head Nurse.');
-        }
-
         $hangingDtr = DailyTimeRecord::where('user_id', $user->id)
             ->whereNull('time_out')
             ->first();
@@ -77,20 +73,24 @@ class DTRController extends Controller
             $start = Carbon::parse($hangingDtr->time_in);
             $end = now();
             $hours = $start->diffInMinutes($end) / 60;
+            $today = now()->toDateString();
 
-            // Determine if late based on shift schedule
-            $shiftSchedule = $nurse->shiftSchedule;
-            $status = 'Present';
+            // Check if nurse has a date schedule for today
+            $dateSchedule = $nurse->dateSchedules()
+                ->where('date', $today)
+                ->first();
 
-            if ($shiftSchedule) {
-                $scheduledStartTime = Carbon::parse($shiftSchedule->start_time);
+            $status = 'Unscheduled';
+
+            if ($dateSchedule) {
+                // Compare actual start time with scheduled start time
                 $actualStartTime = Carbon::parse($hangingDtr->time_in);
+                $scheduledStartTime = Carbon::parse($dateSchedule->start_shift);
 
-                // Compare only the time portion (ignore date)
-                $actualTimeOfDay = $actualStartTime->format('H:i');
-                $scheduledTimeOfDay = $scheduledStartTime->format('H:i');
-
-                if ($actualTimeOfDay > $scheduledTimeOfDay) {
+                // If actual time is before or at scheduled time, mark as Present, otherwise Late
+                if ($actualStartTime->format('H:i') <= $scheduledStartTime->format('H:i')) {
+                    $status = 'Present';
+                } else {
                     $status = 'Late';
                 }
             }
@@ -135,29 +135,24 @@ class DTRController extends Controller
         $daysInMonth = $lastDay->day;
         $startingDayOfWeek = $firstDay->dayOfWeek;
 
-        // Get nurse's shift schedule
-        $shiftSchedule = $nurse ? $nurse->shiftSchedule : null;
-
-        // Get scheduled days for display
-        $scheduledDays = [];
-        if ($shiftSchedule) {
-            $dayMap = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            foreach ($dayMap as $day) {
-                if ($shiftSchedule->{$day}) {
-                    $scheduledDays[] = ucfirst($day);
-                }
-            }
-        }
+        // Get nurse's date schedules for this month
+        $dateSchedules = $nurse ? $nurse->dateSchedules()
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
+            ->get()
+            ->keyBy(function($schedule) {
+                return Carbon::parse($schedule->date)->format('Y-m-d');
+            })
+            : collect();
 
         return view('dtr.my-dtr', [
             'dtrMap' => $dtrMap,
+            'dateSchedules' => $dateSchedules,
             'daysInMonth' => $daysInMonth,
             'startingDayOfWeek' => $startingDayOfWeek,
             'currentMonth' => $currentMonth,
             'currentYear' => $currentYear,
             'monthName' => $firstDay->format('F Y'),
-            'shiftSchedule' => $shiftSchedule,
-            'scheduledDays' => $scheduledDays
         ]);
     }
 
@@ -215,13 +210,13 @@ class DTRController extends Controller
         $dateTo = Carbon::parse($request->date_to)->endOfDay();
 
         if ($me->designation === 'Clinical') {
-            $nurses = Nurse::with(['user', 'station', 'shiftSchedule'])
+            $nurses = Nurse::with(['user', 'station'])
                 ->where('station_id', $me->station_id)
                 ->where('id', '!=', $me->id)
                 ->orderBy('last_name')
                 ->get();
         } else {
-            $nurses = Nurse::with(['user', 'shiftSchedule'])
+            $nurses = Nurse::with(['user'])
                 ->where('designation', 'Admitting')
                 ->where('id', '!=', $me->id)
                 ->orderBy('last_name')
@@ -261,7 +256,7 @@ class DTRController extends Controller
         $dateTo = Carbon::parse($request->date_to)->endOfDay();
 
         // Get all nurses (no filtering)
-        $nurses = Nurse::with(['user', 'station', 'shiftSchedule'])
+        $nurses = Nurse::with(['user', 'station'])
             ->orderBy('last_name')
             ->get();
 
@@ -283,9 +278,8 @@ class DTRController extends Controller
 
             $allReports[] = [
                 'nurse' => $nurse,
-                'shiftSchedule' => $nurse->shiftSchedule,
                 'records' => $records,
-                'summary' => $this->buildSummary($records, $nurse->shiftSchedule, $dateFrom, $dateTo),
+                'summary' => $this->buildSummary($records, null, $dateFrom, $dateTo),
             ];
         }
 
@@ -310,14 +304,13 @@ class DTRController extends Controller
             ->orderBy('time_in')
             ->get();
 
-        $shiftSchedule = $nurse->shiftSchedule;
-        $summary = $this->buildSummary($records, $shiftSchedule, $dateFrom, $dateTo);
+        $summary = $this->buildSummary($records, null, $dateFrom, $dateTo);
 
         // Format dates for view
         $dateFromFormatted = $dateFrom->format('M d, Y');
         $dateToFormatted = $dateTo->format('M d, Y');
 
-        $pdf = Pdf::loadView('dtr.dtr-report', compact('nurse', 'records', 'shiftSchedule', 'summary', 'dateFromFormatted', 'dateToFormatted'));
+        $pdf = Pdf::loadView('dtr.dtr-report', compact('nurse', 'records', 'summary', 'dateFromFormatted', 'dateToFormatted'));
         $pdf->setPaper('A4', 'portrait');
         return $pdf->stream('dtr-report-' . $nurse->employee_id . '-' . $dateFrom->format('Ymd') . '.pdf');
     }
@@ -331,29 +324,31 @@ class DTRController extends Controller
         $totalHours = $records->sum('total_hours');
         $presentDays = $records->where('status', 'Present')->count();
         $lateDays = $records->where('status', 'Late')->count();
+        $unscheduledDays = $records->where('status', 'Unscheduled')->count();
         $incompleteDays = $records->where('status', 'Incomplete')->count();
 
-        // Calculate expected hours based on shift schedule and date range
+        // For date schedules, we can calculate expected hours from actual schedules
+        // This is now simpler since we iterate through actual assigned dates
         $expectedHours = 0;
-        if ($shiftSchedule) {
-            $dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            $current = $dateFrom->copy();
-            while ($current->lte($dateTo)) {
-                $dayName = $dayMap[$current->dayOfWeek];
-                if ($shiftSchedule->{$dayName}) {
-                    $start = Carbon::parse($shiftSchedule->start_time);
-                    $end = Carbon::parse($shiftSchedule->end_time);
-                    $expectedHours += $end->gt($start)
-                        ? $start->diffInMinutes($end) / 60
-                        : (1440 - $start->diffInMinutes($end)) / 60;
-                }
-                $current->addDay();
+
+        // Group records by date
+        $recordsByDate = $records->groupBy(function($record) {
+            return Carbon::parse($record->time_in)->format('Y-m-d');
+        });
+
+        // For each date with a record, calculate expected hours from the shift duration
+        foreach ($recordsByDate as $date => $dateRecords) {
+            // Since we don't have shift schedule anymore, we estimate based on total_hours worked
+            // If completed shift, the worked hours are expected hours
+            $dateRecord = $dateRecords->first();
+            if ($dateRecord->status !== 'Incomplete' && $dateRecord->status !== 'Ongoing') {
+                $expectedHours += $dateRecord->total_hours;
             }
         }
 
         $overtime = max(0, $totalHours - $expectedHours);
         $deficit = max(0, $expectedHours - $totalHours);
 
-        return compact('totalRecords', 'totalHours', 'presentDays', 'lateDays', 'incompleteDays', 'expectedHours', 'overtime', 'deficit');
+        return compact('totalRecords', 'totalHours', 'presentDays', 'lateDays', 'unscheduledDays', 'incompleteDays', 'expectedHours', 'overtime', 'deficit');
     }
 }

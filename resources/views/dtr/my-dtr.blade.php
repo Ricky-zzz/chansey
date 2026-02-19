@@ -16,47 +16,28 @@
         </div>
 
         <!-- Assigned Schedule Card -->
-        @if ($shiftSchedule)
+        @if ($dateSchedules && $dateSchedules->count() > 0)
             <div class="mb-6 card-enterprise border-l-4 border-l-sky-500 p-4">
-                <h2 class="text-base font-bold text-slate-800 mb-4">Your Assigned Schedule</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Shift Name</div>
-                        <div class="text-lg font-bold text-sky-600 mt-1">{{ $shiftSchedule->name }}</div>
-                    </div>
-                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Time In</div>
-                        <div class="text-lg font-bold text-emerald-600 mt-1 font-mono">{{ $shiftSchedule->formatted_start_time }}</div>
-                    </div>
-                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
-                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Time Out</div>
-                        <div class="text-lg font-bold text-red-600 mt-1 font-mono">{{ $shiftSchedule->formatted_end_time }}</div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Scheduled Days</div>
-                    <div class="flex flex-wrap gap-2">
-                        @php
-                            $dayMap = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                            $dayShortMap = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                        @endphp
-                        @foreach ($dayMap as $index => $day)
-                            @if ($shiftSchedule->{$day})
-                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
-                                    <span class="font-bold text-sm text-emerald-700">{{ $dayShortMap[$index] }}</span>
-                                </div>
-                            @else
-                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
-                                    <span class="font-bold text-sm text-slate-400">{{ $dayShortMap[$index] }}</span>
-                                </div>
+                <h2 class="text-base font-bold text-slate-800 mb-4">Scheduled Dates This Month</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    @foreach ($dateSchedules as $schedule)
+                        <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ \Carbon\Carbon::parse($schedule->date)->format('l, M d') }}</div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-sm font-mono font-bold text-emerald-600">{{ $schedule->start_shift }}</span>
+                                <span class="text-xs text-slate-400">—</span>
+                                <span class="text-sm font-mono font-bold text-red-600">{{ $schedule->end_shift }}</span>
+                            </div>
+                            @if ($schedule->assignment)
+                                <div class="text-xs text-slate-500 mt-1">{{ $schedule->assignment }}</div>
                             @endif
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @else
             <div class="mb-6 card-enterprise border-l-4 border-l-amber-500 p-4">
-                <p class="text-sm text-amber-700 font-medium">No shift schedule assigned. Please contact your Head Nurse.</p>
+                <p class="text-sm text-amber-700 font-medium">No date schedules assigned for this month. Contact your Head Nurse.</p>
             </div>
         @endif
 
@@ -98,9 +79,9 @@
                     <span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>
                     <span class="font-semibold text-sm text-red-700">Incomplete</span>
                 </div>
-                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
-                    <span class="inline-block w-2 h-2 rounded-full bg-slate-400 mr-1.5"></span>
-                    <span class="font-semibold text-sm text-slate-600">Rest Day</span>
+                <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200">
+                    <span class="inline-block w-2 h-2 rounded-full bg-sky-400 mr-1.5"></span>
+                    <span class="font-semibold text-sm text-sky-600">Unscheduled</span>
                 </div>
             </div>
         </div>
@@ -143,6 +124,9 @@
                         } elseif ($record->status === 'Incomplete') {
                             $bgColor = 'bg-red-50';
                             $badge = '<span class="inline-block px-2 py-1 text-xs rounded-md bg-red-600 text-white font-semibold">Incomplete</span>';
+                        } elseif ($record->status === 'Unscheduled') {
+                            $bgColor = 'bg-sky-50';
+                            $badge = '<span class="inline-block px-2 py-1 text-xs rounded-md bg-sky-500 text-white font-semibold">Unscheduled</span>';
                         }
                     }
                 @endphp
@@ -200,6 +184,7 @@
         $totalHours = collect($dtrMap)->sum('total_hours');
         $presentDays = collect($dtrMap)->where('status', 'Present')->count();
         $lateDays = collect($dtrMap)->where('status', 'Late')->count();
+        $unscheduledDays = collect($dtrMap)->where('status', 'Unscheduled')->count();
     @endphp
 
     <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -263,8 +248,10 @@
                                         <span class="badge-enterprise bg-amber-50 text-amber-700 border-amber-200">⚠ Late</span>
                                     @elseif ($record->status === 'Incomplete')
                                         <span class="badge-enterprise bg-red-50 text-red-700 border-red-200">✕ Inc</span>
+                                    @elseif ($record->status === 'Unscheduled')
+                                        <span class="badge-enterprise bg-sky-50 text-sky-700 border-sky-200">○ Unsched</span>
                                     @else
-                                        <span class="badge-enterprise bg-sky-50 text-sky-700 border-sky-200">{{ $record->status }}</span>
+                                        <span class="badge-enterprise bg-slate-50 text-slate-700 border-slate-200">{{ $record->status }}</span>
                                     @endif
                                 </td>
                             </tr>

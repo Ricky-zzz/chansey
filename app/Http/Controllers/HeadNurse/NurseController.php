@@ -19,7 +19,6 @@ class NurseController extends Controller
     {
         $me = Auth::user()->nurse;
 
-        // Head nurse manages all nurses in their station (excluding themselves)
         $nurses = Nurse::with(['user', 'station', 'dateSchedules'])
             ->where('station_id', $me->station_id)
             ->where('id', '!=', $me->id)
@@ -28,16 +27,13 @@ class NurseController extends Controller
 
         $title = $me->station->station_name . ' Nurses';
 
-        // Get all nurses in the station for the assign modal
         $availableNurses = Nurse::where('station_id', $me->station_id)
             ->where('id', '!=', $me->id)
             ->orderBy('last_name')
             ->get();
 
-        // Get nurse types for the assignment field
         $nurseTypes = \App\Models\NurseType::orderBy('name')->get();
 
-        // Get current admitted patients in the station for assign-patient modal
         $stationPatients = Admission::with('patient')
             ->whereIn('status', ['Admitted', 'Ready for Discharge'])
             ->where('station_id', $me->station_id)
@@ -52,14 +48,10 @@ class NurseController extends Controller
         return view('nurse.headnurse.nurses.index', compact('nurses', 'title', 'availableNurses', 'nurseTypes', 'stationPatients'));
     }
 
-    /**
-     * Get date schedules for a specific nurse.
-     */
     public function getNurseDateSchedules(Nurse $nurse)
     {
         $me = Auth::user()->nurse;
 
-        // Verify the head nurse has authority over this nurse
         if ($nurse->station_id !== $me->station_id && $me->role_level !== 'Chief') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -83,11 +75,7 @@ class NurseController extends Controller
         ]);
     }
 
-    // updateSchedule() method removed - now using date-specific scheduling via DateScheduleController
 
-    /**
-     * Get scheduled nurses for a specific date in this head nurse's station.
-     */
     public function getScheduledNurses(Request $request)
     {
         $me = Auth::user()->nurse;
@@ -112,7 +100,6 @@ class NurseController extends Controller
             ->where('date', $parsedDate)
             ->get();
 
-        // Filter to only include nurses from this head nurse's station
         $nurses = $dateSchedules->filter(function ($ds) {
             return $ds->nurse !== null;
         })->map(function ($dateSchedule) {
