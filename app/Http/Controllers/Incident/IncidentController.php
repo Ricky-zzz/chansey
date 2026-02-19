@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Clinical;
+namespace App\Http\Controllers\Incident;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreIncidentRequest;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class IncidentController extends Controller
 {
     /**
-     * Display incidents for the nurse's station
+     * Display incidents for the user's station
      * Three tabs: All, Reported by Me, I'm Involved
      */
     public function index()
@@ -34,12 +34,12 @@ class IncidentController extends Controller
             ->latest('time_of_incident')
             ->paginate(15, ['*'], 'reports_page');
 
-        // Incidents I'm involved in (via pivot)
+        // Incidents I'm involved in
         $myInvolvement = Incident::where('station_id', $nurse->station_id)
             ->whereHas('involvedStaff', function ($query) use ($user) {
                 $query->where('staff_id', $user->id);
             })
-            ->with(['station', 'admission.patient', 'createdBy', 'revolvedBy', 'involvedStaff'])
+            ->with(['station', 'admission.patient', 'createdBy', 'resolvedBy', 'involvedStaff'])
             ->latest('time_of_incident')
             ->paginate(15, ['*'], 'involved_page');
 
@@ -48,11 +48,18 @@ class IncidentController extends Controller
             'total' => Incident::where('station_id', $nurse->station_id)->count(),
             'unresolved' => Incident::where('station_id', $nurse->station_id)->where('status', 'unresolved')->count(),
             'investigating' => Incident::where('station_id', $nurse->station_id)->where('status', 'investigating')->count(),
-            'myInvolvement' => $myInvolvement->total(),
+            'severeCount' => Incident::where('station_id', $nurse->station_id)
+                ->whereIn('severity_level', ['High', 'Severe'])
+                ->count(),
+            'myInvolvement' => Incident::where('station_id', $nurse->station_id)
+                ->whereHas('involvedStaff', function ($query) use ($user) {
+                    $query->where('staff_id', $user->id);
+                })
+                ->count(),
         ];
 
         return view('nurse.incident.index', [
-            'title' => 'Incident Reports',
+            'title' => 'Station Incident Reports',
             'allIncidents' => $allIncidents,
             'myReports' => $myReports,
             'myInvolvement' => $myInvolvement,
@@ -119,6 +126,7 @@ class IncidentController extends Controller
             'root_cause' => $validated['root_cause'] ?? null,
             'follow_up_actions' => $validated['follow_up_actions'] ?? null,
             'follow_up_instructions' => $validated['follow_up_instructions'] ?? null,
+            'witness' => !empty($validated['witnesses']) ? array_filter($validated['witnesses']) : null,
             'status' => 'unresolved',
         ]);
 
@@ -129,33 +137,58 @@ class IncidentController extends Controller
             ]);
         }
 
-        return redirect()->route('nurse.incident.show', $incident)
+        return redirect()->route('incident.show', $incident)
             ->with('success', 'Incident report created successfully!');
     }
 
     /**
-     * Show incident details (read-only for staff)
+     * Show incident details
      */
     public function show(Incident $incident)
     {
         $user = Auth::user();
         $nurse = $user->nurse;
 
-        // Verify access: creator, involved staff, or head nurse
+        // Verify access: must be in same station
         if ($incident->station_id !== $nurse->station_id) {
             abort(403, 'Unauthorized access.');
         }
 
         $incident->load(['station', 'admission.patient', 'createdBy', 'resolvedBy', 'involvedStaff']);
 
-        $isCreator = $incident->created_by_id === $user->id;
-        $isInvolved = $incident->isStaffInvolved($user->id);
+        // Check if user is head nurse and can update status
+        $canUpdateStatus = $nurse->role_level === 'Head';
 
         return view('nurse.incident.show', [
             'title' => 'Incident Report Details',
             'incident' => $incident,
-            'isCreator' => $isCreator,
-            'isInvolved' => $isInvolved,
+            'canUpdateStatus' => $canUpdateStatus,
         ]);
+    }
+
+    /**
+     * Update incident status (Head Nurse only)
+     */
+    public function updateStatus(UpdateIncidentStatusRequest $request, Incident $incident)
+    {
+        $user = Auth::user();
+        $nurse = $user->nurse;
+
+        // Verify: must be head nurse in same station
+        if ($incident->station_id !== $nurse->station_id || $nurse->role_level !== 'Head') {
+            abort(403, 'Only head nurses can update incident status.');
+        }
+
+        $validated = $request->validated();
+
+        // Update incident status
+        $incident->update([
+            'status' => $validated['status'],
+            'resolved_by_id' => $validated['status'] === 'resolved' ? $user->id : null,
+            'resolved_at' => $validated['status'] === 'resolved' ? now() : null,
+        ]);
+
+        return redirect()->route('incident.show', $incident)
+            ->with('success', 'Incident status updated successfully!');
     }
 }

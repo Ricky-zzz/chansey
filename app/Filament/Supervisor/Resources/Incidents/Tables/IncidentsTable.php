@@ -56,7 +56,7 @@ class IncidentsTable
                     ->label('Filter by Station')
                     ->placeholder('All Stations')
                     ->options(function () {
-                        return Station::pluck('name', 'id')->toArray();
+                        return Station::pluck('station_name', 'id')->toArray();
                     }),
 
                 SelectFilter::make('status')

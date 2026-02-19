@@ -78,8 +78,7 @@ class Incident extends Model
     public function involvedStaff(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'incident_staff', 'incident_id', 'staff_id')
-            ->withPivot('role_in_incident')
-            ->withTimestamps();
+            ->withPivot('role_in_incident');
     }
 
     /**

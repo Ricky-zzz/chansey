@@ -6,7 +6,7 @@
     {{-- Header --}}
     <div class="card-enterprise p-5 mb-6">
         <div class="flex items-center gap-4">
-            <a href="{{ route('nurse.incidents.index') }}" class="btn btn-circle btn-ghost btn-sm">
+            <a href="{{ route('incident.index') }}" class="btn btn-circle btn-ghost btn-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
@@ -19,7 +19,7 @@
     </div>
 
     {{-- Form --}}
-    <form action="{{ route('nurse.incidents.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('incident.store') }}" method="POST" class="space-y-6">
         @csrf
 
         {{-- INCIDENT DETAILS SECTION --}}
@@ -227,6 +227,46 @@
             @enderror
         </div>
 
+        {{-- WITNESSES SECTION --}}
+        <div class="card-enterprise p-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Witnesses</h3>
+
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Other Witnesses (Optional)</label>
+            <p class="text-xs text-slate-500 mb-3">Add witnesses who are not in the staff list (e.g., family members, passersby, visitors)</p>
+
+            <div id="witnesses-container" class="space-y-2">
+                @php
+                    $oldWitnesses = old('witnesses', []);
+                    $witnessCount = !empty($oldWitnesses) ? count($oldWitnesses) : 1;
+                @endphp
+                @for($i = 0; $i < $witnessCount; $i++)
+                    <div class="flex gap-2 items-end witness-row">
+                        <div class="flex-1">
+                            <input type="text" name="witnesses[]" class="input-enterprise w-full"
+                                   placeholder="Witness name (e.g., John Doe, Family member)"
+                                   value="{{ $oldWitnesses[$i] ?? '' }}">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline btn-error remove-witness" style="{{ $i === 0 ? 'display: none;' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                @endfor
+            </div>
+
+            <button type="button" id="add-witness-btn" class="btn btn-sm btn-outline btn-primary mt-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Another Witness
+            </button>
+
+            @error('witnesses')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
         {{-- ROOT CAUSE & FOLLOW-UP SECTION --}}
         <div class="card-enterprise p-6">
             <h3 class="text-lg font-bold text-slate-800 mb-4">Root Cause & Follow-up</h3>
@@ -246,8 +286,12 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Recommended Follow-up Actions</label>
-                    <input type="text" name="follow_up_actions" class="input-enterprise w-full"
-                           placeholder="e.g., monitoring, referral, corrective action" value="{{ old('follow_up_actions') }}">
+                    <select name="follow_up_actions" class="select-enterprise w-full">
+                        <option value="">-- Select action --</option>
+                        <option value="monitoring" @selected(old('follow_up_actions') === 'monitoring')>Monitoring</option>
+                        <option value="referral" @selected(old('follow_up_actions') === 'referral')>Referral</option>
+                        <option value="corrective_action" @selected(old('follow_up_actions') === 'corrective_action')>Corrective Action</option>
+                    </select>
                 </div>
 
                 <div>
@@ -260,7 +304,7 @@
 
         {{-- BUTTONS --}}
         <div class="flex gap-3 justify-between">
-            <a href="{{ route('nurse.incidents.index') }}" class="btn-enterprise-secondary">
+            <a href="{{ route('incident.index') }}" class="btn-enterprise-secondary">
                 Cancel
             </a>
             <button type="submit" class="btn-enterprise-primary">
@@ -277,6 +321,45 @@
 <script>
     document.querySelector('input[name="injury"]').addEventListener('change', function() {
         document.getElementById('injury-details').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // Witness management
+    document.getElementById('add-witness-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const container = document.getElementById('witnesses-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'flex gap-2 items-end witness-row';
+        newRow.innerHTML = `
+            <div class="flex-1">
+                <input type="text" name="witnesses[]" class="input-enterprise w-full"
+                       placeholder="Witness name (e.g., John Doe, Family member)">
+            </div>
+            <button type="button" class="btn btn-sm btn-outline btn-error remove-witness">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        `;
+        container.appendChild(newRow);
+        newRow.querySelector('.remove-witness').addEventListener('click', removeWitness);
+    });
+
+    function removeWitness(e) {
+        e.preventDefault();
+        e.target.closest('.witness-row').remove();
+        updateRemoveButtons();
+    }
+
+    function updateRemoveButtons() {
+        const rows = document.querySelectorAll('.witness-row');
+        rows.forEach((row, index) => {
+            const btn = row.querySelector('.remove-witness');
+            btn.style.display = rows.length === 1 ? 'none' : '';
+        });
+    }
+
+    document.querySelectorAll('.remove-witness').forEach(btn => {
+        btn.addEventListener('click', removeWitness);
     });
 </script>
 @endsection

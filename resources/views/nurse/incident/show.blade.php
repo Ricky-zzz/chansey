@@ -7,7 +7,7 @@
     <div class="card-enterprise p-5 mb-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="{{ route('nurse.incidents.index') }}" class="btn btn-circle btn-ghost btn-sm">
+                <a href="{{ route('incident.index') }}" class="btn btn-circle btn-ghost btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -18,14 +18,21 @@
                 </div>
             </div>
 
-            {{-- Status Badge --}}
-            <div>
-                @if($incident->status === 'resolved')
-                    <span class="badge-enterprise badge-success">Resolved</span>
-                @elseif($incident->status === 'investigating')
-                    <span class="badge-enterprise badge-warning">Investigating</span>
-                @else
-                    <span class="badge-enterprise badge-error">Unresolved</span>
+            {{-- Status Badge & Update Button (Head Nurses Only) --}}
+            <div class="flex items-center gap-3">
+                <div>
+                    @if($incident->status === 'resolved')
+                        <span class="badge-enterprise badge-success">Resolved</span>
+                    @elseif($incident->status === 'investigating')
+                        <span class="badge-enterprise badge-warning">Investigating</span>
+                    @else
+                        <span class="badge-enterprise badge-error">Unresolved</span>
+                    @endif
+                </div>
+                @if($canUpdateStatus && $incident->status !== 'resolved')
+                    <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('status-update-modal').showModal()">
+                        Update Status
+                    </button>
                 @endif
             </div>
         </div>
@@ -100,28 +107,28 @@
         <div class="space-y-4">
             @if($incident->what_happened)
                 <div>
-                    <label class="detail-label">What Happened</label>
+                    <label class="detail-label">What Happened?</label>
                     <div class="detail-narrative">{{ $incident->what_happened }}</div>
                 </div>
             @endif
 
             @if($incident->how_discovered)
                 <div>
-                    <label class="detail-label">How Was It Discovered</label>
+                    <label class="detail-label">How Was It Discovered?</label>
                     <div class="detail-narrative">{{ $incident->how_discovered }}</div>
                 </div>
             @endif
 
             @if($incident->action_taken)
                 <div>
-                    <label class="detail-label">Actions Taken Immediately</label>
+                    <label class="detail-label">Actions Taken Immediately:</label>
                     <div class="detail-narrative">{{ $incident->action_taken }}</div>
                 </div>
             @endif
 
             @if($incident->narrative)
                 <div>
-                    <label class="detail-label">Overall Narrative</label>
+                    <label class="detail-label">Overall Narrative:</label>
                     <div class="detail-narrative">{{ $incident->narrative }}</div>
                 </div>
             @endif
@@ -229,6 +236,24 @@
         </div>
     @endif
 
+    {{-- WITNESSES SECTION --}}
+    @if($incident->witness && count($incident->witness) > 0)
+        <div class="card-enterprise p-6 mb-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Other Witnesses <span class="text-slate-500 text-base font-normal">({{ count($incident->witness) }})</span></h3>
+
+            <div class="space-y-2">
+                @foreach($incident->witness as $witness)
+                    @if(!empty($witness))
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-sm font-semibold text-slate-800">{{ $witness }}</p>
+                            <p class="text-xs text-slate-500 mt-1">Non-staff witness</p>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- ROOT CAUSE & FOLLOW-UP SECTION --}}
     <div class="card-enterprise p-6 mb-6">
         <h3 class="text-lg font-bold text-slate-800 mb-4">Root Cause & Follow-up</h3>
@@ -278,7 +303,7 @@
 
     {{-- BACK BUTTON --}}
     <div class="mb-6">
-        <a href="{{ route('nurse.incidents.index') }}" class="btn-enterprise-secondary">
+        <a href="{{ route('incident.index') }}" class="btn-enterprise-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -286,23 +311,67 @@
         </a>
     </div>
 
+    {{-- STATUS UPDATE MODAL (Head Nurses Only) --}}
+    @if($canUpdateStatus)
+        <dialog id="status-update-modal" class="modal">
+            <div class="modal-box w-full max-w-md">
+                <h3 class="font-bold text-lg mb-4">Update Incident Status</h3>
+
+                <form method="POST" action="{{ route('incident.status-update', $incident) }}" class="space-y-4">
+                    @csrf
+                    @method('PATCH')
+
+                    <div>
+                        <label class="label">
+                            <span class="label-text font-semibold">Current Status</span>
+                        </label>
+                        <p class="text-sm text-slate-600 capitalize px-3 py-2 bg-slate-50 rounded-lg">
+                            @if($incident->status === 'resolved')
+                                <span class="badge-enterprise badge-success">Resolved</span>
+                            @elseif($incident->status === 'investigating')
+                                <span class="badge-enterprise badge-warning">Investigating</span>
+                            @else
+                                <span class="badge-enterprise badge-error">Unresolved</span>
+                            @endif
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="label">
+                            <span class="label-text font-semibold">New Status *</span>
+                        </label>
+                        <select name="status" required class="select-enterprise w-full">
+                            <option value="">-- Select new status --</option>
+                            @if($incident->status === 'unresolved')
+                                <option value="investigating">Move to Investigating</option>
+                                <option value="resolved">Resolve Incident</option>
+                            @elseif($incident->status === 'investigating')
+                                <option value="unresolved">Back to Unresolved</option>
+                                <option value="resolved">Resolve Incident</option>
+                            @endif
+                        </select>
+                        @error('status')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex gap-3 justify-end">
+                        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('status-update-modal').close()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-enterprise-primary btn-sm">
+                            Update Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
+    @endif
+
 </div>
 
-<style>
-    .detail-group {
-        @apply space-y-1;
-    }
-
-    .detail-label {
-        @apply text-xs font-semibold text-slate-500 uppercase tracking-wide;
-    }
-
-    .detail-value {
-        @apply text-sm text-slate-700;
-    }
-
-    .detail-narrative {
-        @apply text-sm text-slate-700 whitespace-pre-wrap leading-relaxed;
-    }
-</style>
 @endsection

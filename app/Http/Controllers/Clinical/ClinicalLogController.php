@@ -24,8 +24,9 @@ class ClinicalLogController extends Controller
     {
         $user = Auth::user();
         $order = null;
-        $type = $request->type;
+        $type = null;
 
+        // Priority 1: Get type from medical order if order_id is provided
         if ($request->medical_order_id) {
             $order = MedicalOrder::findOrFail($request->medical_order_id);
             $type = match ($order->type) {
@@ -34,6 +35,19 @@ class ClinicalLogController extends Controller
                 'Dietary'    => 'Dietary',
                 default      => 'Note'
             };
+        }
+
+        // Priority 2: Use submitted type as fallback
+        if (!$type && $request->type) {
+            $type = $request->type;
+        }
+
+        // Priority 3: Default to 'Note' if nothing else is set
+        $type = $type ?? 'Note';
+
+        // Validate type is set
+        if (!$type || $type === '') {
+            return back()->with('error', 'Error: No log type specified. Please select a monitoring task or provide a note type.');
         }
 
         try {

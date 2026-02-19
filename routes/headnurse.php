@@ -65,10 +65,5 @@ Route::middleware(['auth', 'headnurse'])->prefix('nurse/headnurse')->name('nurse
 
     // Station Endorsements
     Route::get('/endorsments', [EndorsmentController::class, 'index'])->name('endorsments.index');
-
-    // Station Incidents
-    Route::get('/incident', [\App\Http\Controllers\HeadNurse\IncidentController::class, 'index'])->name('incident.index');
-    Route::get('/incident/{incident}', [\App\Http\Controllers\HeadNurse\IncidentController::class, 'show'])->name('incident.show');
-    Route::patch('/incident/{incident}/status-update', [\App\Http\Controllers\HeadNurse\IncidentController::class, 'updateStatus'])->name('incident.update-status');
 });
 

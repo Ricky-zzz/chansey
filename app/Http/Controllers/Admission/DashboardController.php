@@ -18,13 +18,13 @@ class DashboardController extends Controller
 
         $stats = [
             'Private'      => $this->getBedStats('Private'),
-            'Ward'         => $this->getBedStats('Ward'), 
+            'Ward'         => $this->getBedStats('Ward'),
             'ICU'          => $this->getBedStats('ICU'),
             'ER'           => $this->getBedStats('ER'),
         ];
 
-        $recentAdmissions = Admission::with(['patient', 'bed.room']) 
-            ->orderBy('created_at', 'desc') 
+        $recentAdmissions = Admission::with(['patient', 'bed.room'])
+            ->orderBy('created_at', 'desc')
             ->where('status', 'Admitted')
             ->take(5)
             ->get();
@@ -50,8 +50,8 @@ class DashboardController extends Controller
             'status_color' => $available === 0 ? 'text-error' : ($available < 3 ? 'text-warning' : 'text-success'),
             'border_color' => $available === 0 ? 'border-error' : ($available < 3 ? 'border-warning' : 'border-primary'),
             'bg_icon'      => $available === 0 ? 'bg-red-50 text-error' : 'bg-cyan-50 text-primary',
-            'badge_text'   => $available === 0 ? 'Full Capacity' : 'Available',
-            'badge_class'  => $available === 0 ? 'badge-error text-white' : 'badge-success text-white',
+            'badge_text'   => $available === 0 ? 'Full Capacity' : 'Good Availability',
+            'badge_class'  => $available === 0 ? 'badge-error bg-red-600 text-white' : 'badge-success bg-emerald-600 text-white',
         ];
     }
 }

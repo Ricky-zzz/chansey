@@ -1,6 +1,6 @@
 <div class="drawer-side z-20">
     <label for="my-drawer-2" class="drawer-overlay"></label>
-    <aside class="sidebar-enterprise flex flex-col relative">
+    <aside class="menu w-72 h-screen sidebar-enterprise flex flex-col relative">
         <!-- Close Button (Mobile) -->
         <label for="my-drawer-2" class="btn btn-square btn-ghost absolute top-4 right-4 lg:hidden z-10">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -9,7 +9,7 @@
         </label>
 
         <!-- Brand -->
-        <div class="mb-8 px-4 pt-4">
+        <div class="mb-8 px-4 pt-4 pb-2 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
                     <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-8 h-8 rounded-md object-cover" />
@@ -26,7 +26,7 @@
         </div>
 
         <!-- Navigation -->
-        <ul class="space-y-1 flex-1 px-2">
+        <ul class="space-y-1 overflow-y-scroll flex-1 px-4">
             <li class="px-3 mb-2">
                 <span class="sidebar-section-title">Main Menu</span>
             </li>
@@ -77,7 +77,7 @@
         </ul>
 
         <!-- User Footer -->
-        <div class="border-t border-slate-200 pt-4 mt-4 space-y-3 px-4">
+        <div class="border-t border-slate-200 pt-4 space-y-3 px-4 pb-4 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                     <span class="font-bold text-sm">{{ Auth::user()->initials }}</span>

@@ -33,16 +33,14 @@
         </div>
     </div>
 
+    <!-- MODALS SECTION (inside Alpine scope so x-bind/:value/x-text work) -->
+    @include('nurse.clinical.ward.components.modals.log-modal')
+    @include('nurse.clinical.ward.components.modals.lab-modal')
+    @include('nurse.clinical.ward.components.modals.transfer-modal')
+    @include('nurse.clinical.ward.components.modals.supply-modal')
+    <x-clinical-log-modal />
+
 </div>
-
-<!-- MODALS SECTION -->
-@include('nurse.clinical.ward.components.modals.log-modal')
-@include('nurse.clinical.ward.components.modals.lab-modal')
-@include('nurse.clinical.ward.components.modals.transfer-modal')
-@include('nurse.clinical.ward.components.modals.supply-modal')
-
-<!-- EXISTING VIEW LOG MODAL (Keep if it's a custom component) -->
-<x-clinical-log-modal />
 
 <!-- ALPINE.JS SCRIPT -->
 @push('scripts')

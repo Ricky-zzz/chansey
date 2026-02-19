@@ -6,6 +6,9 @@
             medName: '',
             medQty: 0,
 
+            labOrderId: null,
+            labInstruction: '',
+
             transferOrderId: null,
             transferInstruction: '',
             transferStations: [],
@@ -34,12 +37,14 @@
                 this.logType = type || 'Notes';
                 this.medName = medName;
                 this.medQty = parseInt(medQty) || 0;
+                console.log('Opening log modal:', { id, type: this.logType, medName, medQty });
                 document.getElementById('log_modal').showModal();
             },
 
             openLabModal(id, instruction) {
                 this.labOrderId = id;
                 this.labInstruction = instruction;
+                console.log('Opening lab modal:', { id, instruction });
                 document.getElementById('lab_modal').showModal();
             },
 
@@ -47,6 +52,7 @@
                 this.transferOrderId = id;
                 this.transferInstruction = instruction;
                 this.selectedTargetStation = '';
+                console.log('Opening transfer modal:', { id, instruction });
                 document.getElementById('transfer_modal').showModal();
             },
 

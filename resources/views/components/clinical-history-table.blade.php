@@ -40,6 +40,10 @@
                    class="badge-enterprise text-xs {{ $currentType === 'Discharge' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
                     Discharge
                 </a>
+                <a href="{{ route($routeName, ['id' => $patientId, 'type' => 'Note']) }}"
+                   class="badge-enterprise text-xs {{ $currentType === 'Note' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }} cursor-pointer transition-colors">
+                    Notes
+                </a>
             </div>
         </div>
 
@@ -76,7 +80,8 @@
                                   ($log->type === 'Laboratory' ? 'bg-amber-100 text-amber-700' :
                                   ($log->type === 'Transfer' ? 'bg-rose-100 text-rose-700' :
                                   ($log->type === 'Utility' ? 'bg-purple-100 text-purple-700' :
-                                  ($log->type === 'Discharge' ? 'bg-lime-100 text-lime-700' : 'bg-slate-100 text-slate-600')))))}}">
+                                  ($log->type === 'Discharge' ? 'bg-lime-100 text-lime-700' :
+                                  ($log->type === 'Note' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'))))))}}">
                                 {{ $log->type }}
                             </span>
                         </td>
@@ -94,6 +99,8 @@
                                 Moved: <strong class="text-slate-800">{{ $log->data['from_bed'] ?? 'Unknown' }}</strong> → <strong class="text-slate-800">{{ $log->data['to_bed'] ?? 'Unknown' }}</strong>
                             @elseif($log->type === 'Discharge')
                                 {{ $log->data['note'] ?? 'Patient discharged' }}
+                            @elseif($log->type === 'Note')
+                                <span class="text-slate-700 line-clamp-2">{{ $log->data['note'] ?? $log->data['observation'] ?? 'No note content' }}</span>
                             @else
                                 {{ $log->data['observation'] ?? ($log->data['note'] ?? 'No Data') }}
                             @endif

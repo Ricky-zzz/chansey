@@ -64,7 +64,7 @@ require __DIR__ . '/headnurse.php';
 require __DIR__ . '/physician.php';
 require __DIR__ . '/accountant.php';
 require __DIR__ . '/memo.php';
-require __DIR__ . '/incidents.php';
+require __DIR__ . '/incident.php';
 
 // File viewing route
 Route::middleware(['auth'])->get('/document/view/{id}', [FileController::class, 'view'])->name('document.view');

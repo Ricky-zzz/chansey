@@ -76,8 +76,8 @@
                 @if($order->dispensed)
                 <button
                     @click="openLogModal(@js($order->id), 'Medication', @js($order->medicine->brand_name ?? $order->medicine->generic_name ?? ''), @js($order->quantity ?? 1))"
-                    class="btn btn-sm btn-{{ $status['color'] }} {{ $status['disabled'] ? 'text-gray-700' : 'text-white' }} w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
-                    {{ $status['disabled'] ? 'disabled' : '' }}>
+                    class="btn btn-sm btn-{{ $status['color'] }} text-white w-full {{ isset($status['animate']) ? 'animate-pulse' : '' }}"
+                    >
                     {{ $status['label'] }}
                 </button>
                 @else

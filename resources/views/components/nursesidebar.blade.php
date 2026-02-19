@@ -95,14 +95,14 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('nurse.incidents.index') }}"
-                        class="{{ request()->routeIs('nurse.incidents.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
+                    <a href="{{ route('incident.index') }}"
+                        class="{{ request()->routeIs('incident.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 9v3.75m-9.303 3.376c.866-1.5 2.845-2.422 4.303-2.422h13.882c1.458 0 2.437.922 3.303 2.422m0 0V18a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18V9.677m0 0A6.75 6.75 0 0 1 12 3c4.97 0 9.185 3.223 10.303 7.677m0 0v3.75m0 0v3.75" />
                         </svg>
-                        Incident Reports
+                        <span class="truncate">Incident Reports</span>
                     </a>
                 </li>
             @endif
@@ -182,14 +182,14 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('nurse.headnurse.incident.index') }}"
-                        class="{{ request()->routeIs('nurse.headnurse.incident.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
+                    <a href="{{ route('incident.index') }}"
+                        class="{{ request()->routeIs('incident.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 9v3.75m-9.303 3.376c.866-1.5 2.845-2.422 4.303-2.422h13.882c1.458 0 2.437.922 3.303 2.422m0 0V18a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18V9.677m0 0A6.75 6.75 0 0 1 12 3c4.97 0 9.185 3.223 10.303 7.677m0 0v3.75m0 0v3.75" />
                         </svg>
-                        Station Incidents
+                        <span class="truncate">Station Incidents</span>
                     </a>
                 </li>
             @endif
@@ -369,12 +369,12 @@
                     </div>
                 </div>
                 <div class="overflow-hidden flex-1">
-                    <div class="font-semibold text-sm text-slate-800 truncate">{{ Auth::user()->name }}</div>
+                    <div class="font-semibold text-xs text-slate-800 truncate">{{ Auth::user()->name }}</div>
                     <div class="text-xs text-slate-500 truncate">
                         {{ Auth::user()->nurse->designation ?? 'Nurse' }} ({{ Auth::user()->badge_id }})
                     </div>
                     @if(in_array(Auth::user()->nurse->role_level, ['Head', 'Supervisor', 'Chief']))
-                        <div class="text-xs text-emerald-600 font-bold">{{ Auth::user()->nurse->role_level }} Nurse</div>
+                        <div class="text-xs text-emerald-600 font-bold truncate">{{ Auth::user()->nurse->role_level }} Nurse</div>
                     @endif
                 </div>
             </div>

@@ -23,7 +23,7 @@ class StoreIncidentRequest extends FormRequest
     {
         return [
             'admission_id' => 'nullable|exists:admissions,id',
-            'time_of_incident' => 'required|date_time',
+            'time_of_incident' => 'required|date',
             'location_details' => 'nullable|string|max:255',
             'incident_category' => 'required|string|in:medication_error,patient_fall,equipment_malfunction,near_miss,wrong_documentation,other',
             'severity_level' => 'required|string|in:Low,Moderate,High,Severe',
@@ -34,12 +34,12 @@ class StoreIncidentRequest extends FormRequest
             'injury' => 'nullable|boolean',
             'injury_type' => 'nullable|string|max:255',
             'vitals' => 'nullable|array',
-            'vitals.temperature' => 'nullable|numeric|min:35|max:42',
-            'vitals.bp' => 'nullable|string|max:10',
-            'vitals.hr' => 'nullable|numeric|min:30|max:200',
-            'vitals.pr' => 'nullable|numeric|min:30|max:200',
-            'vitals.rr' => 'nullable|numeric|min:5|max:50',
-            'vitals.o2' => 'nullable|numeric|min:50|max:100',
+            'vitals.temperature' => 'nullable|numeric',
+            'vitals.bp' => 'nullable|string',
+            'vitals.hr' => 'nullable|numeric',
+            'vitals.pr' => 'nullable|numeric',
+            'vitals.rr' => 'nullable|numeric',
+            'vitals.o2' => 'nullable|numeric',
             'doctor_notified' => 'nullable|boolean',
             'family_notified' => 'nullable|boolean',
             'root_cause' => 'nullable|string|in:human_error,system_issue,equipment_failure,staffing_issue,other',
@@ -47,6 +47,8 @@ class StoreIncidentRequest extends FormRequest
             'follow_up_instructions' => 'nullable|string|max:1000',
             'involved_staff' => 'nullable|array',
             'involved_staff.*' => 'exists:users,id',
+            'witnesses' => 'nullable|array',
+            'witnesses.*' => 'nullable|string|max:255',
         ];
     }
 
@@ -61,11 +63,7 @@ class StoreIncidentRequest extends FormRequest
             'incident_category.required' => 'Please select an incident category.',
             'severity_level.required' => 'Please select a severity level.',
             'vitals.temperature.numeric' => 'Temperature must be a valid number.',
-            'vitals.temperature.min' => 'Temperature must be at least 35°C.',
-            'vitals.temperature.max' => 'Temperature cannot exceed 42°C.',
             'vitals.o2.numeric' => 'O2 saturation must be a valid number.',
-            'vitals.o2.min' => 'O2 saturation must be at least 50%.',
-            'vitals.o2.max' => 'O2 saturation cannot exceed 100%.',
         ];
     }
 }

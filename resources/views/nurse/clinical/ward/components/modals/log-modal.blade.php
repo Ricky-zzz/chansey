@@ -7,8 +7,8 @@
 
         <form action="{{ route('nurse.clinical.logs.store', $admission->id) }}" method="POST">
             @csrf
-            <input type="hidden" name="medical_order_id" :value="orderId">
-            <input type="hidden" name="type" :value="logType">
+            <input type="hidden" name="medical_order_id" :value="orderId || ''">
+            <input type="hidden" name="type" :value="logType || 'Note'">
 
             <!-- MEDICATION ALERT (Only if Meds and medName is set) -->
             <template x-if="logType === 'Medication' && medName !== ''">

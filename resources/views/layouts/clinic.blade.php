@@ -55,6 +55,37 @@
         </div>
     </div>
     @endif
+        <!-- SERVER VALIDATION ERRORS DISPLAY -->
+    @if ($errors->count() > 0)
+    <div class="fixed inset-0 flex items-start justify-center pt-12 z-50 pointer-events-none"
+        x-cloak
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition
+        @load="setTimeout(() => show = false, 6000)">
+        <div class="toast-enterprise-error flex items-start gap-3 shadow-lg pointer-events-auto max-w-2xl px-5 py-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-red-600 shrink-0 h-6 w-6 mt-0.5" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m2-2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="flex-1">
+                <h3 class="font-bold text-sm">Validation Error</h3>
+                <ul class="text-sm mt-2 space-y-1">
+                    @foreach ($errors->all() as $error)
+                    <li class="flex items-start gap-2">
+                        <span class="text-lg">•</span>
+                        <span>{{ $error }}</span>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+            <button @click="show = false" class="ml-auto text-red-600 hover:text-red-800 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    @endif
     <div class="drawer lg:drawer-open">
         <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
 

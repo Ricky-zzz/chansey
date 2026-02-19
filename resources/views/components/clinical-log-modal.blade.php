@@ -14,7 +14,8 @@
                         'bg-rose-100 text-rose-700': viewLogData.type === 'Transfer',
                         'bg-purple-100 text-purple-700': viewLogData.type === 'Utility',
                         'bg-lime-100 text-lime-700': viewLogData.type === 'Discharge',
-                        'bg-slate-100 text-slate-600': !['Medication', 'Vitals', 'Laboratory', 'Transfer', 'Utility', 'Discharge'].includes(viewLogData.type)
+                        'bg-indigo-100 text-indigo-700': viewLogData.type === 'Note',
+                        'bg-slate-100 text-slate-600': !['Medication', 'Vitals', 'Laboratory', 'Transfer', 'Utility', 'Discharge', 'Note'].includes(viewLogData.type)
                     }"
                     x-text="viewLogData.type">
                 </div>
@@ -269,6 +270,53 @@
                                 <p class="text-sm text-slate-800" x-text="viewLogData.data.remarks"></p>
                             </div>
                         </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- NOTE LOG LAYOUT -->
+            <template x-if="viewLogData.type === 'Note'">
+                <div class="space-y-3">
+                    <!-- Note Content -->
+                    <template x-if="viewLogData.data.note || viewLogData.data.observation">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200">
+                            <p class="text-sm text-slate-800 whitespace-pre-wrap" x-text="viewLogData.data.note || viewLogData.data.observation || 'No note content'"></p>
+                        </div>
+                    </template>
+
+                    <!-- Vital Signs (if provided with note) -->
+                    <template x-if="viewLogData.data.bp || viewLogData.data.temp || viewLogData.data.hr || viewLogData.data.pr || viewLogData.data.o2">
+                        <div class="text-xs font-semibold text-slate-400 mt-3 mb-2">Associated Vital Signs</div>
+                        <template x-if="viewLogData.data.bp">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">BLOOD PRESSURE</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.bp"></span>
+                            </div>
+                        </template>
+                        <template x-if="viewLogData.data.temp">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">TEMP</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.temp"></span>
+                            </div>
+                        </template>
+                        <template x-if="viewLogData.data.hr">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">HEART RATE</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.hr"></span>
+                            </div>
+                        </template>
+                        <template x-if="viewLogData.data.pr">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">PULSE RATE</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.pr"></span>
+                            </div>
+                        </template>
+                        <template x-if="viewLogData.data.o2">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">O2 SAT (%)</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.o2"></span>
+                            </div>
+                        </template>
                     </template>
                 </div>
             </template>
