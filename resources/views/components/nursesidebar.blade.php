@@ -369,12 +369,12 @@
                     </div>
                 </div>
                 <div class="overflow-hidden flex-1">
-                    <div class="font-semibold text-xs text-slate-800 truncate">{{ Auth::user()->name }}</div>
-                    <div class="text-xs text-slate-500 truncate">
+                    <div class="font-semibold text-xs text-slate-800 wrap-break">{{ Auth::user()->name }}</div>
+                    <div class="text-xs text-slate-500 wrap-break">
                         {{ Auth::user()->nurse->designation ?? 'Nurse' }} ({{ Auth::user()->badge_id }})
                     </div>
                     @if(in_array(Auth::user()->nurse->role_level, ['Head', 'Supervisor', 'Chief']))
-                        <div class="text-xs text-emerald-600 font-bold truncate">{{ Auth::user()->nurse->role_level }} Nurse</div>
+                        <div class="text-xs text-emerald-600 font-bold wrap-break">{{ Auth::user()->nurse->role_level }} Nurse</div>
                     @endif
                 </div>
             </div>

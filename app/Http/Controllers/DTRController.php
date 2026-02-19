@@ -73,11 +73,13 @@ class DTRController extends Controller
             $start = Carbon::parse($hangingDtr->time_in);
             $end = now();
             $hours = $start->diffInMinutes($end) / 60;
-            $today = now()->toDateString();
+            // Use the shift's START date (time_in), not the end date, for schedule lookup
+            // This handles overnight shifts correctly (e.g., 11 PM to 9 AM next day)
+            $shiftStartDate = Carbon::parse($hangingDtr->time_in)->toDateString();
 
-            // Check if nurse has a date schedule for today
+            // Check if nurse has a date schedule for the shift's start date
             $dateSchedule = $nurse->dateSchedules()
-                ->where('date', $today)
+                ->where('date', $shiftStartDate)
                 ->first();
 
             $status = 'Unscheduled';

@@ -147,27 +147,38 @@
                     <div class="toast toast-top toast-end z-50">
                         <div class="toast-enterprise-${type} flex items-center gap-3 px-4 py-3">
                             ${type === 'success' ? `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"shrink-0 h-5 w-5 text-emerald-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n                                    <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z\" />\n                                </svg>
                             ` : `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="shrink-0 h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m8-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"shrink-0 h-5 w-5 text-red-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n                                    <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2m8-2a9 9 0 11-18 0 9 9 0 0118 0z\" />\n                                </svg>
                             `}
                             <div class="text-sm">
                                 <span class="font-semibold">${type === 'success' ? 'Success!' : 'Error!'}</span> ${message}
                             </div>
+                            <button class="ml-2 text-slate-500 hover:text-slate-700 toast-close-btn" aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `;
 
                 const temp = document.createElement('div');
                 temp.innerHTML = toastHtml;
-                document.body.appendChild(temp.firstElementChild);
+                const toastEl = temp.firstElementChild;
+                document.body.appendChild(toastEl);
 
+                // Dismiss on close button click
+                const closeBtn = toastEl.querySelector('.toast-close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        toastEl.remove();
+                    });
+                }
+
+                // Auto-dismiss after 3 seconds
                 setTimeout(() => {
-                    temp.firstElementChild?.remove();
+                    toastEl?.remove();
                 }, 3000);
             },
 

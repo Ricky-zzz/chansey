@@ -3,23 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Clock - Golden Gate Academy</title>
+    <title>Time Clock - Golden Gate College</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gradient-to-br from-white to-emerald-50 min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center bg-yellow-50 py-12 px-4 sm:px-6 lg:px-8">
 
     <div class="w-full max-w-md">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="flex justify-center mb-6">
-                <div class="w-20 h-20 rounded-xl overflow-hidden ring-1 ring-slate-200 shadow-sm">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate Academy Logo" class="w-full h-full object-cover" />
-                </div>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Golden Gate Academy</h1>
-            <p class="text-base text-slate-500">Time Clock System</p>
-        </div>
-
         <!-- Messages -->
         @if ($errors->any())
             <div class="toast-enterprise-error flex items-start gap-3 mb-6 px-4 py-3">
@@ -48,7 +37,18 @@
         <!-- Form Card -->
         <div class="card-enterprise">
             <div class="p-8">
-                <h2 class="text-xl font-bold text-slate-800 mb-6">Clock In / Out</h2>
+                <!-- Logo -->
+                <div class="text-center mb-8">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-40 h-40 rounded-xl overflow-hidden ring-1 ring-slate-200 shadow-sm">
+                            <a href="/">
+                                <img src="{{ asset('images/logo.jpg') }}" alt="Golden Gate College Logo" class="w-full h-full object-cover" />
+                            </a>
+                        </div>
+                    </div>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-1">Golden Gate College</h1>
+                    <p class="text-sm text-slate-500">Time Clock System</p>
+                </div>
 
                 <form method="POST" action="{{ route('dtr.store') }}" class="space-y-6">
                     @csrf
@@ -60,7 +60,7 @@
                             type="text"
                             name="badge_id"
                             placeholder="e.g., NUR-001"
-                            class="input-enterprise w-full py-3 text-base"
+                            class="input-enterprise w-full py-3 text-base border border-slate-300 rounded-lg"
                             required
                             autofocus
                         />
@@ -76,7 +76,7 @@
                             type="password"
                             name="password"
                             placeholder="••••••••"
-                            class="input-enterprise w-full py-3 text-base"
+                            class="input-enterprise w-full py-3 text-base border border-slate-300 rounded-lg"
                             required
                         />
                         @error('password')
@@ -85,43 +85,40 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="form-control pt-4">
-                        <div class="flex gap-4">
-                            <!-- Time In Button -->
-                            <button
-                                type="submit"
-                                name="action"
-                                value="time_in"
-                                class="btn-enterprise-primary flex-1 py-3 text-base font-bold inline-flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0Z" />
-                                </svg>
-                                TIME IN
-                            </button>
+                    <div class="form-control pt-4 space-y-3">
+                        <!-- Time In Button -->
+                        <button
+                            type="submit"
+                            name="action"
+                            value="time_in"
+                            class="btn-enterprise-primary w-full py-3 text-base font-bold inline-flex items-center justify-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0Z" />
+                            </svg>
+                            TIME IN
+                        </button>
 
-                            <!-- Time Out Button -->
-                            <button
-                                type="submit"
-                                name="action"
-                                value="time_out"
-                                class="btn-enterprise-danger flex-1 py-3 text-base font-bold inline-flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
-                                </svg>
-                                TIME OUT
-                            </button>
-                        </div>
+                        <!-- Time Out Button -->
+                        <button
+                            type="submit"
+                            name="action"
+                            value="time_out"
+                            class="btn-enterprise-danger w-full py-3 text-base font-bold inline-flex items-center justify-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
+                            </svg>
+                            TIME OUT
+                        </button>
                     </div>
                 </form>
 
                 <!-- Footer Info -->
                 <div class="border-t border-slate-200 my-6"></div>
-                <div class="text-center">
-                    <p class="text-slate-600 text-sm mb-3">
-                        <span class="font-bold text-slate-700">Current Time:</span>
-                        <span id="clock" class="font-mono text-lg text-emerald-600 font-bold"></span>
+                <div class="text-center space-y-2">
+                    <p class="text-slate-700 text-sm font-semibold">
+                        Current Time: <span id="clock" class="font-mono text-lg text-emerald-600 font-bold"></span>
                     </p>
                     <p class="text-xs text-slate-500">
                         If you need assistance, contact the Head Nurse

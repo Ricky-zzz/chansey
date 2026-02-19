@@ -38,11 +38,11 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="stat-card">
             <div class="stat-title text-xs text-slate-500">From Nurse</div>
-            <div class="stat-value text-lg text-slate-800">{{ $endorsment->outgoingNurse->name }}</div>
+            <div class="stat-value text-sm text-slate-800">{{ $endorsment->outgoingNurse->name }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-title text-xs text-slate-500">To Nurse</div>
-            <div class="stat-value text-lg text-slate-800">{{ $endorsment->incomingNurse->user->name }}</div>
+            <div class="stat-value text-sm text-slate-800">{{ $endorsment->incomingNurse->user->name }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-title text-xs text-slate-500">Code Status</div>
@@ -152,81 +152,80 @@
             <span class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 rounded-full text-sm font-bold">A</span>
             Assessment
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {{-- Vitals --}}
-            @if($endorsment->latest_vitals)
-                <div class="border border-slate-200 rounded-lg p-4">
-                    <p class="text-xs text-slate-500 font-semibold uppercase mb-3">Latest Vitals</p>
-                    <div class="space-y-2">
-                        @foreach($endorsment->latest_vitals as $key => $value)
-                            <div class="flex justify-between">
-                                <span class="text-slate-600 text-sm">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                <span class="font-semibold text-slate-800">{{ $value }}</span>
-                            </div>
-                        @endforeach
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4 bg-white/60 rounded-lg p-4 border border-slate-100">
+                {{-- Vitals --}}
+                @if($endorsment->latest_vitals)
+                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                        <p class="text-xs text-slate-700 font-semibold uppercase mb-3 tracking-wide">Latest Vitals</p>
+                        <div class="space-y-2">
+                            @foreach($endorsment->latest_vitals as $key => $value)
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600 text-sm font-semibold">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                    <span class="font-semibold text-slate-800">{{ $value }}</span>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
+                @endif
+                {{-- IV Lines --}}
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <p class="text-xs text-slate-700 font-semibold uppercase mb-2 tracking-wide">IV Lines</p>
+                    @if($endorsment->iv_lines && count($endorsment->iv_lines) > 0)
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($endorsment->iv_lines as $iv)
+                                <li class="text-slate-800 text-sm">{{ $iv }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-slate-500 italic text-sm">None</p>
+                    @endif
                 </div>
-            @endif
-
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase mb-2">Pain Scale</p>
-                <p class="text-slate-800 font-semibold text-lg">{{ $endorsment->pain_scale ?? 'Not assessed' }}</p>
+                {{-- Wounds --}}
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <p class="text-xs text-slate-700 font-semibold uppercase mb-2 tracking-wide">Wounds / Incisions</p>
+                    @if($endorsment->wounds && count($endorsment->wounds) > 0)
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($endorsment->wounds as $wound)
+                                <li class="text-slate-800 text-sm">{{ $wound }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-slate-500 italic text-sm">None</p>
+                    @endif
+                </div>
             </div>
-
-            {{-- IV Lines --}}
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase mb-2">IV Lines</p>
-                @if($endorsment->iv_lines && count($endorsment->iv_lines) > 0)
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($endorsment->iv_lines as $iv)
-                            <li class="text-slate-800 text-sm">{{ $iv }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="text-slate-500 italic text-sm">None</p>
-                @endif
-            </div>
-
-            {{-- Wounds --}}
-            <div>
-                <p class="text-xs text-slate-500 font-semibold uppercase mb-2">Wounds / Incisions</p>
-                @if($endorsment->wounds && count($endorsment->wounds) > 0)
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($endorsment->wounds as $wound)
-                            <li class="text-slate-800 text-sm">{{ $wound }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="text-slate-500 italic text-sm">None</p>
-                @endif
-            </div>
-
-            {{-- Labs Pending --}}
-            <div class="md:col-span-2">
-                <p class="text-xs text-slate-500 font-semibold uppercase mb-2">Pending Labs</p>
-                @if($endorsment->labs_pending && count($endorsment->labs_pending) > 0)
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($endorsment->labs_pending as $lab)
-                            <li class="text-slate-800 text-sm">{{ $lab }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="text-slate-500 italic text-sm">None pending</p>
-                @endif
-            </div>
-
-            {{-- Abnormal Findings --}}
-            <div class="md:col-span-2">
-                <p class="text-xs text-slate-500 font-semibold uppercase mb-2">Abnormal Findings</p>
-                @if($endorsment->abnormal_findings && count($endorsment->abnormal_findings) > 0)
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($endorsment->abnormal_findings as $finding)
-                            <li class="text-slate-800 text-sm">{{ $finding }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="text-slate-500 italic text-sm">None documented</p>
-                @endif
+            <div class="space-y-4 bg-white/60 rounded-lg p-4 border border-slate-100">
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 flex flex-col items-center justify-center">
+                    <p class="text-xs text-slate-700 font-semibold uppercase mb-2 tracking-wide">Pain Scale</p>
+                    <p class="text-emerald-700 font-bold text-3xl">{{ $endorsment->pain_scale ?? 'Not assessed' }}</p>
+                </div>
+                {{-- Labs Pending --}}
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <p class="text-xs text-slate-700 font-semibold uppercase mb-2 tracking-wide">Pending Labs</p>
+                    @if($endorsment->labs_pending && count($endorsment->labs_pending) > 0)
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($endorsment->labs_pending as $lab)
+                                <li class="text-slate-800 text-sm">{{ $lab }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-slate-500 italic text-sm">None pending</p>
+                    @endif
+                </div>
+                {{-- Abnormal Findings --}}
+                <div class="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <p class="text-xs text-slate-700 font-semibold uppercase mb-2 tracking-wide">Abnormal Findings</p>
+                    @if($endorsment->abnormal_findings && count($endorsment->abnormal_findings) > 0)
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($endorsment->abnormal_findings as $finding)
+                                <li class="text-slate-800 text-sm">{{ $finding }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-slate-500 italic text-sm">None documented</p>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
