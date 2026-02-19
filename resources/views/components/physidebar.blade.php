@@ -1,6 +1,12 @@
 <div class="drawer-side z-20">
     <label for="my-drawer-2" class="drawer-overlay"></label>
-    <aside class="sidebar-enterprise flex flex-col">
+    <aside class="sidebar-enterprise flex flex-col relative">
+        <!-- Close Button (Mobile) -->
+        <label for="my-drawer-2" class="btn btn-square btn-ghost absolute top-4 right-4 lg:hidden z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </label>
 
         <!-- Brand -->
         <div class="mb-8 px-4 pt-4">

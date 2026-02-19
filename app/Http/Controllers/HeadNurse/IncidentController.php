@@ -55,7 +55,11 @@ class IncidentController extends Controller
             'allIncidents' => $allIncidents,
             'myReports' => $myReports,
             'myInvolvement' => $myInvolvement,
-            'stats' => $stats,
+            'totalCount' => $stats['total'],
+            'unresolvedCount' => $stats['unresolved'],
+            'investigatingCount' => $stats['investigating'],
+            'severeCount' => $stats['severeCount'],
+            'myInvolvementCount' => $myInvolvement->total(),
             'station' => $headNurse->station,
         ]);
     }
