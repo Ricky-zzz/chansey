@@ -31,3 +31,31 @@
 
 # GENSERVICE
 - SVC-FM-001, password
+
+
+# coomands
+- npm run build
+
+- php artisan config:cache
+- php artisan route:cache
+- php artisan view:cache
+- php artisan event:cache
+
+- php artisan optimize
+ 
+- php artisan filament:optimize
+
+- php artisan cache:clear
+- php artisan config:clear
+- php artisan route:clear
+- php artisan view:clear
+
+
+- APP_ENV=production
+- APP_DEBUG=false
+
+
+- php artisan optimize:clear
+- php artisan optimize
+- php artisan icons:cache
+- php artisan filament:optimize
