@@ -16,8 +16,14 @@ return new class extends Migration
         Schema::create('endorsment_notes', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('endorsment_id')->constrained('endorsments')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Who added the note
+            $table->foreignId('endorsment_id')
+                ->constrained('endorsments')
+                ->cascadeOnDelete()
+                ->name('fk_endorsment_notes_endorsment');
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->name('fk_endorsment_notes_user');
 
             $table->text('note'); // The amendment/correction note
             $table->string('note_type')->default('amendment'); // 'amendment', 'observation', 'clarification'

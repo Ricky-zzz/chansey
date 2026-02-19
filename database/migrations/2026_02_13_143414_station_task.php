@@ -15,22 +15,37 @@ return new class extends Migration
             $table->id();
 
             // Scope
-            $table->foreignId('station_id')->constrained()->cascadeOnDelete()->index(); // Which station this task belongs to
+            $table->foreignId('station_id')
+                ->constrained('stations')
+                ->cascadeOnDelete()
+                ->name('fk_station_tasks_station')
+                ->index();
 
             // Actors
-            $table->foreignId('created_by_user_id')->constrained('users')->index(); // Head Nurse
-            $table->foreignId('assigned_to_nurse_id')->constrained('nurses')->index(); // Staff Nurse
+            $table->foreignId('created_by_user_id')
+                ->constrained('users')
+                ->name('fk_station_tasks_created_by')
+                ->index();
+            $table->foreignId('assigned_to_nurse_id')
+                ->constrained('nurses')
+                ->cascadeOnDelete()
+                ->name('fk_station_tasks_assigned_to')
+                ->index();
 
             // Content
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('priority'); //'Low', 'Medium', 'High'
+            $table->string('priority');
 
-            // Optional link to an admission id order has somthing to do with an admission
-            $table->foreignId('admission_id')->nullable()->constrained()->nullOnDelete();
+            // Optional link to an admission id order has something to do with an admission
+            $table->foreignId('admission_id')
+                ->nullable()
+                ->constrained('admissions')
+                ->nullOnDelete()
+                ->name('fk_station_tasks_admission');
 
             // Workflow
-            $table->string('status')->default('Pending')->index(); // Pending -> In Progress -> Done
+            $table->string('status')->default('Pending')->index();
             $table->timestamp('completed_at')->nullable();
 
             $table->timestamps();

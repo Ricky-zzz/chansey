@@ -280,6 +280,21 @@
             </li>
             @endif
 
+            <!-- Safety Section (For All Users) -->
+            <li>
+                <span class="sidebar-section-title">Safety</span>
+            </li>
+
+            <li>
+                <a href="{{ route('nurse.incidents.index') }}"
+                    class="{{ request()->routeIs('nurse.incidents.*') ? 'sidebar-link-active' : 'sidebar-link' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c.866-1.5 2.845-2.422 4.303-2.422h13.882c1.458 0 2.437.922 3.303 2.422m0 0V18a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18V9.677m0 0A6.75 6.75 0 0 1 12 3c4.97 0 9.185 3.223 10.303 7.677m0 0v3.75m0 0v3.75" />
+                    </svg>
+                    Incident Reports
+                </a>
+            </li>
+
         </ul>
 
         <!-- User Footer (Sticky Bottom) -->

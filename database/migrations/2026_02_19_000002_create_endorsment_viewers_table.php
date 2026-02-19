@@ -16,8 +16,14 @@ return new class extends Migration
         Schema::create('endorsment_viewers', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('endorsment_id')->constrained('endorsments')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Who viewed it
+            $table->foreignId('endorsment_id')
+                ->constrained('endorsments')
+                ->cascadeOnDelete()
+                ->name('fk_endorsment_viewers_endorsment');
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->name('fk_endorsment_viewers_user');
             $table->timestamp('viewed_at')->useCurrent(); // When they viewed it
 
             // Indexes for quick lookups

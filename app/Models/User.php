@@ -149,6 +149,18 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(EndorsmentViewer::class);
     }
 
+    public function incidentsReported()
+    {
+        return $this->hasMany(Incident::class, 'created_by_id');
+    }
+
+    public function incidentsInvolved()
+    {
+        return $this->belongsToMany(Incident::class, 'incident_staff', 'staff_id', 'incident_id')
+            ->withPivot('role_in_incident')
+            ->withTimestamps();
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {

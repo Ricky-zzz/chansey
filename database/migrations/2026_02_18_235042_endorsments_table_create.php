@@ -16,13 +16,29 @@ return new class extends Migration
             $table->id();
 
             // A. Shift Information
-            $table->foreignId('station_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('admission_id')->constrained()->cascadeOnDelete(); // Per-admission endorsement
+            $table->foreignId('station_id')
+                ->constrained('stations')
+                ->cascadeOnDelete()
+                ->name('fk_endorsments_station');
+            $table->foreignId('admission_id')
+                ->constrained('admissions')
+                ->cascadeOnDelete()
+                ->name('fk_endorsments_admission');
 
             // Shift participants (from users table, matching with nurse roles)
-            $table->foreignId('outgoing_nurse_id')->constrained('users')->cascadeOnDelete(); // Creator
-            $table->foreignId('incoming_nurse_id')->constrained('users')->cascadeOnDelete(); // Receiver
-            $table->foreignId('submitted_by_id')->nullable()->constrained('users')->nullOnDelete(); // Formal submission
+            $table->foreignId('outgoing_nurse_id')
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->name('fk_endorsments_outgoing');
+            $table->foreignId('incoming_nurse_id')
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->name('fk_endorsments_incoming');
+            $table->foreignId('submitted_by_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete()
+                ->name('fk_endorsments_submitted_by');
 
             // Submission tracking (immutable after submission)
             $table->timestamp('submitted_at')->nullable(); // NULL = draft, SET = locked

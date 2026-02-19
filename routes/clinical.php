@@ -8,6 +8,7 @@ use \App\Http\Controllers\Clinical\OrderExecutionController;
 use App\Http\Controllers\Clinical\MyTaskController;
 use App\Http\Controllers\Clinical\PatientLoadController;
 use App\Http\Controllers\Clinical\EndorsmentController;
+use App\Http\Controllers\Clinical\IncidentController;
 use Illuminate\Support\Facades\Route;
 
 //  Clinical NURSES
