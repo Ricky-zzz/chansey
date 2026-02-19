@@ -135,8 +135,8 @@ class NurseResource extends Resource
                             ->label('Station Assignment')
                             ->preload()
                             ->searchable()
-                            ->visible(fn(Get $get): bool => $get('role_level') === 'Head')
-                            ->required(fn(Get $get): bool => $get('role_level') === 'Head')
+                            ->visible(fn(Get $get): bool => in_array($get('role_level'), ['Head', 'Staff']))
+                            ->required(fn(Get $get): bool => in_array($get('role_level'), ['Head', 'Staff']))
                             ->columnSpanFull(),
 
                         Select::make('unit_id')
@@ -237,22 +237,18 @@ class NurseResource extends Resource
                             ->label('Last Name'),
 
                         TextEntry::make('contact_number')
-                            ->label('Contact Number')
-                            ->default('—'),
+                            ->label('Contact Number'),
 
                         TextEntry::make('birthdate')
                             ->label('Date of Birth')
-                            ->date()
-                            ->default('—'),
+                            ->date(),
 
                         TextEntry::make('date_hired')
                             ->label('Date Hired')
-                            ->date()
-                            ->default('—'),
+                            ->date(),
 
                         TextEntry::make('address')
                             ->label('Address')
-                            ->default('—')
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
@@ -264,8 +260,7 @@ class NurseResource extends Resource
                             ->label('PRC License Number'),
 
                         TextEntry::make('nurseType.name')
-                            ->label('Nurse Type / Specialization')
-                            ->default('—'),
+                            ->label('Nurse Type / Specialization'),
 
                         TextEntry::make('designation')
                             ->label('Designation')
@@ -288,12 +283,15 @@ class NurseResource extends Resource
                             }),
 
                         TextEntry::make('station.station_name')
-                            ->label('Station Assignment')
-                            ->default('—'),
+                            ->label('Station Assignment'),
+
+                        TextEntry::make('station.unit.name')
+                            ->label('Unit / Building')
+                            ->visible(fn(?Nurse $record): bool => $record && in_array($record->role_level, ['Head', 'Staff'])),
 
                         TextEntry::make('unit.name')
                             ->label('Unit / Building')
-                            ->default('—'),
+                            ->visible(fn(?Nurse $record): bool => $record && $record->role_level === 'Supervisor'),
 
                         TextEntry::make('status')
                             ->label('Employment Status')
@@ -374,18 +372,20 @@ class NurseResource extends Resource
 
                 TextColumn::make('nurseType.name')
                     ->label('Nurse Type')
-                    ->default('—')
+                    ->default('-')
                     ->sortable(),
 
                 TextColumn::make('station.station_name')
                     ->label('Station')
-                    ->default('—')
-                    ->sortable(),
+                    ->default('-')
+                    ->sortable()
+                    ->visible(fn(?Nurse $record): bool => $record && in_array($record->role_level, ['Head', 'Staff', 'Chief'])),
 
                 TextColumn::make('unit.name')
                     ->label('Unit')
-                    ->default('—')
-                    ->sortable(),
+                    ->default('-')
+                    ->sortable()
+                    ->visible(fn(?Nurse $record): bool => $record && in_array($record->role_level, ['Supervisor', 'Chief'])),
 
                 TextColumn::make('status')
                     ->badge()
@@ -431,6 +431,15 @@ class NurseResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    \Filament\Actions\Action::make('viewStations')
+                        ->label('View Stations')
+                        ->icon('heroicon-o-building-library')
+                        ->visible(fn(Nurse $record): bool => $record->role_level === 'Supervisor' && $record->unit_id)
+                        ->slideOver()
+                        ->modalContent(fn(Nurse $record): \Illuminate\View\View => view('filament.modals.supervisor-stations', [
+                            'supervisor' => $record,
+                            'stations' => $record->unit->stations ?? collect(),
+                        ])),
                     \Filament\Actions\Action::make('dtrReport')
                         ->label('DTR Report')
                         ->icon('heroicon-o-document-text')
@@ -495,7 +504,6 @@ class NurseResource extends Resource
         return [
             'index' => Pages\ListNurses::route('/'),
             'create' => Pages\CreateNurse::route('/create'),
-            'view' => Pages\ViewNurse::route('/{record}'),
             'edit' => Pages\EditNurse::route('/{record}/edit'),
         ];
     }
