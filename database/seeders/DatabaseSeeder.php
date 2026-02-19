@@ -552,9 +552,9 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
+            StudentImportSeeder::class,
             PatientAdmissionSeeder::class,
             FloatingNurseSeeder::class,
-            StudentImportSeeder::class, // Import student nurses from tblnurses
         ]);
     }
 }

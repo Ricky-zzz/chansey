@@ -302,13 +302,24 @@ class StudentImportSeeder extends Seeder
 
         // Section names mapped to subjid
         $sectionNames = [
-            2638 => 'Section 2638',
-            2706 => 'Section 2706',
-            2707 => 'Section 2707',
-            2708 => 'Section 2708',
-            2709 => 'Section 2709',
-            2710 => 'Section 2710',
-            2711 => 'Section 2711',
+            2638 => 'Section A',
+            2706 => 'Section B',
+            2707 => 'Section C',
+            2708 => 'Section D',
+            2709 => 'Section E',
+            2710 => 'Section F',
+            2711 => 'Section G',
+        ];
+
+        // Short codes for use in station names, badges, emails
+        $sectionShortCodes = [
+            2638 => 'A',
+            2706 => 'B',
+            2707 => 'C',
+            2708 => 'D',
+            2709 => 'E',
+            2710 => 'F',
+            2711 => 'G',
         ];
 
         // ==================================================
@@ -354,10 +365,10 @@ class StudentImportSeeder extends Seeder
             ]);
 
             $unitStationMap[$unit->id] = [];
+            $shortCode = $sectionShortCodes[$subjid];
 
             // Create Stations for this Unit
             foreach ($stationTypes as $sType) {
-                $shortCode = substr($sectionName, -4); // e.g., "2638"
 
                 $station = Station::create([
                     'unit_id' => $unit->id,
@@ -412,7 +423,9 @@ class StudentImportSeeder extends Seeder
 
         foreach ($unitStationMap as $unitId => $stations) {
             $unit = Unit::find($unitId);
-            $shortCode = substr($unit->name, -4);
+            // Find subjid from unit name to get short code
+            $subjid = array_search($unit->name, $sectionNames);
+            $shortCode = $sectionShortCodes[$subjid];
 
             // A. Create Dummy Supervisor for this Unit
             $supUser = User::create([
@@ -503,7 +516,7 @@ class StudentImportSeeder extends Seeder
 
             $unitId = $unitIds[$sectionIndex];
             $stations = $unitStationMap[$unitId];
-            $shortCode = substr($sectionNames[$subjid], -4);
+            $shortCode = $sectionShortCodes[$subjid];
 
             // Separate students: ~20% to ADM, ~80% to Clinical Stations
             $totalStudents = count($students);
