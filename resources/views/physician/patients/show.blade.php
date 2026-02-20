@@ -1,9 +1,9 @@
 @extends('layouts.physician')
 
 @section('content')
-<div class="max-w-full mx-auto" x-data="clinicalChart()">
+<div class="max-w-full mx-auto flex flex-col h-screen overflow-hidden" x-data="clinicalChart()">
     <!-- BREADCRUMB -->
-    <div class="flex items-center gap-2 text-sm mb-3">
+    <div class="flex items-center gap-2 text-sm mb-3 shrink-0">
         <a href="{{ route('physician.dashboard') }}" class="text-slate-500 hover:text-emerald-600 transition-colors">Dashboard</a>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         <a href="{{ route('physician.mypatients.index') }}" class="text-slate-500 hover:text-emerald-600 transition-colors">My Patients</a>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- 1. HEADER: PATIENT CONTEXT -->
-    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 card-enterprise p-6">
+    <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 card-enterprise p-6 shrink-0">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                 <span class="text-2xl font-bold">{{ substr($admission->patient->first_name, 0, 1) }}</span>
@@ -73,11 +73,11 @@
     </div>
 
     <!-- 2. TOP GRID: LATEST STATUS & PLAN SUMMARY -->
-    <div class="grid grid-cols-1  lg:grid-cols-3 gap-6 h-[calc(100vh-300px)] overflow-hidden" x-data="{ orderView: 'active' }">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0 overflow-y-auto" x-data="{ orderView: 'active' }">
 
         <!-- LEFT COLUMN: ORDERS (ACTIVE OR HISTORY) (SCROLLABLE) -->
-        <div class="lg:col-span-1">
-            <div class="flex justify-between items-center mb-4 px-1">
+        <div class="lg:col-span-1 flex flex-col min-h-0">
+            <div class="flex justify-between items-center mb-4 px-1 shrink-0">
                 <h3 class="font-bold text-slate-700 text-lg" x-text="orderView === 'active' ? 'Active Orders' : 'Order History'"></h3>
                 <div class="flex border border-slate-200 rounded-lg overflow-hidden">
                     <button @click="orderView = 'active'" :class="orderView === 'active' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'" class="px-3 py-1 text-xs font-medium transition-colors">Active</button>
@@ -86,7 +86,7 @@
                 <span class="badge-enterprise bg-slate-100 text-slate-600 text-xs" x-text="orderView === 'active' ? {{ $admission->medicalOrders->count() }} : {{ $orderHistory->count() }}"></span>
             </div>
 
-            <div class="space-y-4 overflow-y-auto flex-1 m-1">
+            <div class="space-y-4 m-1 overflow-y-auto flex-1 min-h-0">
                 <!-- ACTIVE ORDERS -->
                 <template x-if="orderView === 'active'">
                     <div>
@@ -205,7 +205,7 @@
         </div>
 
         <!-- RIGHT COLUMN: CLINICAL STATUS -->
-        <div class="lg:col-span-2 space-y-6 h-full overflow-y-auto">
+        <div class="lg:col-span-2 space-y-6">
 
             <!-- A. LATEST CLINICAL STATUS & PLAN -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

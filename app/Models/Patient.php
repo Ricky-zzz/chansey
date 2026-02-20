@@ -34,7 +34,7 @@ class Patient extends Model
         'date_of_birth' => 'datetime',
     ];
 
-    protected $appends = ['formatted_date_of_birth'];
+    protected $appends = ['formatted_date_of_birth', 'full_name'];
 
     // --- RELATIONSHIPS ---
 

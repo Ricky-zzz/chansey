@@ -3,6 +3,9 @@
 namespace App\Filament\Supervisor\Resources\Incidents\Pages;
 
 use App\Filament\Supervisor\Resources\Incidents\IncidentResource;
+use Filament\Schemas\Components\Grid;
+use Filament\Infolists\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
@@ -15,132 +18,176 @@ class ViewIncident extends ViewRecord
     {
         return $schema
             ->schema([
-                // Incident Details
-                TextEntry::make('time_of_incident')
-                    ->label('Date & Time')
-                    ->dateTime('M d, Y H:i'),
+                // INCIDENT OVERVIEW
+                Section::make('Incident Overview')
+                    ->icon('heroicon-o-exclamation-triangle')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('time_of_incident')
+                                    ->label('Date & Time of Incident')
+                                    ->dateTime('M d, Y H:i'),
 
-                TextEntry::make('incident_category')
-                    ->label('Category')
-                    ->formatStateUsing(fn (string $state): string => str_replace('_', ' ', ucfirst($state))),
+                                TextEntry::make('time_reported')
+                                    ->label('Time Reported')
+                                    ->dateTime('M d, Y H:i'),
 
-                TextEntry::make('severity_level')
-                    ->label('Severity')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Severe' => 'danger',
-                        'High' => 'warning',
-                        'Moderate' => 'info',
-                        'Low' => 'success',
-                    }),
+                                TextEntry::make('incident_category')
+                                    ->label('Category')
+                                    ->formatStateUsing(fn(string $state): string => str_replace('_', ' ', ucfirst($state)))
+                                    ->columnSpan(1),
 
-                TextEntry::make('station.name')
-                    ->label('Station'),
+                                TextEntry::make('severity_level')
+                                    ->label('Severity Level')
+                                    ->badge()
+                                    ->color(fn(string $state): string => match ($state) {
+                                        'Severe' => 'danger',
+                                        'High' => 'warning',
+                                        'Moderate' => 'info',
+                                        'Low' => 'success',
+                                    }),
 
-                TextEntry::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'resolved' => 'success',
-                        'investigating' => 'warning',
-                        'unresolved' => 'danger',
-                    })
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                                TextEntry::make('station.station_name')
+                                    ->label('Station')
+                                    ->placeholder('No station assigned'),
 
-                TextEntry::make('location_details')
-                    ->label('Location'),
+                                TextEntry::make('location_details')
+                                    ->label('Location Details'),
 
-                // Patient & Staff
-                TextEntry::make('admission.patient.name')
-                    ->label('Patient')
-                    ->default('N/A'),
+                                TextEntry::make('status')
+                                    ->label('Status')
+                                    ->badge()
+                                    ->color(fn(string $state): string => match ($state) {
+                                        'resolved' => 'success',
+                                        'investigating' => 'warning',
+                                        'unresolved' => 'danger',
+                                    })
+                                    ->formatStateUsing(fn(string $state): string => ucfirst($state))
+                                    ->columnSpan(1),
+                            ]),
+                    ]),
 
-                TextEntry::make('createdBy.name')
-                    ->label('Reported By'),
+                // PATIENT & PERSONNEL
+                Section::make('Patient & Personnel')
+                    ->icon('heroicon-o-users')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
 
-                TextEntry::make('resolvedBy.name')
-                    ->label('Resolved By')
-                    ->default('Pending'),
+                                TextEntry::make('admission.patient.full_name')
+                                    ->label('Patient Name')
+                                    ->placeholder('No patient associated'),
 
-                TextEntry::make('time_reported')
-                    ->label('Time Reported')
-                    ->dateTime('M d, Y H:i'),
+                                TextEntry::make('createdBy.name')
+                                    ->label('Reported By'),
 
-                // Narrative
-                TextEntry::make('narrative')
-                    ->label('Summary'),
+                                TextEntry::make('resolvedBy.name')
+                                    ->label('Resolved By')
+                                    ->placeholder('Pending Resolution'),
+                            ]),
+                    ]),
 
-                TextEntry::make('what_happened')
-                    ->label('What Happened'),
+                // INCIDENT DETAILS
+                Section::make('Incident Details')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        TextEntry::make('narrative')
+                            ->label('Summary')
+                            ->columnSpanFull(),
 
-                TextEntry::make('how_discovered')
-                    ->label('How Discovered'),
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('what_happened')
+                                    ->label('What Happened'),
 
-                TextEntry::make('action_taken')
-                    ->label('Action Taken'),
+                                TextEntry::make('how_discovered')
+                                    ->label('How Discovered'),
 
-                // Clinical Data
-                TextEntry::make('vitals.temperature')
-                    ->label('Temperature')
-                    ->formatStateUsing(fn ($state) => $state ? $state . '°C' : 'N/A')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                                TextEntry::make('action_taken')
+                                    ->label('Action Taken')
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
 
-                TextEntry::make('vitals.bp')
-                    ->label('Blood Pressure')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                // CLINICAL VITALS
+                Section::make('Clinical Vitals')
+                    ->icon('heroicon-o-heart')
+                    ->visible(fn($record) => $record->vitals !== null)
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextEntry::make('vitals.temperature')
+                                    ->label('Temperature')
+                                    ->formatStateUsing(fn($state) => $state ? $state . '°C' : 'N/A'),
 
-                TextEntry::make('vitals.hr')
-                    ->label('Heart Rate')
-                    ->formatStateUsing(fn ($state) => $state ? $state . ' bpm' : 'N/A')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                                TextEntry::make('vitals.bp')
+                                    ->label('Blood Pressure'),
 
-                TextEntry::make('vitals.pr')
-                    ->label('Pulse Rate')
-                    ->formatStateUsing(fn ($state) => $state ? $state . ' bpm' : 'N/A')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                                TextEntry::make('vitals.hr')
+                                    ->label('Heart Rate')
+                                    ->formatStateUsing(fn($state) => $state ? $state . ' bpm' : 'N/A'),
 
-                TextEntry::make('vitals.rr')
-                    ->label('Respiratory Rate')
-                    ->formatStateUsing(fn ($state) => $state ? $state . ' /min' : 'N/A')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                                TextEntry::make('vitals.pr')
+                                    ->label('Pulse Rate')
+                                    ->formatStateUsing(fn($state) => $state ? $state . ' bpm' : 'N/A'),
 
-                TextEntry::make('vitals.o2')
-                    ->label('O2 Saturation')
-                    ->formatStateUsing(fn ($state) => $state ? $state . '%' : 'N/A')
-                    ->visible(fn ($record) => $record->vitals !== null),
+                                TextEntry::make('vitals.rr')
+                                    ->label('Respiratory Rate')
+                                    ->formatStateUsing(fn($state) => $state ? $state . ' /min' : 'N/A'),
 
-                // Injury & Notifications
-                TextEntry::make('injury')
-                    ->label('Injury Occurred')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Yes' : 'No')
-                    ->badge()
-                    ->color(fn (bool $state): string => $state ? 'danger' : 'success'),
+                                TextEntry::make('vitals.o2')
+                                    ->label('O2 Saturation')
+                                    ->formatStateUsing(fn($state) => $state ? $state . '%' : 'N/A'),
+                            ]),
+                    ]),
 
-                TextEntry::make('injury_type')
-                    ->label('Injury Type'),
+                // INJURY & NOTIFICATIONS
+                Section::make('Injury & Notifications')
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextEntry::make('injury')
+                                    ->label('Injury Occurred')
+                                    ->formatStateUsing(fn(bool $state): string => $state ? 'Yes' : 'No')
+                                    ->badge()
+                                    ->color(fn(bool $state): string => $state ? 'danger' : 'success'),
 
-                TextEntry::make('doctor_notified')
-                    ->label('Doctor Notified')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Yes' : 'No')
-                    ->badge()
-                    ->color(fn (bool $state): string => $state ? 'success' : 'warning'),
+                                TextEntry::make('injury_type')
+                                    ->label('Injury Type')
+                                    ->placeholder('No injury reported'),
 
-                TextEntry::make('family_notified')
-                    ->label('Family Notified')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Yes' : 'No')
-                    ->badge()
-                    ->color(fn (bool $state): string => $state ? 'success' : 'warning'),
+                                TextEntry::make('doctor_notified')
+                                    ->label('Doctor Notified')
+                                    ->formatStateUsing(fn(bool $state): string => $state ? 'Yes' : 'No')
+                                    ->badge()
+                                    ->color(fn(bool $state): string => $state ? 'success' : 'warning'),
 
-                // Root Cause & Follow-up
-                TextEntry::make('root_cause')
-                    ->label('Root Cause')
-                    ->formatStateUsing(fn ($state) => $state ? str_replace('_', ' ', ucfirst($state)) : 'N/A'),
+                                TextEntry::make('family_notified')
+                                    ->label('Family Notified')
+                                    ->formatStateUsing(fn(bool $state): string => $state ? 'Yes' : 'No')
+                                    ->badge()
+                                    ->color(fn(bool $state): string => $state ? 'success' : 'warning'),
+                            ]),
+                    ]),
 
-                TextEntry::make('follow_up_actions')
-                    ->label('Follow-up Actions'),
+                // ROOT CAUSE & FOLLOW-UP
+                Section::make('Root Cause & Follow-up')
+                    ->icon('heroicon-o-check-circle')
+                    ->schema([
+                        TextEntry::make('root_cause')
+                            ->label('Root Cause')
+                            ->formatStateUsing(fn($state) => $state ? str_replace('_', ' ', ucfirst($state)) : 'To be determined')
+                            ->columnSpanFull(),
 
-                TextEntry::make('follow_up_instructions')
-                    ->label('Follow-up Instructions'),
+                        TextEntry::make('follow_up_actions')
+                            ->label('Follow-up Actions')
+                            ->columnSpanFull(),
+
+                        TextEntry::make('follow_up_instructions')
+                            ->label('Follow-up Instructions')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

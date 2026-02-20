@@ -48,11 +48,6 @@ class StaffNursesTable
                     ->default('—')
                     ->sortable(),
 
-                TextColumn::make('station.station_name')
-                    ->label('Station')
-                    ->default('—')
-                    ->sortable(),
-
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => $state === 'Active' ? 'success' : 'gray')

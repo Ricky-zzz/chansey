@@ -22,7 +22,7 @@ html {
         @apply btn bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
     }
     .btn-enterprise-danger {
-        @apply btn bg-red-600 hover:bg-red-700 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;
+        @apply btn bg-red-600 hover:bg-red-700 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-7 min-h-0;
     }
     .btn-enterprise-warning {
         @apply btn bg-amber-500 hover:bg-amber-600 text-white border-0 rounded-lg shadow-sm font-medium normal-case h-9 min-h-0;

@@ -285,7 +285,7 @@
                     </template>
 
                     <!-- Vital Signs (if provided with note) -->
-                    <template x-if="viewLogData.data.bp || viewLogData.data.temp || viewLogData.data.hr || viewLogData.data.pr || viewLogData.data.o2">
+                    <template x-if="viewLogData.data.bp || viewLogData.data.temp || viewLogData.data.hr || viewLogData.data.pr || viewLogData.data.rr || viewLogData.data.o2">
                         <div class="text-xs font-semibold text-slate-400 mt-3 mb-2">Associated Vital Signs</div>
                         <template x-if="viewLogData.data.bp">
                             <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
@@ -309,6 +309,12 @@
                             <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
                                 <span class="font-semibold text-slate-500">PULSE RATE</span>
                                 <span class="font-mono text-slate-800" x-text="viewLogData.data.pr"></span>
+                            </div>
+                        </template>
+                        <template x-if="viewLogData.data.rr">
+                            <div class="flex justify-between text-sm border-b border-slate-200 pb-2">
+                                <span class="font-semibold text-slate-500">RESP RATE</span>
+                                <span class="font-mono text-slate-800" x-text="viewLogData.data.rr"></span>
                             </div>
                         </template>
                         <template x-if="viewLogData.data.o2">
