@@ -22,38 +22,19 @@ class IncomingMemos extends TableWidget
             return Memo::query()->where('id', null); // Return empty query if no nurse record
         }
 
-        // Get unit: from nurse record OR from station (for Head Nurses)
         $unitId = (int)($me->getUnitId() ?? 0);
         $stationId = (int)$me->station_id;
         $roleLevel = $me->role_level;
 
-        return Memo::query()
-            // Don't show my own memos in inbox
+        // Query using indexed pivot tables (fast!)
+        return Memo::with(['creator', 'targetRoles', 'targetUnits', 'targetStations'])
             ->where('created_by_user_id', '!=', $me->user_id)
-            ->where(function($q) use ($unitId, $stationId, $roleLevel) {
-
-                // STRICT MATCHING: All specified constraints must match
-
-                // Constraint 1: Role must match (if specified)
-                $q->where(function($roleCheck) use ($roleLevel) {
-                    $roleCheck->whereJsonContains('target_roles', $roleLevel)
-                              ->orWhereNull('target_roles')
-                              ->orWhereJsonLength('target_roles', 0);
-                })
-
-                // Constraint 2: Unit must match (if specified)
-                ->where(function($unitCheck) use ($unitId) {
-                    $unitCheck->whereJsonContains('target_units', $unitId)
-                              ->orWhereNull('target_units')
-                              ->orWhereJsonLength('target_units', 0);
-                })
-
-                // Constraint 3: Station must match (if specified)
-                ->where(function($stationCheck) use ($stationId) {
-                    $stationCheck->whereJsonContains('target_stations', $stationId)
-                                 ->orWhereNull('target_stations')
-                                 ->orWhereJsonLength('target_stations', 0);
-                });
+            // Role must match
+            ->whereHas('targetRoles', fn($q) => $q->where('role', $roleLevel))
+            // Station OR Unit must match
+            ->where(function($q) use ($unitId, $stationId) {
+                $q->whereHas('targetStations', fn($sq) => $sq->where('station_id', $stationId))
+                  ->orWhereHas('targetUnits', fn($uq) => $uq->where('unit_id', $unitId));
             })
             ->latest();
     }

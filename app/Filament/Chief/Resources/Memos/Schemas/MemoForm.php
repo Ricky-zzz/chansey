@@ -17,10 +17,17 @@ class MemoForm
 {
     public static function configure(Schema $schema): Schema
     {
+        // Preload options for "All" selectors
+        $allRoles = ['Staff', 'Head', 'Supervisor', 'Chief'];
+        $allUnits = Unit::pluck('id')->toArray();
+        $allStations = Station::pluck('id')->toArray();
+
         return $schema
+            ->columns(1)
             ->components([
                 Section::make('Announcement Details')
                     ->description('Create a new announcement for staff and units.')
+                    ->columns(1)
                     ->schema([
                         TextInput::make('title')
                             ->label('Announcement Title')
@@ -46,103 +53,99 @@ class MemoForm
                     ]),
 
                 Section::make('Target Audience')
-                    ->description('**TARGETING RULES:** Select roles, then optionally narrow by location. Stations are automatically filtered to match selected units. Leave Units/Stations empty for GLOBAL broadcast. Specify them for TARGETED messaging. Strict role matching is enforced.')
+                    ->description('Select who should receive this memo. Use "All" options to auto-populate all entries.')
+                    ->columns(1)
                     ->schema([
-                        Select::make('target_roles')
+                        Select::make('target_roles_input')
                             ->label('Target by Role')
                             ->options([
+                                '*all*' => '✓ All Roles',
                                 'Staff' => 'Staff',
                                 'Head' => 'Head Nurse',
                                 'Supervisor' => 'Supervisor',
                                 'Chief' => 'Chief Nurse',
-                                '*all*' => '✓ All Roles',
                             ])
                             ->multiple()
-                            ->nullable()
+                            ->required()
                             ->live()
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                $roles = $get('target_roles');
+                            ->afterStateUpdated(function (Get $get, Set $set) use ($allRoles) {
+                                $roles = $get('target_roles_input');
                                 if (is_array($roles) && in_array('*all*', $roles)) {
-                                    $set('target_roles', [
-                                        'Staff', 'Head', 'Supervisor', 'Chief'
-                                    ]);
+                                    $set('target_roles_input', $allRoles);
                                 }
                             })
                             ->columnSpanFull(),
 
-                        Select::make('target_units')
+                        Select::make('target_units_input')
                             ->label('Target by Unit')
                             ->options(
-                                Unit::all()->mapWithKeys(fn($unit) => [
+                                ['*all*' => '✓ All Units'] + Unit::all()->mapWithKeys(fn($unit) => [
                                     $unit->id => $unit->name,
-                                ])->toArray() + ['*all*' => '✓ All Units']
+                                ])->toArray()
                             )
                             ->placeholder('Select units...')
                             ->multiple()
-                            ->nullable()
+                            ->required()
                             ->live()
-                            ->afterStateUpdated(function (Get $get, Set $set) {
-                                $units = $get('target_units');
+                            ->afterStateUpdated(function (Get $get, Set $set) use ($allUnits, $allStations) {
+                                $units = $get('target_units_input');
                                 if (is_array($units) && in_array('*all*', $units)) {
-                                    // Get all unit IDs as integers
-                                    $allUnitIds = Unit::pluck('id')->toArray();
-                                    $set('target_units', $allUnitIds);
+                                    // When "All Units" is selected, auto-populate all units AND all stations
+                                    $set('target_units_input', $allUnits);
+                                    $set('target_stations_input', $allStations);
                                 } else {
                                     // Clear stations that don't belong to selected units
-                                    $selectedStations = $get('target_stations');
-                                    if (is_array($selectedStations) && !empty($units) && !in_array('*all*', $units)) {
+                                    $selectedStations = $get('target_stations_input');
+                                    if (is_array($selectedStations) && !empty($units)) {
                                         $validStations = Station::whereIn('unit_id', $units)->pluck('id')->toArray();
                                         $filteredStations = array_intersect($selectedStations, $validStations);
                                         if (count($filteredStations) !== count($selectedStations)) {
-                                            $set('target_stations', array_values($filteredStations));
+                                            $set('target_stations_input', array_values($filteredStations));
                                         }
                                     }
                                 }
                             })
                             ->columnSpanFull(),
 
-                        Select::make('target_stations')
+                        Select::make('target_stations_input')
                             ->label('Target by Station/Ward')
                             ->options(function (Get $get) {
-                                $selectedUnits = $get('target_units');
+                                $selectedUnits = $get('target_units_input');
 
-                                // If no units selected or "*all*" was used, show all stations
                                 if (empty($selectedUnits) || !is_array($selectedUnits)) {
-                                    return Station::all()->mapWithKeys(fn($station) => [
-                                        $station->id => $station->station_name . ' (' . $station->unit->name . ')',
-                                    ])->toArray() + ['*all*' => '✓ All Stations'];
+                                    return ['*all*' => '✓ All Stations'] + Station::with('unit')->get()->mapWithKeys(fn($station) => [
+                                        $station->id => $station->station_name . ' (' . ($station->unit->name ?? 'N/A') . ')',
+                                    ])->toArray();
                                 }
 
-                                // Filter stations by selected units
-                                return Station::whereIn('unit_id', $selectedUnits)
+                                return ['*all*' => '✓ All Stations (in selected units)'] + Station::whereIn('unit_id', $selectedUnits)
+                                    ->with('unit')
                                     ->get()
                                     ->mapWithKeys(fn($station) => [
-                                        $station->id => $station->station_name . ' (' . $station->unit->name . ')',
-                                    ])->toArray() + ['*all*' => '✓ All Stations (in selected units)'];
+                                        $station->id => $station->station_name . ' (' . ($station->unit->name ?? 'N/A') . ')',
+                                    ])->toArray();
                             })
                             ->placeholder('Select stations...')
                             ->multiple()
-                            ->nullable()
+                            ->required()
                             ->live()
                             ->afterStateUpdated(function (Get $get, Set $set) {
-                                $stations = $get('target_stations');
-                                $selectedUnits = $get('target_units');
+                                $stations = $get('target_stations_input');
+                                $selectedUnits = $get('target_units_input');
 
                                 if (is_array($stations) && in_array('*all*', $stations)) {
-                                    // If units are selected, get all stations in those units
                                     if (!empty($selectedUnits) && is_array($selectedUnits)) {
                                         $allStationIds = Station::whereIn('unit_id', $selectedUnits)->pluck('id')->toArray();
                                     } else {
-                                        // Otherwise get all stations
                                         $allStationIds = Station::pluck('id')->toArray();
                                     }
-                                    $set('target_stations', $allStationIds);
+                                    $set('target_stations_input', $allStationIds);
                                 }
                             })
                             ->helperText(fn(Get $get) =>
-                                !empty($get('target_units'))
+                                !empty($get('target_units_input'))
                                     ? '✓ Filtered to show only stations in selected units'
-                                    : 'Select units first to filter stations, or leave empty for global'
+                                    : 'Select units first to filter stations'
                             )
                             ->columnSpanFull(),
                     ]),

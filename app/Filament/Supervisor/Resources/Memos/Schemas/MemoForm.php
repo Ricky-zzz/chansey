@@ -24,14 +24,17 @@ class MemoForm
         $stationOptions = $stations->mapWithKeys(fn($station) => [
             $station->id => $station->station_name,
         ])->toArray();
+        $allStationIds = $stations->pluck('id')->toArray();
 
         return $schema
+            ->columns(1)
             ->components([
                 Hidden::make('created_by_user_id')
                     ->default(fn() => Auth::id()),
 
                 Section::make('Announcement Details')
                     ->description('Create a new announcement for staff in your unit.')
+                    ->columns(1)
                     ->schema([
                         TextInput::make('title')
                             ->label('Announcement Title')
@@ -57,25 +60,41 @@ class MemoForm
                     ]),
 
                 Section::make('Target Audience')
-                    ->description('**IMPORTANT:** Memos are automatically restricted to YOUR UNIT. Select roles to target specific positions. Leave stations empty to send to ALL stations in your unit, or select specific stations.')
+                    ->description('Memos are automatically restricted to YOUR UNIT. Select roles and stations.')
+                    ->columns(1)
                     ->schema([
-                        Select::make('target_roles')
+                        Select::make('target_roles_input')
                             ->label('Target by Role')
                             ->options([
+                                '*all*' => '✓ All Roles',
                                 'Staff' => 'Staff',
                                 'Head' => 'Head Nurse',
                             ])
                             ->multiple()
-                            ->nullable()
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                $roles = $get('target_roles_input');
+                                if (is_array($roles) && in_array('*all*', $roles)) {
+                                    $set('target_roles_input', ['Staff', 'Head']);
+                                }
+                            })
                             ->columnSpanFull(),
 
-                        Select::make('target_stations')
+                        Select::make('target_stations_input')
                             ->label('Target by Station/Ward')
-                            ->options($stationOptions)
+                            ->options(['*all*' => '✓ All Stations'] + $stationOptions)
                             ->placeholder('Select stations...')
                             ->multiple()
-                            ->nullable()
-                            ->helperText('✓ Showing only stations in your unit. Leave empty to send to all stations.')
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set) use ($allStationIds) {
+                                $stations = $get('target_stations_input');
+                                if (is_array($stations) && in_array('*all*', $stations)) {
+                                    $set('target_stations_input', $allStationIds);
+                                }
+                            })
+                            ->helperText('✓ Showing only stations in your unit.')
                             ->columnSpanFull(),
                     ]),
             ]);

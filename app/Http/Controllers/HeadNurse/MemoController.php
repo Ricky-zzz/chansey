@@ -12,7 +12,8 @@ class MemoController extends Controller
 {
     public function index()
     {
-        $memos = Memo::where('created_by_user_id', Auth::id())
+        $memos = Memo::with(['targetRoles', 'targetStations'])
+            ->where('created_by_user_id', Auth::id())
             ->latest()
             ->paginate(15);
 
@@ -47,15 +48,16 @@ class MemoController extends Controller
             $attachmentPath = $request->file('attachment')->store('memos/attachments', 'public');
         }
 
-        Memo::create([
+        $memo = Memo::create([
             'created_by_user_id' => Auth::id(),
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'target_roles' => ['Staff'], // Lock to Staff only
-            'target_units' => null, // Units are null for station heads
-            'target_stations' => [(int)$headNurse->station_id], // Head nurse's station (force int)
             'attachment_path' => $attachmentPath,
         ]);
+
+        // Head nurse targets Staff in their station only
+        $memo->syncTargetRoles(['Staff']);
+        $memo->targetStations()->sync([$headNurse->station_id]);
 
         return redirect()->route('nurse.headnurse.memos.index')
             ->with('success', 'Memo created successfully!');

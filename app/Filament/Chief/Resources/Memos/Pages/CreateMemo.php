@@ -17,6 +17,25 @@ class CreateMemo extends CreateRecord
         return $data;
     }
 
+    protected function afterCreate(): void
+    {
+        $record = $this->record;
+        $data = $this->data;
+
+        // Sync pivot tables
+        if (!empty($data['target_roles_input'])) {
+            $record->syncTargetRoles($data['target_roles_input']);
+        }
+
+        if (!empty($data['target_units_input'])) {
+            $record->targetUnits()->sync($data['target_units_input']);
+        }
+
+        if (!empty($data['target_stations_input'])) {
+            $record->targetStations()->sync($data['target_stations_input']);
+        }
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

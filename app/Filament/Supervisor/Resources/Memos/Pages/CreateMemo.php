@@ -13,20 +13,36 @@ class CreateMemo extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $data['created_by_user_id'] = Auth::id();
+        return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        $record = $this->record;
+        $data = $this->data;
         $supervisor = Auth::user()->nurse;
 
-        // Always force target_units to supervisor's unit
-        $data['target_units'] = [(int)$supervisor->unit_id];
-
-        // If target_stations is empty, populate with all stations under this unit
-        if (empty($data['target_stations']) || !is_array($data['target_stations'])) {
-            $allStationIds = Station::where('unit_id', $supervisor->unit_id)
-                ->pluck('id')
-                ->map(fn($id) => (int)$id)
-                ->toArray();
-            $data['target_stations'] = $allStationIds;
+        // Sync target roles
+        if (!empty($data['target_roles_input'])) {
+            $record->syncTargetRoles($data['target_roles_input']);
         }
 
-        return $data;
+        // Force target unit to supervisor's unit
+        $record->targetUnits()->sync([$supervisor->unit_id]);
+
+        // Sync target stations (already filtered to unit in form)
+        if (!empty($data['target_stations_input'])) {
+            $record->targetStations()->sync($data['target_stations_input']);
+        } else {
+            // If empty, target all stations in supervisor's unit
+            $allStationIds = Station::where('unit_id', $supervisor->unit_id)->pluck('id')->toArray();
+            $record->targetStations()->sync($allStationIds);
+        }
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

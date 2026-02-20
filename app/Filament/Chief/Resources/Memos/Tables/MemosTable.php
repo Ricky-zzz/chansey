@@ -32,14 +32,10 @@ class MemosTable
                         return htmlspecialchars($preview);
                     }),
 
-                TextColumn::make('target_roles')
+                TextColumn::make('targetRoles.role')
                     ->label('Target Roles')
                     ->getStateUsing(function ($record) {
-                        $roles = $record->target_roles;
-                        if (empty($roles) || !is_array($roles)) {
-                            return '—';
-                        }
-                        $roles = array_filter($roles);
+                        $roles = $record->targetRoles->pluck('role')->toArray();
                         if (empty($roles)) {
                             return '—';
                         }
@@ -51,18 +47,10 @@ class MemosTable
                         return $display;
                     }),
 
-                TextColumn::make('target_units')
+                TextColumn::make('targetUnits.name')
                     ->label('Target Units')
                     ->getStateUsing(function ($record) {
-                        $units = $record->target_units;
-                        if (empty($units) || !is_array($units)) {
-                            return '—';
-                        }
-                        $units = array_filter($units);
-                        if (empty($units)) {
-                            return '—';
-                        }
-                        $unitNames = \App\Models\Unit::whereIn('id', $units)->pluck('name')->toArray();
+                        $unitNames = $record->targetUnits->pluck('name')->toArray();
                         if (empty($unitNames)) {
                             return '—';
                         }
@@ -74,18 +62,10 @@ class MemosTable
                         return $display;
                     }),
 
-                TextColumn::make('target_stations')
+                TextColumn::make('targetStations.station_name')
                     ->label('Target Stations')
                     ->getStateUsing(function ($record) {
-                        $stations = $record->target_stations;
-                        if (empty($stations) || !is_array($stations)) {
-                            return '—';
-                        }
-                        $stations = array_filter($stations);
-                        if (empty($stations)) {
-                            return '—';
-                        }
-                        $stationNames = \App\Models\Station::whereIn('id', $stations)->pluck('station_name')->toArray();
+                        $stationNames = $record->targetStations->pluck('station_name')->toArray();
                         if (empty($stationNames)) {
                             return '—';
                         }
